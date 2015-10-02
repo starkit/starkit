@@ -1,4 +1,4 @@
-Astropy affiliated package template
+starkit
 ===================================
 
 .. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
