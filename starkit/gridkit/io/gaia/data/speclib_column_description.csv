@@ -1,0 +1,76 @@
+name,description,type,units
+object,star,string,
+type,BPRP or RVS,string,
+provider,name or initials,string,
+date,date,string,yyyymmdd
+version,0x,string,
+code,name of the Code used,string,
+fluxnorm,0 or 1,int,
+resolution,power of resolution,float,
+ntot,nb of points,long,
+lambda0,lambda start,float,nm
+lambdaEnd,lambda at end of spectrum,float,nm
+dlambda,lambda step,float,nm
+teff,effective temperature,float,K
+logg,log surface gravity,float,cgs
+vturb,microturbulence,float,km/s
+vrot,rotational velocity,float,km/s
+y,helium content (mass fraction),float,
+zmetal,metallicity (mass fraction),float,
+feref,iron abundance (log H = 12),float,dex
+alphaFe,ratio alpha element / Fe,float,dex
+cAbund,carbon abundance (log H = 12),float,dex
+nAbund,nitrogen abundance (log H = 12),float,dex
+oAbund,oxygen abundance (log H = 12),float,dex
+mgAbund,magnesium abundance (log H = 12),float,dex
+siAbund,silicon abundance (log H = 12),float,dex
+caAbund,calcium abundance (log H = 12),float,dex
+feAbund,iron abundance (log H = 12),float,dex
+mass,stellar mass,float,Solar Mass
+gMag,computed G magnitude otherwise 999,float,
+bcG,computed bolometric correction in G otherwise 999,float,
+aV,reddening once applied otherwise 999,float,
+startype,type of extrem stars like Be WR ApBp HgMn,string,
+numMod,model number for Be WR,long,
+heAbund,helium abundance (log H = 12),float,dex
+neAbund,neon abundance (log H = 12),float,dex
+naAbund,sodium abundance (log H = 12),float,dex
+alAbund,aluminium abundance (log H = 12),float,dex
+pAbund,phosphorus abundance (log H = 12),float,dex
+sAbund,sulphur abundance (log H = 12),float,dex
+clAbund,clorine abundance (log H = 12),float,dex
+scAbund,scandium abundance (log H = 12),float,dex
+tiAbund,titanium abundance (log H = 12),float,dex
+vAbund,vanadium abundance (log H = 12),float,dex
+crAbund,chromium abundance (log H = 12),float,dex
+mnAbund,manganese abundance (log H = 12),float,dex
+coAbund,cobalt abundance (log H = 12),float,dex
+niAbund,nickel abundance (log H = 12),float,dex
+cuAbund,copper abundance (log H = 12),float,dex
+znAbund,zinc abundance (log H = 12),float,dex
+gaAbund,gallium abundance (log H = 12),float,dex
+srAbund,strontium abundance (log H = 12),float,dex
+ytAbund,yttrium abundance (log H = 12),float,dex
+zrAbund,zirconium abundance (log H = 12),float,dex
+moAbund,molybdenum abundance (log H = 12),float,dex
+xeAbund,xenon abundance (log H = 12),float,dex
+baAbund,barium abundance (log H = 12),float,dex
+laAbund,lanthanum abundance (log H = 12),float,dex
+ceAbund,cerium abundance (log H = 12),float,dex
+prAbund,praeseodymium abundance (log H = 12),float,dex
+ndAbund,neodymium abundance (log H = 12),float,dex
+smAbund,samarium abundance (log H = 12),float,dex
+euAbund,europium abundance (log H = 12),float,dex
+gdAbund,gadolinium abundance (log H = 12),float,dex
+tbAbund,terbium abundance (log H = 12),float,dex
+dyAbund,dysprosium abundance (log H = 12),float,dex
+hoAbund,holmium abundance (log H = 12),float,dex
+erAbund,erbium abundance (log H = 12),float,dex
+tmAbund,thulium abundance (log H = 12),float,dex
+ybAbund,ytterbium abundance (log H = 12),float,dex
+luAbund,lutetium abundance (log H = 12),float,dex
+ptAbund,platinum abundance (log H = 12),float,dex
+auAbund,gold abundance (log H = 12),float,dex
+hgAbund,mercury abundance (log H = 12),float,dex
+thAbund,thorium abundance (log H = 12),float,dex
+uAbund,uranium abundance (log H = 12),float,dex
