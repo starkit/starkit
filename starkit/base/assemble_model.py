@@ -67,8 +67,8 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
                     current_stellar_operation = operation.from_grid(
                         spectral_grid, **param_values)
                 elif 'Grism' in operation.__name__:
-                    current_stellar_operation = operation(
-                        parameters.pop('R_wavelength'), **param_values)
+                    current_stellar_operation = operation.from_grid(
+                        parameters.pop('R_wavelength'), spectral_grid, **param_values)
                 else:
                     current_stellar_operation = operation(**param_values)
                 if observation_model is None:

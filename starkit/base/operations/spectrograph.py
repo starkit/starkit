@@ -85,23 +85,34 @@ class InstrumentConvolveGrism(SpectrographOperationModel):
     R = modeling.Parameter()
     requires_observed_spectrum = False
 
+    @classmethod
+    def from_grid(cls, wavelength, grid, R=np.inf):
+        grid_R = getattr(grid, 'R', None)
+        grid_sampling = getattr(grid, 'R_sampling', None)
+        return cls(wavelength, R=R, grid_R=grid_R, grid_sampling=grid_sampling)
 
-    def __init__(self, wavelength, R=np.inf, sampling=4):
+
+    def __init__(self, wavelength, R, grid_R, sampling=4, ):
         super(InstrumentConvolveGrism, self).__init__(R=R)
         self.wavelength = wavelength
         self.sampling = sampling
+        self.fwhm2sigma = 1 / (2 * np.sqrt(np.log(2) * 2))
 
     def evaluate(self, wavelength, flux, R):
 
         if np.isinf(R):
             return wavelength, flux
 
-        delta_lambda = R / self.wavelength
+        rescaled_R = 1 / np.sqrt((1/R)**2 - (1 / self.grid_R)**2 )
+
+        delta_lambda = (rescaled_R / self.wavelength) * self.fwhm2sigma
 
         new_wavelength = np.arange(wavelength[0], wavelength[-1],
                                    delta_lambda / self.sampling)
 
-        return new_wavelength, np.interp(new_wavelength, wavelength, flux)
+        new_flux = np.interp(new_wavelength, wavelength, flux)
+
+        return new_wavelength, nd.gaussian_filter1d(new_flux, self.sampling)
 
 
 
