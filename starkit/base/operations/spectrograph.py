@@ -104,7 +104,7 @@ class InstrumentConvolveGrism(SpectrographOperationModel):
             return wavelength, flux
 
         rescaled_R = 1 / np.sqrt((1/R)**2 - (1 / self.grid_R)**2 )
-        
+
         delta_lambda = (self.wavelength / rescaled_R) * self.fwhm2sigma
 
 
