@@ -141,6 +141,7 @@ class MultiNestResult(object):
 
             # sort the parameter in order to create the CDF
             param_x = self.posterior_data[param_name]
+
             weights = np.copy(self.posterior_data['weights'])
             ind = np.argsort(param_x)
             weights = np.array(weights[ind])
