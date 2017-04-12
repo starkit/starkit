@@ -42,7 +42,7 @@ class MultiNestResult(object):
 
 
     @classmethod
-    def from_multinest_basename(cls, basename, parameter_names):
+    def from_multinest_basename(cls, basename, parameter_names,equal_weights=False):
         """
         Reading a MultiNest result from a basename
 
@@ -52,11 +52,17 @@ class MultiNestResult(object):
         basename: str
             basename (path + prefix) for a multinest run
 
+        Keywords
+        --------
+        equal_weights - load the equally weighted chains instead
+
         Returns
             : ~MultinestResult
         """
-
-        posterior_data = cls.read_posterior_data(basename, parameter_names)
+        if equal_weights:
+            posterior_data = cls.read_posterior_data(basename, parameter_names)
+        else:
+            posterior_data = cls.read_equal_posterior_data(basename, parameter_names)
 
         return cls(posterior_data)
 
@@ -79,9 +85,23 @@ class MultiNestResult(object):
 
         return cls(posterior_data)
 
-
     @staticmethod
     def read_posterior_data(basename, parameter_names):
+        """
+        Reading the posterior data into a pandas dataframe
+
+        Multinest weighted posterior file blah_.txt has the following format
+        weights, log likelihood, parameters
+        """
+
+        posterior_data = pd.read_csv(
+            '{0}_.txt'.format(basename),
+            delim_whitespace=True, names=['weights']+['loglikelihood']+parameter_names)
+        posterior_data.index = np.arange(len(posterior_data))
+        return posterior_data
+
+    @staticmethod
+    def read_equal_posterior_data(basename, parameter_names):
         """
         Reading the posterior data into a pandas dataframe
 
@@ -91,12 +111,17 @@ class MultiNestResult(object):
             '{0}_post_equal_weights.dat'.format(basename),
             delim_whitespace=True, names=parameter_names + ['x'])
         posterior_data.index = np.arange(len(posterior_data))
+
+        # since the chain is equally weighted, we should just put equal weights
+        # in
+        posterior_data['weights'] = np.zeros(len(posterior_data))+1.0/float(len(posterior_data))
+
         return posterior_data
 
     def __init__(self, posterior_data):
         self.posterior_data = posterior_data
         self.parameter_names = [col_name for col_name in posterior_data.columns
-                                if col_name not in ['x']]
+                                if col_name not in ['x','weights','loglikelihood']]
 
 
     @property
@@ -113,8 +138,17 @@ class MultiNestResult(object):
     def calculate_sigmas(self, sigma_number):
         sigma_dict = []
         for param_name in self.parameter_names:
-            param_x = self.posterior_data[param_name].sort(inplace=False)
-            k = np.linspace(0, 1, len(param_x))
+
+            # sort the parameter in order to create the CDF
+            param_x = self.posterior_data[param_name]
+            weights = np.copy(self.posterior_data['weights'])
+            ind = np.argsort(param_x)
+            weights = np.array(weights[ind])
+            #k = [np.sum(weights[0:i+1]) for i in xrange(len(weights))]
+
+            # make CDF of the weights to determine sigmas later
+            k = np.cumsum(weights)
+
             sigma_lower = np.interp(stats.norm.cdf(-sigma_number), k, param_x)
             sigma_upper = np.interp(stats.norm.cdf(sigma_number), k, param_x)
             sigma_dict.append((param_name, (sigma_lower, sigma_upper)))
@@ -122,11 +156,12 @@ class MultiNestResult(object):
 
     def plot_triangle(self, **kwargs):
         try:
-            from triangle import corner
+            from corner import corner
         except ImportError:
-            raise ImportError('Plotting requires trianglepy')
+            raise ImportError('Plotting requires corner.py')
         corner(self.posterior_data[self.parameter_names],
-               labels=self.parameter_names, **kwargs)
+               labels=self.parameter_names,
+               weights=self.posterior_data['weights'], **kwargs)
 
     def to_hdf(self, fname_or_buf, key='multinest'):
         """
