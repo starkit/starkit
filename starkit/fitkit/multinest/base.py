@@ -60,9 +60,9 @@ class MultiNestResult(object):
             : ~MultinestResult
         """
         if equal_weights:
-            posterior_data = cls.read_posterior_data(basename, parameter_names)
-        else:
             posterior_data = cls.read_equal_posterior_data(basename, parameter_names)
+        else:
+            posterior_data = cls.read_posterior_data(basename, parameter_names)
 
         return cls(posterior_data)
 

@@ -25,6 +25,31 @@ class SpectralChi2Likelihood(StarKitModel):
             return -1e300
         return loglikelihood
 
+    
+class SpectralL1Likelihood(StarKitModel):
+    # this likelihood is for the L1 norm, which is appropriate for
+    # Laplacian noise, or to have less sensitvity to outliers. 
+    inputs = ('wavelength', 'flux')
+    outputs = ('loglikelihood', )
+
+    def __init__(self, observed):
+        super(SpectralL1Likelihood, self).__init__()
+        self.observed_wavelength = observed.wavelength.to(u.angstrom).value
+        self.observed_flux = observed.flux.value
+        self.observed_uncertainty = getattr(observed, 'uncertainty', None)
+        if self.observed_uncertainty is not None:
+            self.observed_uncertainty = self.observed_uncertainty.value
+        else:
+            self.observed_uncertainty = np.ones_like(self.observed_wavelength)
+
+
+    def evaluate(self, wavelength, flux):
+        loglikelihood =  -1.0*np.sum(
+            np.abs(self.observed_flux - flux) / self.observed_uncertainty)
+        if np.isnan(loglikelihood):
+            return -1e300
+        return loglikelihood
+
 class PhotometryColorLikelihood(StarKitModel):
     inputs = ('photometry',)
     outputs = ('loglikelihood',)
