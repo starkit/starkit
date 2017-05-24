@@ -132,6 +132,13 @@ class MultiNestResult(object):
     def median(self):
         return self.posterior_data[self.parameter_names].median()
 
+    @property
+    def maximum(self):
+        # returns the maximum in the posterior
+        if 'weights' in self.posterior_data.columns:
+            max_ind = self.posterior_data.weights.argmax()
+            return self.posterior_data[self.parameter_names].iloc[max_ind]
+
     def __repr__(self):
         return "<MultiNest Result (median)\n{0}>".format(self.median.__repr__())
 
@@ -155,14 +162,29 @@ class MultiNestResult(object):
             sigma_dict.append((param_name, (sigma_lower, sigma_upper)))
         return OrderedDict(sigma_dict)
 
-    def plot_triangle(self, **kwargs):
+    def plot_triangle(self, parameters = None, **kwargs):
+        '''
+        Produce a corner plot of the chains posterior.
+
+        Keywords
+        --------
+        parameters - a list of paramters to plot. By default, it will plot
+                     all fit parameters. This is useful if you run into problems
+                     where one of the fit paramters is fixed and corner.py does
+                     not work on it
+        '''
         try:
             from corner import corner
         except ImportError:
             raise ImportError('Plotting requires corner.py')
-        corner(self.posterior_data[self.parameter_names],
-               labels=self.parameter_names,
-               weights=self.posterior_data['weights'], **kwargs)
+        if parameters is None:
+            corner(self.posterior_data[self.parameter_names],
+                   labels=self.parameter_names,
+                   weights=self.posterior_data['weights'], **kwargs)
+        else:
+            corner(self.posterior_data[parameters],
+                   labels=parameters,
+                   weights=self.posterior_data['weights'], **kwargs)
 
     def to_hdf(self, fname_or_buf, key='multinest'):
         """
