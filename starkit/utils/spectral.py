@@ -20,8 +20,6 @@ def prepare_observed(observed):
         uncertainty = getattr(observed.uncertainty, 'array',
                                        observed.uncertainty).value
 
-    spec = Spectrum1D.from_array(wavelength,
-                                 flux)
-    spec.uncertainty = uncertainty
+    spec = Spectrum1D(wavelength, flux, uncertainty)
 
     return spec

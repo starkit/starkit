@@ -169,7 +169,7 @@ class Normalize(SpectrographOperationModel):
 
         self.signal_to_noise = (self.observed.flux.value /
                                 self.observed.uncertainty.value)
-        self.flux_unit = observed.unit
+        self.flux_unit = observed.flux.unit
         self._rcond = (len(observed.flux.value) *
                        np.finfo(observed.flux.dtype).eps)
         self._Vp = np.polynomial.polynomial.polyvander(

@@ -20,3 +20,13 @@ class Spectrum1D(object):
             self._uncertainty = u.Quantity(value, self.flux.unit)
 
     uncertainty = property(uncertainty_getter, uncertainty_setter)
+
+    def slice_index(self, start=None, stop=None, step=None):
+        spectral_slice = slice(start, stop, step)
+        if self.uncertainty is not None:
+            new_uncertainty = self.uncertainty[spectral_slice]
+        else:
+            new_uncertainty = None
+
+        return Spectrum1D(self.wavelength[spectral_slice], self.flux[spectral_slice],
+                          new_uncertainty)
