@@ -1,4 +1,3 @@
-#from specutils.spectrum1d import Spectrum1D as SUSpectrum1D
 from astropy import units as u
 
 class SKSpectrum1D(object):
