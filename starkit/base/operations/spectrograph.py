@@ -8,7 +8,7 @@ from astropy import units as u
 
 from starkit.base.operations.base import (SpectralOperationModel,
                                           InstrumentOperationModel)
-from starkit.fix_spectrum1d import Spectrum1D
+from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
 
@@ -169,7 +169,7 @@ class Normalize(SpectrographOperationModel):
 
         self.signal_to_noise = (self.observed.flux.value /
                                 self.observed.uncertainty.value)
-        self.flux_unit = observed.unit
+        self.flux_unit = observed.flux.unit
         self._rcond = (len(observed.flux.value) *
                        np.finfo(observed.flux.dtype).eps)
         self._Vp = np.polynomial.polynomial.polyvander(
@@ -248,7 +248,7 @@ class NormalizeParts(SpectrographOperationModel):
 
     @staticmethod
     def spectrum_1d_getitem(observed, part):
-        observed_part = Spectrum1D.from_array(
+        observed_part = SKSpectrum1D.from_array(
             observed.wavelength[part],
             observed.flux[part])
         if getattr(observed, 'uncertainty', None) is not None:

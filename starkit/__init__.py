@@ -12,7 +12,7 @@ from ._astropy_init import *
 
 # For egg_info test builds to pass, put package imports here.
 from starkit.base.assemble_model import assemble_model
-from starkit.fix_spectrum1d import Spectrum1D
+from starkit.fix_spectrum1d import SKSpectrum1D
 import starkit.base.operations as operations
 
 import logging

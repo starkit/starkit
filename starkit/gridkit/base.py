@@ -7,12 +7,13 @@ import h5py
 from scipy import interpolate
 import numpy as np
 
-from starkit.base.parameter import StarKitParameter as Parameter
+#from starkit.base.parameter import StarKitParameter as Parameter
+from astropy.modeling import Parameter
 from starkit.fitkit.priors import UniformPrior
 
 logger = logging.getLogger(__name__)
 
-class BaseSpectralGrid(modeling.FittableModel):
+class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
     outputs = ('wavelength', 'flux')
 
@@ -74,6 +75,19 @@ def _get_interpolate_parameters(index):
 
 
 def load_grid(hdf_fname):
+    """
+    Load the grid from an HDF file
+
+    Parameters
+    ----------
+    hdf_fname: ~str
+        filename and path to the HDF file
+
+    Returns
+    -------
+        : SpectralGrid object
+
+    """
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
     logger.info('Discovered columns {0}'.format(', '.join(index.columns)))
