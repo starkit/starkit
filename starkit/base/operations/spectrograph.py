@@ -8,7 +8,7 @@ from astropy import units as u
 
 from starkit.base.operations.base import (SpectralOperationModel,
                                           InstrumentOperationModel)
-from starkit.fix_spectrum1d import Spectrum1D
+from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
 
@@ -248,7 +248,7 @@ class NormalizeParts(SpectrographOperationModel):
 
     @staticmethod
     def spectrum_1d_getitem(observed, part):
-        observed_part = Spectrum1D.from_array(
+        observed_part = SKSpectrum1D.from_array(
             observed.wavelength[part],
             observed.flux[part])
         if getattr(observed, 'uncertainty', None) is not None:

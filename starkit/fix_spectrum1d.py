@@ -1,7 +1,7 @@
 #from specutils.spectrum1d import Spectrum1D as SUSpectrum1D
 from astropy import units as u
 
-class Spectrum1D(object):
+class SKSpectrum1D(object):
 
 
     def __init__(self, wavelength, flux, uncertainty):
@@ -28,5 +28,5 @@ class Spectrum1D(object):
         else:
             new_uncertainty = None
 
-        return Spectrum1D(self.wavelength[spectral_slice], self.flux[spectral_slice],
-                          new_uncertainty)
+        return SKSpectrum1D(self.wavelength[spectral_slice], self.flux[spectral_slice],
+                            new_uncertainty)

@@ -1,7 +1,7 @@
 import numpy as np
 
 from astropy import units as u
-from starkit.fix_spectrum1d import Spectrum1D
+from starkit.fix_spectrum1d import SKSpectrum1D
 from starkit.base.operations.base import InstrumentOperationModel
 
 from scipy import interpolate
@@ -74,8 +74,8 @@ class Photometry(ImagerInstrumentOperation):
 
     def evaluate_slow(self, wavelength, flux):
 
-        spec = Spectrum1D.from_array(wavelength * u.angstrom,
-                                     flux * u.erg/u.s/u.cm**2/u.angstrom)
+        spec = SKSpectrum1D.from_array(wavelength * u.angstrom,
+                                       flux * u.erg / u.s / u.cm ** 2 / u.angstrom)
         return np.array(u.Quantity(self.calculate_magnitudes(spec)).value)
 
 
