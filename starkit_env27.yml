@@ -17,6 +17,7 @@ dependencies:
 - Cython=0.21
 - pytest=3.0
 - pyyaml=3.12
+- progressbar2=3.34
 
 # RTD requirements
 - sphinx=1.5.1
