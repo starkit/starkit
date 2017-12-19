@@ -1,13 +1,13 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy import ndimage as nd
+from astropy import units as u
 
 class BaseProcessGrid(object):
-    def __init__(self, input_wavelength, R, wavelength_range = (0, np.inf),
-                 sampling=4, interpolation_kind='linear'):
+
+    def __init__(self, input_wavelength, wavelength_range = (0, np.inf), R=None, R_sampling=4):
 
         input_wavelength = input_wavelength.to('angstrom').value
-        self.interpolation_kind = interpolation_kind
         self.start_idx, self.stop_idx = self._get_wavelength_bounds(
             input_wavelength, wavelength_range)
         self.input_wavelength = input_wavelength
