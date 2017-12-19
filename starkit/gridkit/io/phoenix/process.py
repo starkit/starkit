@@ -1,12 +1,15 @@
-
+from starkit.gridkit.io.process import BaseProcessGrid
 import numpy as np
 from scipy import ndimage as nd
 from scipy.interpolate import interp1d
-from specutils import Spectrum1D
+
 from astropy import units as u
+from astropy.io import fits
 
+class PhoenixProcessGrid(BaseProcessGrid):
+    """
 
-class PhoenixProcess(object):
+    """
 
     uv_wavelength = (500, 3000)
     uv_R = 3000 / 0.1
@@ -15,26 +18,24 @@ class PhoenixProcess(object):
     nir_wavelength = (25000, 55000)
     nir_R = 1e5
 
-    def __init__(self, input_wavelength, R, wavelength_range = (0, np.inf),
-                 pre_sampling=2, sampling=4):
+    def __init__(self, index, input_wavelength, meta, wavelength_start=0*u.angstrom, wavelength_stop=np.inf*u.angstrom,
+                 R=5000.0, R_sampling=4, pre_sampling=2):
+        """
 
+        Parameters
+        ----------
+        index
+        input_wavelength
+        meta
+        wavelength_start
+        wavelength_stop
+        R
+        R_sampling
+        pre_sampling: Select the sampling that you want to have before convolution (there are strange jumps in the diff)
+        """
+        super(PhoenixProcessGrid, self).__init__(index, input_wavelength, meta, wavelength_start=wavelength_start,
+                                                 wavelength_stop=wavelength_stop, R=R, R_sampling=R_sampling)
 
-        self.wavelength_start = input_wavelength.searchsorted(
-            wavelength_range[0])
-        self.wavelength_end = input_wavelength.searchsorted(wavelength_range[1])
-
-        self.cut_wavelength = input_wavelength[
-                              self.wavelength_start:self.wavelength_end]
-
-        self.initial_output_wavelength = self._logrange(
-            input_wavelength[self.wavelength_start],
-            input_wavelength[self.wavelength_end - 1], R, sampling)
-        self.output_wavelength = None
-
-        self.R = R
-        self.wavelength_range = wavelength_range
-        self.sampling = sampling
-        self.pre_sampling = pre_sampling
         self.wavelength_interp = []
         for wl_region in ['uv', 'oir', 'nir']:
             current_wl = getattr(self, '{0}_wavelength'.format(wl_region))
@@ -48,22 +49,8 @@ class PhoenixProcess(object):
         self.wavelength_interp = np.hstack(tuple(self.wavelength_interp))
 
 
-    @property
-    def R(self):
-        return self._R
-
-    @R.setter
-    def R(self, value):
-        self._R = float(value)
-
-    @staticmethod
-    def _logrange(wavelength_start, wavelength_end, R, sampling):
-        return np.exp(
-            np.arange(np.log(wavelength_start), np.log(wavelength_end),
-                      1 / (sampling * float(R))))
-
     def interp_wavelength(self, flux):
-        cut_flux = flux[self.wavelength_start:self.wavelength_end]
+        cut_flux = flux[self.start_idx:self.stop_idx]
         processed_wavelengths = []
         processed_fluxes = []
         for wl_region in ['uv', 'oir', 'nir']:
@@ -71,9 +58,11 @@ class PhoenixProcess(object):
             current_wl_interp = getattr(
                 self, '{0}_wavelength_interp'.format(wl_region))
             rescaled_R = 1 / np.sqrt((1/self.R)**2 - (1/current_R)**2 )
-            sigma = ((current_R / rescaled_R) * self.sampling /
+            sigma = ((current_R / rescaled_R) * self.R_sampling /
                      (2 * np.sqrt(2 * np.log(2))))
 
+            #The sampling is very strange (it's not really log - it's linear with jumps (every 5000 angstrom)
+            # Specifically the UV is sampled at 0.1 angstrom which is also stated as the delta_lambda
             interp_flux = interp1d(self.cut_wavelength, cut_flux,
                                    bounds_error=False)(
                 current_wl_interp
@@ -105,6 +94,10 @@ class PhoenixProcess(object):
         return output_flux
 
 
-    def __call__(self, flux):
-        new_flux =  self.interp_wavelength(flux)
-        return new_flux
+    def get_fluxes(self):
+        fluxes = np.empty((len(self.index), len(self.output_wavelength)))
+        for i, fname in enumerate(self.index.filename):
+            surface = fits.getval(fname, 'PHXREFF')**2 * 4 * np.pi
+            flux = fits.getdata(fname) * surface
+            fluxes[i] = self.interp_wavelength(flux)
+        return fluxes
