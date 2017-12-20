@@ -1,11 +1,15 @@
-from starkit.gridkit.io.process import BaseProcessGrid
+import h5py
+import pandas as pd
 import numpy as np
 from scipy import ndimage as nd
 from scipy.interpolate import interp1d
 
+
 from astropy import units as u
 from astropy.io import fits
 
+
+from starkit.gridkit.io.process import BaseProcessGrid
 class PhoenixProcessGrid(BaseProcessGrid):
     """
 
@@ -46,6 +50,7 @@ class PhoenixProcessGrid(BaseProcessGrid):
                     wavelength_interp)
             self.wavelength_interp.append(wavelength_interp)
 
+
         self.wavelength_interp = np.hstack(tuple(self.wavelength_interp))
 
 
@@ -62,7 +67,7 @@ class PhoenixProcessGrid(BaseProcessGrid):
                      (2 * np.sqrt(2 * np.log(2))))
 
             #The sampling is very strange (it's not really log - it's linear with jumps (every 5000 angstrom)
-            # Specifically the UV is sampled at 0.1 angstrom which is also stated as the delta_lambda
+            #Specifically the UV is sampled at 0.1 angstrom which is also stated as the delta_lambda
             interp_flux = interp1d(self.cut_wavelength, cut_flux,
                                    bounds_error=False)(
                 current_wl_interp
@@ -93,11 +98,21 @@ class PhoenixProcessGrid(BaseProcessGrid):
             )
         return output_flux
 
+    @staticmethod
+    def load_flux(fname):
+        """
+        load the 1D flux array from file
 
-    def get_fluxes(self):
-        fluxes = np.empty((len(self.index), len(self.output_wavelength)))
-        for i, fname in enumerate(self.index.filename):
-            surface = fits.getval(fname, 'PHXREFF')**2 * 4 * np.pi
-            flux = fits.getdata(fname) * surface
-            fluxes[i] = self.interp_wavelength(flux)
-        return fluxes
+        Parameters
+        ----------
+        fname : str
+
+        Returns
+        -------
+            : numpy.ndarray
+        """
+
+        surface = fits.getval(fname, 'PHXREFF') ** 2 * 4 * np.pi
+        flux = fits.getdata(fname).astype(np.float64) * surface
+        return flux
+
