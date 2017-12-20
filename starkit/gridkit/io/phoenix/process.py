@@ -11,9 +11,6 @@ from astropy.io import fits
 
 from starkit.gridkit.io.process import BaseProcessGrid
 class PhoenixProcessGrid(BaseProcessGrid):
-    """
-
-    """
 
     uv_wavelength = (500, 3000)
     uv_R = 3000 / 0.1
@@ -25,17 +22,17 @@ class PhoenixProcessGrid(BaseProcessGrid):
     def __init__(self, index, input_wavelength, meta, wavelength_start=0*u.angstrom, wavelength_stop=np.inf*u.angstrom,
                  R=5000.0, R_sampling=4, pre_sampling=2):
         """
-
         Parameters
         ----------
-        index
-        input_wavelength
-        meta
-        wavelength_start
-        wavelength_stop
-        R
-        R_sampling
-        pre_sampling: Select the sampling that you want to have before convolution (there are strange jumps in the diff)
+        index: pandas.DataFrame
+        input_wavelength : astropy.units.Quantity
+        meta : pandas.Series
+        wavelength_start : astropy.units.Quantity
+        wavelength_stop : astropy.units.Quantity
+        R : float
+        R_sampling : integer
+        pre_sampling: integer
+            Select the sampling that you want to have before convolution (there are strange jumps in the diff)
         """
         super(PhoenixProcessGrid, self).__init__(index, input_wavelength, meta, wavelength_start=wavelength_start,
                                                  wavelength_stop=wavelength_stop, R=R, R_sampling=R_sampling)

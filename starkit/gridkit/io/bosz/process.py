@@ -24,17 +24,18 @@ class BOSZProcessGrid(BaseProcessGrid):
 
         Parameters
         ----------
-        index
-        input_wavelength
-        meta
-        wavelength_start
-        wavelength_stop
-        R
-        R_sampling
-        pre_sampling: Select the sampling that you want to have before convolution (there are strange jumps in the diff)
+        index : pandas.DataFrame
+        input_wavelength : astropy.units.Quantity
+        meta : pandas.Series
+        wavelength_start : astropy.units.Quantity
+        wavelength_stop : astropy.units.Quantity
+        R : float
+        R_sampling : integer
         """
         super(BOSZProcessGrid, self).__init__(index, input_wavelength, meta, wavelength_start=wavelength_start,
                                                  wavelength_stop=wavelength_stop, R=R, R_sampling=R_sampling)
+
+
 
 
     def interp_wavelength(self, flux):
