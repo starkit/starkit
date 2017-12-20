@@ -81,6 +81,7 @@ class BaseProcessGrid(object):
         meta['flux_unit'] = 'erg/s/angstrom'
         meta['R'] = self.R
         meta['R_sampling'] = self.R_sampling
+        meta['grid_type'] = 'log'
         meta['uuid'] = str(uuid.uuid4())
         return meta
 
@@ -99,10 +100,12 @@ class BaseProcessGrid(object):
         fluxes = self.get_fluxes()
         meta = self.get_meta()
         index = self.get_index()
+
         with h5py.File(fname) as fh:
             del fh['fluxes']
             fh['fluxes'] = fluxes
 
         meta.to_hdf(fname, 'meta')
         index.to_hdf(fname, 'index')
+        pd.DataFrame(self.output_wavelength).to_hdf(fname, 'wavelength')
         print "done"

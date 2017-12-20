@@ -31,8 +31,8 @@ class BaseSpectralGrid(modeling.Model):
     def get_grid_extent(self):
         extents = []
         for i, param_name in enumerate(self.param_names):
-            extents.append((self.interpolator.points[:,i].min(),
-                            self.interpolator.points[:,i].max()))
+            extents.append((self.interpolator.points[:, i].min(),
+                            self.interpolator.points[:, i].max()))
         return extents
 
     def get_grid_uniform_priors(self):
@@ -64,15 +64,6 @@ class BaseSpectralGrid(modeling.Model):
         for i in xrange(self.fluxes.shape[0]):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
-def _get_interpolate_parameters(index):
-    interpolate_parameters = []
-
-    for column in index.columns:
-        if len(index[column].unique()) > 1:
-            interpolate_parameters.append(column)
-    return interpolate_parameters
-
-
 
 def load_grid(hdf_fname):
     """
@@ -90,36 +81,34 @@ def load_grid(hdf_fname):
     """
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
-    logger.info('Discovered columns {0}'.format(', '.join(index.columns)))
-    interpolate_parameters = _get_interpolate_parameters(index)
+    meta = pd.read_hdf(hdf_fname, 'meta')
+    logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
+    interpolate_parameters = meta['parameters']
 
     with h5py.File(hdf_fname) as fh:
         logger.info('Reading Fluxes')
         fluxes = fh['fluxes'].__array__()
-        logger.info('Fluxes shape {0}'.format(fluxes.shape))
-        flux_unit = u.Unit(fh['fluxes'].attrs['unit'])
-        wavelength = fh['wavelength'].__array__()
-        data_set_type = fh['wavelength'].attrs['grid']
-        if data_set_type == 'log':
-            R = fh['wavelength'].attrs.get('R', None)
-            R_sampling = fh['wavelength'].attrs.get('R_sampling', 4)
+    logger.info('Fluxes shape {0}'.format(fluxes.shape))
+    flux_unit = u.Unit(meta['flux_unit'])
+    wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
+    wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
 
-        else:
-            R = None
-            R_sampling = None
+    if meta['grid_type'] == 'log':
+        R = fh['wavelength'].attrs.get('R', None)
+        R_sampling = fh['wavelength'].attrs.get('R_sampling', 4)
+    else:
+        raise ValueError('No other grid_type than log is supported')
 
-        wavelength_unit = u.Unit(fh['wavelength'].attrs['unit'])
-        parameter_defaults = {}
-        for param in interpolate_parameters:
-            parameter_defaults[param] = fh['index'].get(param, None)
+    parameter_defaults = {}
+    parameter_defaults = {param: index.iloc[0, param]
+                            for param in interpolate_parameters}
 
     class_dict = {}
     for param in interpolate_parameters:
         if parameter_defaults[param] is None:
             param_descriptor = Parameter()
         else:
-            param_descriptor = Parameter(fixed=True,
-                                         default=parameter_defaults[param])
+            param_descriptor = Parameter(default=parameter_defaults[param])
 
         class_dict[param] = param_descriptor
 
@@ -127,7 +116,7 @@ def load_grid(hdf_fname):
 
     SpectralGrid = type('SpectralGrid', (BaseSpectralGrid, ), class_dict)
 
-    initial_parameters = {item:index[item].iloc[0]
+    initial_parameters = {item: index[item].iloc[0]
                           for item in interpolate_parameters}
     logger.info('Initializing spec grid')
     spec_grid = SpectralGrid(wavelength, index[interpolate_parameters], fluxes,
@@ -141,11 +130,3 @@ def load_grid(hdf_fname):
         parameter.prior = uniform_prior
 
     return spec_grid
-
-
-
-
-
-
-
-
