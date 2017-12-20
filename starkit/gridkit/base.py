@@ -94,13 +94,13 @@ def load_grid(hdf_fname):
     wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
 
     if meta['grid_type'] == 'log':
-        R = fh['wavelength'].attrs.get('R', None)
-        R_sampling = fh['wavelength'].attrs.get('R_sampling', 4)
+        R = meta['R']
+        R_sampling = meta['R_sampling']
     else:
         raise ValueError('No other grid_type than log is supported')
 
     parameter_defaults = {}
-    parameter_defaults = {param: index.iloc[0, param]
+    parameter_defaults = {param: index.loc[index.index[0], param]
                             for param in interpolate_parameters}
 
     class_dict = {}
