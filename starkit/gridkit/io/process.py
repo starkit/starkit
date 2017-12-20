@@ -1,9 +1,12 @@
+import os
+
 import h5py
 import pandas as pd
 import numpy as np
 import uuid
 from astropy import units as u
 from progressbar import ProgressBar
+
 class BaseProcessGrid(object):
 
     def __init__(self, index, input_wavelength, meta, wavelength_start=0*u.angstrom, wavelength_stop=np.inf*u.angstrom,
@@ -11,8 +14,8 @@ class BaseProcessGrid(object):
 
         self.index = index
         self.meta = meta
-        self.R = R
-        self.R_sampling=R_sampling
+        self.R = float(R)
+        self.R_sampling = int(R_sampling)
 
 
         wavelength_start = np.max(u.Quantity([wavelength_start, np.min(input_wavelength)]))
@@ -77,10 +80,11 @@ class BaseProcessGrid(object):
         for param in meta['parameters']:
             if len(self.index[param].unique()) > 1:
                 parameters.append(param)
-        meta['parameters'] = param
+        meta['parameters'] = parameters
         meta['flux_unit'] = 'erg/s/angstrom'
         meta['R'] = self.R
         meta['R_sampling'] = self.R_sampling
+        meta['grid_type'] = 'log'
         meta['uuid'] = str(uuid.uuid4())
         return meta
 
@@ -95,14 +99,32 @@ class BaseProcessGrid(object):
         index = self.index.copy()
         return index.drop('filename', axis=1)
 
-    def to_hdf(self, fname):
+    def to_hdf(self, fname, overwrite=False):
+        """
+
+        Parameters
+        ----------
+        fname
+        overwrite : bool
+
+        Returns
+        -------
+
+        """
+
+        if os.path.exists(fname) and not overwrite:
+            raise IOError('File {0} exists and overwrite=False ... aborting'.format(fname))
+        if os.path.exists(fname) and overwrite:
+            os.system('rm -f {0}'.format(fname))
+
         fluxes = self.get_fluxes()
         meta = self.get_meta()
         index = self.get_index()
-        with h5py.File(fname) as fh:
-            del fh['fluxes']
+
+        with h5py.File(fname, mode='w') as fh:
             fh['fluxes'] = fluxes
 
         meta.to_hdf(fname, 'meta')
         index.to_hdf(fname, 'index')
+        pd.DataFrame(self.output_wavelength).to_hdf(fname, 'wavelength')
         print "done"
