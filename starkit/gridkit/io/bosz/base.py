@@ -12,7 +12,7 @@ from progressbar import ProgressBar
 
 bosz_bibtex = """
 @ARTICLE{2017AJ....153..234B,
-   author = {{Bohlin}, R.~C. and {M{\'e}sz{\'a}ros}, S. and {Fleming}, S.~W. and 
+   author = {{Bohlin}, R.~C. and {M{\'e}sz{\'a}ros}, S. and {Fleming}, S.~W. and
 	{Gordon}, K.~D. and {Koekemoer}, A.~M. and {Kov{\'a}cs}, J.},
     title = "{A New Stellar Atmosphere Grid and Comparisons with HST/STIS CALSPEC Flux Distributions}",
   journal = {\aj},
@@ -47,44 +47,56 @@ def make_raw_index():
         bosz_index : pd.DataFrame
     """
     all_fnames = glob('ascii/insbroad_300000/*/*/*/*.asc.bz2')
-    bosz_index = pd.DataFrame(index=np.arange(len(all_fnames)), columns=['teff', 'logg', 'mh', 'alpha', 'ch',
-                                                                            'rot', 'micro', 'res', 'filename'])
-    print "Reading Phoenix grid..."
-    bar = ProgressBar(max_value=len(all_fnames))
-    pattern = re.compile('am(p|m)(\d+)c(p|m)(\d+)+o(p|m)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
-    data_frame = []
-    for i, fname in bar(enumerate(all_fnames)):
-        #if i %100 == 0: print i,
-        s = pattern.search(fname)
-        mm, mh, cm, ch, om, alpha, teff, logg, micro, rot, res = s.groups()
-        if mm == 'm':
+
+
+    nfiles = len(all_fnames)
+    mh_arr = np.zeros(nfiles)
+    ch_arr = np.zeros(nfiles)
+    alpha_arr = np.zeros(nfiles)
+    teff_arr = np.zeros(nfiles)
+    logg_arr = np.zeros(nfiles)
+    micro_arr = np.zeros(nfiles)
+    rot_arr = np.zeros(nfiles)
+    res_arr = np.zeros(nfiles)
+    pattern = re.compile('a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
+
+    for i in np.arange(nfiles):
+        filename = all_fnames[i]
+        base = filename.split('.')[0]
+        s = pattern.search(filename)
+        mm,mh,cm,ch,om,alpha,teff,logg,micro,rot,res =  s.group(1,2,3,4,5,6,7,8,9,10,11)
+        if mm == 'mm':
             mscale = -1.0
         else:
             mscale = 1.0
-        if cm == 'm':
+        if cm == 'cm':
             cscale = -1.0
         else:
             cscale = 1.0
-        if om == 'm':
+        if om == 'mm':
             oscale = -1.0
         else:
             oscale = 1.0
 
-        teff = float(teff)
-        logg = float(logg)
-        mh = mscale * float(mh) / 10.
-        ch = cscale * float(cscale) / 10.
-        alpha = oscale * float(alpha) / 10.
+        mh = mh[0]+'.'+mh[1:]
+        ch = ch[0]+'.'+ch[1:]
+        alpha = alpha[0]+'.'+alpha[1:]
+        logg = logg[0]+'.'+logg[1:]
+        micro = micro[0]+'.'+micro[1:]
 
-        micro = float(micro)
-        rot = float(rot)
-        res = float(res)
+        mh_arr[i] = float(mh)*mscale
+        ch_arr[i] = float(ch)*cscale
+        alpha_arr[i] = float(alpha)*oscale
+        teff_arr[i] = float(teff)
+        logg_arr[i] = float(logg)
+        micro_arr[i] = float(micro)
+        rot_arr[i] = float(rot)
+        res_arr[i] = float(res)
 
-        data_frame.append([teff, logg, mh, alpha, ch, rot, micro, res, fname])
+    return pd.DataFrame({'mh':mh_arr,'ch':ch_arr,'alpha':alpha_arr,'teff':teff_arr,
+                      'logg':logg_arr,'micro':micro_arr,'rot':rot_arr,
+                      'res':res_arr,'filename':all_fnames})
 
-    bosz_index.iloc[:, :] = data_frame
-
-    return bosz_index
 
 
 def make_grid_info(fname):
@@ -140,4 +152,3 @@ def cache_bosz_grid(delete=False):
     bar = ProgressBar(max_value=len(all_fnames))
     for i, fname in bar(enumerate(all_fnames)):
         convert_bz2_memmap(fname)
-
