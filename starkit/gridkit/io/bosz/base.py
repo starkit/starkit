@@ -110,7 +110,7 @@ def make_grid_info(fname):
     """
 
     raw_index = make_raw_index()
-    wavelength = np.loadtxt(raw_index.loc[0, 'filename'], usecols=(1,), unpack=True)
+    wavelength = np.loadtxt(raw_index.loc[0, 'filename'], usecols=(0,), unpack=True)
 
     with pd.HDFStore(fname) as fh:
         fh['index'] = raw_index
