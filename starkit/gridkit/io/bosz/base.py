@@ -73,7 +73,7 @@ def make_raw_index():
             cscale = -1.0
         else:
             cscale = 1.0
-        if om == 'mm':
+        if om == 'om':
             oscale = -1.0
         else:
             oscale = 1.0
