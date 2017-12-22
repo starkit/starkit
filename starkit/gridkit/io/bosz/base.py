@@ -48,7 +48,6 @@ def make_raw_index():
     """
     all_fnames = glob('ascii/insbroad_300000/*/*/*/*.asc.bz2')
 
-
     nfiles = len(all_fnames)
     mh_arr = np.zeros(nfiles)
     ch_arr = np.zeros(nfiles)
@@ -59,34 +58,22 @@ def make_raw_index():
     rot_arr = np.zeros(nfiles)
     res_arr = np.zeros(nfiles)
     pattern = re.compile('a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
+    pattern_dir = re.compile('metal_(.....)\/carbon_(.....)\/alpha_(.....)')
 
     for i in np.arange(nfiles):
         filename = all_fnames[i]
         base = filename.split('.')[0]
         s = pattern.search(filename)
+        s2 = pattern_dir.search(filename)
         mm,mh,cm,ch,om,alpha,teff,logg,micro,rot,res =  s.group(1,2,3,4,5,6,7,8,9,10,11)
-        if mm == 'mm':
-            mscale = -1.0
-        else:
-            mscale = 1.0
-        if cm == 'cm':
-            cscale = -1.0
-        else:
-            cscale = 1.0
-        if om == 'om':
-            oscale = -1.0
-        else:
-            oscale = 1.0
+        mh,ch,alpha = s2.group(1,2,3) # use the directory names for more accurate grid points
 
-        mh = mh[0]+'.'+mh[1:]
-        ch = ch[0]+'.'+ch[1:]
-        alpha = alpha[0]+'.'+alpha[1:]
         logg = logg[0]+'.'+logg[1:]
         micro = micro[0]+'.'+micro[1:]
 
-        mh_arr[i] = float(mh)*mscale
-        ch_arr[i] = float(ch)*cscale
-        alpha_arr[i] = float(alpha)*oscale
+        mh_arr[i] = float(mh)
+        ch_arr[i] = float(ch)
+        alpha_arr[i] = float(alpha)
         teff_arr[i] = float(teff)
         logg_arr[i] = float(logg)
         micro_arr[i] = float(micro)
@@ -96,8 +83,6 @@ def make_raw_index():
     return pd.DataFrame({'mh':mh_arr,'ch':ch_arr,'alpha':alpha_arr,'teff':teff_arr,
                       'logg':logg_arr,'micro':micro_arr,'rot':rot_arr,
                       'res':res_arr,'filename':all_fnames})
-
-
 
 def make_grid_info(fname):
     """
