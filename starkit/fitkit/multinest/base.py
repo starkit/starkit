@@ -130,7 +130,23 @@ class MultiNestResult(object):
 
     @property
     def median(self):
-        return self.posterior_data[self.parameter_names].median()
+        median_dict = []
+        for param_name in self.parameter_names:
+            # sort the parameter in order to create the CDF
+            param_x = np.copy(self.posterior_data[param_name])
+
+            weights = np.copy(self.posterior_data['weights'])
+            ind = np.argsort(param_x)
+            param_x = np.array(param_x[ind])
+            weights = np.array(weights[ind])
+            #k = [np.sum(weights[0:i+1]) for i in xrange(len(weights))]
+
+            # make CDF of the weights to determine sigmas later
+            k = np.cumsum(weights)
+            median = np.interp(0.5,k,param_x)
+            median_dict.append((param_name, median))
+            
+        return pd.Series(OrderedDict(median_dict))
 
     @property
     def maximum(self):
@@ -156,7 +172,6 @@ class MultiNestResult(object):
 
             # make CDF of the weights to determine sigmas later
             k = np.cumsum(weights)
-
             sigma_lower = np.interp(stats.norm.cdf(-sigma_number), k, param_x)
             sigma_upper = np.interp(stats.norm.cdf(sigma_number), k, param_x)
             sigma_dict.append((param_name, (sigma_lower, sigma_upper)))
