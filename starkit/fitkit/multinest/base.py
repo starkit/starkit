@@ -126,7 +126,17 @@ class MultiNestResult(object):
 
     @property
     def mean(self):
-        return self.posterior_data[self.parameter_names].mean()
+        mean_dict = []
+        for param_name in self.parameter_names:
+            # sort the parameter in order to create the CDF
+            param_x = np.copy(self.posterior_data[param_name])
+
+            weights = np.copy(self.posterior_data['weights'])
+            mean = np.average(param_x,weights=weights)
+            mean_dict.append((param_name, mean))
+            
+        return pd.Series(OrderedDict(mean_dict))        
+
 
     @property
     def median(self):
