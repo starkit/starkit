@@ -104,6 +104,7 @@ class CCM89Extinction(StellarOperationModel):
 
     def evaluate(self, wavelength, flux, a_v, r_v):
         from specutils import extinction
+        wavelength = np.array(wavelength)
         extinction_factor = np.ones_like(wavelength)
         valid_wavelength = ((wavelength > 910) & (wavelength < 33333))
 

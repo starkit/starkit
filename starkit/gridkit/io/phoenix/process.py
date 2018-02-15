@@ -111,5 +111,6 @@ class PhoenixProcessGrid(BaseProcessGrid):
 
         surface = fits.getval(fname, 'PHXREFF') ** 2 * 4 * np.pi
         flux = fits.getdata(fname).astype(np.float64) * surface
+        flux *= 1e-8 # converting from erg/s/cm to erg/s/angstrom
         return flux
 
