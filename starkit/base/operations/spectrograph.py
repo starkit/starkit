@@ -103,7 +103,7 @@ class InstrumentDeltaLambdaConstant(SpectrographOperationModel):
             return wavelength, flux
 
         sigma_lambda = delta_lambda * self.fwhm2sigma
-        
+
         new_wavelength = np.arange(wavelength[0], wavelength[-1],
                                    sigma_lambda / self.sampling)
 
