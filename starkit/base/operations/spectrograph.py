@@ -12,7 +12,7 @@ from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
 
-__all__ = ['InstrumentRConstant', 'Interpolate', 'Normalize']
+__all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate', 'Normalize']
 
 class SpectrographOperationModel(InstrumentOperationModel):
     pass
