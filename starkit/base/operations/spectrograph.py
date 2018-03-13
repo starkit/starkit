@@ -102,10 +102,10 @@ class InstrumentDeltaLambdaConstant(SpectrographOperationModel):
         if np.isclose(delta_lambda, 0.0):
             return wavelength, flux
 
-        sigma_lambda = delta_lambda * self.fwhm2sigma
+        sigma_lambda = delta_lambda * self.fwhm2sigma * wavelength.unit
 
         new_wavelength = np.arange(wavelength[0], wavelength[-1],
-                                   sigma_lambda / self.sampling)
+                                   sigma_lambda  / self.sampling)
 
         new_flux = np.interp(new_wavelength, wavelength, flux)
 
