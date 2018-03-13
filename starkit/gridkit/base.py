@@ -45,7 +45,7 @@ class BaseSpectralGrid(modeling.Model):
 
     def evaluate(self, *args):
 
-        return self.wavelength, self.interpolator(np.array(
+        return self.wavelength.value, self.interpolator(np.array(
             args).reshape(len(self.param_names)))[0]
 
     @staticmethod
