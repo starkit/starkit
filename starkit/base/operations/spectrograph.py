@@ -12,12 +12,12 @@ from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
 
-__all__ = ['InstrumentConvolveGrating', 'Interpolate', 'Normalize']
+__all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate', 'Normalize']
 
 class SpectrographOperationModel(InstrumentOperationModel):
     pass
 
-class InstrumentConvolveGrating(SpectrographOperationModel):
+class InstrumentRConstant(SpectrographOperationModel):
     """
     Convolve with a gaussian with given resolution to mimick an instrument
     assuming lambda / delta_lambda being constant
@@ -33,7 +33,7 @@ class InstrumentConvolveGrating(SpectrographOperationModel):
 
     """
 
-    operation_name = 'resolution'
+    operation_name = 'resolution_constant'
 
     R = modeling.Parameter()
     requires_observed_spectrum = False
@@ -46,7 +46,7 @@ class InstrumentConvolveGrating(SpectrographOperationModel):
         return cls(R=R, grid_R=grid_R, grid_sampling=grid_sampling)
 
     def __init__(self, R=np.inf, grid_R=None, grid_sampling=None):
-        super(InstrumentConvolveGrating, self).__init__(R=R)
+        super(InstrumentRConstant, self).__init__(R=R)
         self.grid_sampling = grid_sampling
         self.grid_R = grid_R
 
@@ -64,7 +64,7 @@ class InstrumentConvolveGrating(SpectrographOperationModel):
 
         return wavelength, nd.gaussian_filter1d(flux, sigma)
 
-class InstrumentConvolveGrism(SpectrographOperationModel):
+class InstrumentDeltaLambdaConstant(SpectrographOperationModel):
     """
     Convolve with a gaussian with given resolution to mimick an instrument
     assuming delta_lambda being constant
@@ -80,36 +80,32 @@ class InstrumentConvolveGrism(SpectrographOperationModel):
 
     """
 
-    operation_name = 'resolution'
+    operation_name = 'delta_lambda_constant'
 
-    R = modeling.Parameter()
+    delta_lambda = modeling.Parameter()
     requires_observed_spectrum = False
 
     @classmethod
-    def from_grid(cls, wavelength, grid, R=np.inf):
+    def from_grid(cls, grid, delta_lambda=0.0):
         grid_R = getattr(grid, 'R', None)
-        return cls(wavelength, R=R, grid_R=grid_R)
+        return cls(delta_lambda, grid_R=grid_R)
 
 
-    def __init__(self, wavelength, R, grid_R, sampling=4, ):
-        super(InstrumentConvolveGrism, self).__init__(R=R)
-        self.wavelength = wavelength
+    def __init__(self, delta_lambda, grid_R, sampling=4):
+        super(InstrumentDeltaLambdaConstant, self).__init__(delta_lambda=delta_lambda)
         self.sampling = sampling
         self.fwhm2sigma = 1 / (2 * np.sqrt(np.log(2) * 2))
         self.grid_R = grid_R
 
-    def evaluate(self, wavelength, flux, R):
+    def evaluate(self, wavelength, flux, delta_lambda):
 
-        if np.isinf(R):
+        if np.isclose(delta_lambda, 0.0):
             return wavelength, flux
 
-        rescaled_R = 1 / np.sqrt((1/R)**2 - (1 / self.grid_R)**2 )
-
-        delta_lambda = (self.wavelength / rescaled_R) * self.fwhm2sigma
-
+        sigma_lambda = delta_lambda * self.fwhm2sigma
 
         new_wavelength = np.arange(wavelength[0], wavelength[-1],
-                                   delta_lambda / self.sampling)
+                                   sigma_lambda  / self.sampling)
 
         new_flux = np.interp(new_wavelength, wavelength, flux)
 
@@ -263,3 +259,7 @@ class NormalizeParts(SpectrographOperationModel):
             _wave, fit_flux[part] = normalizer(wavelength[part], flux[part])
 
         return wavelength, fit_flux
+
+
+#Deprecated
+InstrumentConvolveGrating = InstrumentRConstant

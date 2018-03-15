@@ -48,12 +48,6 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
                 and (operation.__name__.startswith('CCM89'))):
                 continue
 
-            if (('Grating' in operation.__name__) and
-                    ('R_wavelength' in parameters)): continue
-
-            if (('Grism' in operation.__name__) and
-                    ('R_wavelength' not in parameters)): continue
-
             param_values = {}
             for param_name in operation.param_names:
                 if param_name in parameters:
@@ -64,11 +58,7 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
                     param_values['observed'] = spectrum
 
                 if hasattr(operation, 'from_grid'):
-                    if 'Grism' in operation.__name__:
-                        current_stellar_operation = operation.from_grid(
-                            parameters.pop('R_wavelength'), spectral_grid, **param_values)
-                    else:
-                        current_stellar_operation = operation.from_grid(
+                    current_stellar_operation = operation.from_grid(
                             spectral_grid, **param_values)
 
                 else:
