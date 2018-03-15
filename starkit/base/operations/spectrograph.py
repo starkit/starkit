@@ -259,3 +259,7 @@ class NormalizeParts(SpectrographOperationModel):
             _wave, fit_flux[part] = normalizer(wavelength[part], flux[part])
 
         return wavelength, fit_flux
+
+
+#Deprecated
+InstrumentConvolveGrating = InstrumentRConstant
