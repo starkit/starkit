@@ -60,7 +60,7 @@ class BaseProcessGrid(object):
             fluxes : numpy.ndarray
         """
         fluxes = np.empty((len(self.index), len(self.output_wavelength)), dtype=np.float64)
-        bar = ProgressBar(max_value=len(self.index))
+        bar = ProgressBar(maxval=len(self.index))
         for i, fname in bar(enumerate(self.index.filename)):
             flux = self.load_flux(fname)
             fluxes[i] = self.interp_wavelength(flux)
