@@ -3,7 +3,7 @@ from astropy import units as u
 class SKSpectrum1D(object):
 
     @classmethod
-    def from_array(cls, wavelength, flux, uncertainty):
+    def from_array(cls, wavelength, flux, uncertainty=None):
         """
 
         Parameters
