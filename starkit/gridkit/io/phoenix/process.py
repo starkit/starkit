@@ -1,5 +1,3 @@
-import h5py
-import pandas as pd
 import numpy as np
 from scipy import ndimage as nd
 from scipy.interpolate import interp1d
