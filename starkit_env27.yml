@@ -1,17 +1,18 @@
 name: starkit
 
 channels:
-    - defaults
     - conda-forge
+    - defaults
+
 
 dependencies:
 - python=2.7
 - numpy=1.12
 - scipy=1.0
-- pandas=0.20
+- pandas
 - pytables
 - h5py=2.6
-- matplotlib=2.0
+- matplotlib=2
 - astropy=1.3
 - numexpr=2.6
 - Cython=0.21
@@ -21,11 +22,12 @@ dependencies:
 - tqdm=4
 
 # RTD requirements
-- sphinx=1.5.1
-- nbconvert=4.2.0
-- numpydoc=0.5
-- docutils=0.13.1
-- nbformat=4.0.1
+- sphinx=1
+- nbconvert=4
+- numpydoc
+- docutils
+- nbformat=4
+- conda-forge
 
 #Coverage requirements
 - coverage=3.7.1
