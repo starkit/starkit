@@ -22,7 +22,7 @@ dependencies:
 - tqdm=4
 
 # RTD requirements
-- sphinx=1.5.3
+- sphinx=1.5.6
 - nbconvert=4
 - numpydoc
 - docutils
