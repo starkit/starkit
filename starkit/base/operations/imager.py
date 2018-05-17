@@ -29,9 +29,9 @@ class Photometry(ImagerInstrumentOperation):
             raise ImportError('The photometry plugin needs wsynphot')
 
         if hasattr(filter_set, 'calculate_{0}_magnitudes'.format(mag_type)):
-            filter_set = filter_set
+            self.filter_set = filter_set
         else:
-            filter_set = FilterSet(filter_set)
+            self.filter_set = FilterSet(filter_set)
 
 
         if grid_wavelength is not None:
