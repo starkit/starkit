@@ -143,4 +143,3 @@ class BaseProcessGrid(object):
         index.to_hdf(fname, 'index')
         pd.DataFrame(self.output_wavelength).to_hdf(fname, 'wavelength')
         print "done"
-
