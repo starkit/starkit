@@ -1,9 +1,7 @@
 name: starkit
 
 channels:
-    - conda-forge
     - defaults
-
 
 dependencies:
 - python=2.7
@@ -21,12 +19,6 @@ dependencies:
 - tqdm=4
 
 # RTD requirements
-- sphinx=1.5.3
-- nbconvert=4
-- numpydoc
-- docutils
-- nbformat=4
-- nbsphinx
 
 #Coverage requirements
 - coverage=3.7.1
@@ -39,3 +31,9 @@ dependencies:
   - sphinxcontrib-bibtex
   - sphinxcontrib-tikz
   - coveralls
+  - sphinx==1.5.3
+  - nbconvert
+  - numpydoc
+  - docutils
+  - nbformat
+  - nbsphinx
