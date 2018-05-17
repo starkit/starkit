@@ -27,7 +27,7 @@ dependencies:
 - numpydoc
 - docutils
 - nbformat=4
-- conda-forge
+- nbsphinx
 
 #Coverage requirements
 - coverage=3.7.1
@@ -36,9 +36,7 @@ dependencies:
 - pytest-cov=2.2.1
 
 - pip:
-  - nbsphinx
   - sphinx_bootstrap_theme
   - sphinxcontrib-bibtex
   - sphinxcontrib-tikz
   - coveralls
-  - pytest-html==1.10.0
