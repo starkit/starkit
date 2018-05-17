@@ -2,8 +2,7 @@ name: starkit
 
 channels:
     - defaults
-    - conda-forge
-
+ 
 dependencies:
 - python=2.7
 - numpy=1.12
