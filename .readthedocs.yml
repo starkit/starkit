@@ -1,2 +1,4 @@
 conda:
     file: starkit_env27.yml
+python:
+   setup_py_install: true
