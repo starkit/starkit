@@ -13,7 +13,7 @@ dependencies:
 - pytables
 - h5py=2.6
 - matplotlib=2
-- astropy=1.3
+- astropy=2
 - numexpr=2.6
 - Cython=0.21
 - pytest=3.0
