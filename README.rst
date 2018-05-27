@@ -1,27 +1,36 @@
 StarKit
 =======
 
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
+************
+Installation
+************
 
-This is the template for affiliated packages of the Astropy project.
+We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
+the necessary requirements for Starkit to work.
 
-Astropy affiliated packages are astronomy-related Python packages that
-have requested to be part of the Astropy project’s community.
-Such packages can make use of the setup, installation, and documentation
-infrastructure developed for the ``astropy`` core package simply by
-using this template to lay out the package.
+Once you have anaconda installed please make a new environment with the prerequisites
+for starkit in the following way. This will create an environment called `starkit`::
 
-For more information, see:
+    conda env create --file https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml python=2
+    source activate starkit
+    pip install specutils
 
-* `Detailed instructions for using this template <http://astropy.readthedocs.org/en/latest/development/affiliated-packages.html>`_
-* `The Affiliated Packages section of the Astropy web site <http://affiliated.astropy.org>`_
-* `This template's Github code repository <https://github.com/astropy/package-template>`_
+For now until a new version of Astropy comes out that fixes these problems::
 
-Status reports for developers
------------------------------
+    conda install cython
+    pip install astropy==1.1.2
 
-.. image:: https://travis-ci.org/astropy/package-template.png?branch=master
-    :target: https://travis-ci.org/astropy/package-template
-    :alt: Test Status
+If you are using ipython, also install::
+  
+    conda install ipython 
+
+Once this is installed, there are two ways to install starkit. For simple use::
+
+    pip install git+https://github.com/starkit/starkit
+
+For to download a full development version of starkit please do::
+
+    git clone https://github.com/starkit/starkit
+    cd starkit
+    python setup.py develop
+

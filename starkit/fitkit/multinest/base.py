@@ -161,7 +161,7 @@ class MultiNestResult(object):
     @property
     def maximum(self):
         # returns the maximum in the posterior
-        max_ind = self.posterior_data.loglikelihood.argmin() # this should also be the maxium in weight for the non-equal weighted points
+        max_ind = self.posterior_data.loglikelihood.idxmin() # this should also be the maxium in weight for the non-equal weighted points
         return self.posterior_data[self.parameter_names].iloc[max_ind]
 
     def __repr__(self):
