@@ -78,7 +78,8 @@ def load_grid(hdf_fname, wavelength_type='vacuum'):
     hdf_fname: ~str
         filename and path to the HDF file
     wavelength_type: str
-        use air or vacuum wavelength and convert if necessary
+        use 'air' or 'vacuum' wavelength and convert if necessary (by inspecting
+        what the grid uses in meta)
 
     Returns
     -------
