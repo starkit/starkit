@@ -7,10 +7,14 @@ import h5py
 from scipy import interpolate
 import numpy as np
 
-#from starkit.base.parameter import StarKitParameter as Parameter
 from astropy.modeling import Parameter
 from starkit.fitkit.priors import UniformPrior
+from starkit.utils.vacuumair_conversion import (convert_air2vacuum,
+                                                convert_vacuum2air)
 
+
+wavelength_conversions = {'air2vacuum':convert_air2vacuum,
+                          'vacuum2air':convert_vacuum2air}
 logger = logging.getLogger(__name__)
 
 class BaseSpectralGrid(modeling.Model):
@@ -65,7 +69,7 @@ class BaseSpectralGrid(modeling.Model):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
 
-def load_grid(hdf_fname):
+def load_grid(hdf_fname, wavelength_type='vacuum'):
     """
     Load the grid from an HDF file
 
@@ -73,6 +77,8 @@ def load_grid(hdf_fname):
     ----------
     hdf_fname: ~str
         filename and path to the HDF file
+    wavelength_type: str
+        use air or vacuum wavelength and convert if necessary
 
     Returns
     -------
@@ -93,13 +99,22 @@ def load_grid(hdf_fname):
     wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
     wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
 
+    if wavelength_type not in ['air', 'vacuum']:
+        raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
+                         "{0}".format(wavelength_type))
+    if not meta['wavelength_type'] == wavelength_type:
+        wave_conv = wavelength_conversions['{0}2{1}'.format(
+            meta['wavelength_type'], wavelength_type)]
+
+        wavelength = wave_conv(wavelength)
+
+
     if meta['grid_type'] == 'log':
         R = meta['R']
         R_sampling = meta['R_sampling']
     else:
         raise ValueError('No other grid_type than log is supported')
 
-    parameter_defaults = {}
     parameter_defaults = {param: index.loc[index.index[0], param]
                             for param in interpolate_parameters}
 
