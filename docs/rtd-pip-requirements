@@ -6,16 +6,16 @@ scipy
 pandas
 pytables
 h5py==2
-matplotlib=2
+matplotlib==2
 numexpr==2.6
 pytest==3
 pyyaml
 progressbar2
-tqdm=4
+tqdm==4
 coverage==3
 requests==2
 docopt==0.6.2
-pytest-cov=2
+pytest-cov==2
 
 sphinx_bootstrap_theme
 sphinxcontrib-bibtex
