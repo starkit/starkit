@@ -26,3 +26,7 @@ numpydoc
 docutils
 nbformat
 nbsphinx
+pandoc
+pygments
+ipython
+ipykernel
