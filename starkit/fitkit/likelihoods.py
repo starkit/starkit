@@ -7,8 +7,8 @@ class SpectralChi2Likelihood(StarKitModel):
     inputs = ('wavelength', 'flux')
     outputs = ('loglikelihood', )
 
-    def __init__(self, observed):
-        super(SpectralChi2Likelihood, self).__init__()
+    def __init__(self, observed, *args, **kwargs):
+        super(SpectralChi2Likelihood, self).__init__(*args, **kwargs)
         self.observed_wavelength = observed.wavelength.to(u.angstrom).value
         self.observed_flux = observed.flux.value
         self.observed_uncertainty = getattr(observed, 'uncertainty', None)
@@ -43,16 +43,37 @@ class SpectralL1Likelihood(SpectralChi2Likelihood):
 class SpectralScaledChi2Likelihood(SpectralChi2Likelihood):
     inputs = ('wavelength', 'flux')
     outputs = ('loglikelihood', )
+    lnf = modeling.Parameter()
+
+    def __init__(self, observed, lnf=0.0):
+        super(SpectralScaledChi2Likelihood, self).__init__(observed, lnf=lnf)
 
 
-    def evaluate(self, wavelength, flux):
-        inv_sigma2 = 1.0/(self.observed_uncertainty**2 + self.observed_flux**2*np.exp(2*self.lnf))
-        return -0.5 * np.sum(((flux - salt1.flux.value)**2*inv_sigma2 * - np.log(inv_sigma2)))
-        loglikelihood =  -0.5 * np.sum(
-            ((self.observed_flux - flux) / self.observed_uncertainty)**2)
+    def evaluate(self, wavelength, flux, lnf):
+        """
+        Calculating likelihood and scaling the uncertainties (as shown in http://dfm.io/emcee/current/user/line/)
+        This likelihood function is simply a Gaussian where the variance is underestimated by some fractional amount: f.
+        One can fit for the natural logarithm of f.
+
+        Parameters
+        ----------
+        wavelength : numpy.ndarray
+            wavelength
+        flux : numpy.ndarray
+            flux
+
+        Returns
+        -------
+            : float
+            log likelihood
+        """
+        inv_sigma2 = 1.0/(self.observed_uncertainty**2 + self.observed_flux**2 * np.exp(2 * lnf))
+        loglikelihood = -0.5 * (np.sum((flux - self.observed_flux)**2 * inv_sigma2 - np.log(inv_sigma2)))
+
         if np.isnan(loglikelihood):
             return -1e300
-        return loglikelihood
+        else:
+            return loglikelihood
 
 class PhotometryColorLikelihood(StarKitModel):
     inputs = ('photometry',)
