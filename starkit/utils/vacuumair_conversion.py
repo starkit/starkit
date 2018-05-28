@@ -25,7 +25,7 @@ def convert_vacuum2air(wavelength):
     vac_wavelength = u.Quantity(wavelength, 'angstrom')
     s2 = 1e4 / vac_wavelength.value
     n = 1 + 0.0000834254 + 0.02406147 / (130 - s2) + 0.00015998 / (38.9 - s2)
-    air_wavelength = ((vac_wavelength / n) * u.angstrom).to(wave_unit)
+    air_wavelength = (vac_wavelength / n).to(wave_unit)
     return air_wavelength
 
 def convert_air2vacuum(wavelength):
@@ -52,7 +52,7 @@ def convert_air2vacuum(wavelength):
     s2 = 1e4 / air_wavelength.value
     n = (1 + 0.00008336624212083 + 0.02408926869968 / (130.1065924522 - s2) +
          0.0001599740894897 / (38.92568793293 - s2))
-    air_wavelength = ((air_wavelength / n) * u.angstrom).to(wave_unit)
+    air_wavelength = (air_wavelength * n).to(wave_unit)
     return air_wavelength
 
 

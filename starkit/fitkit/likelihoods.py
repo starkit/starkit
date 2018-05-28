@@ -26,26 +26,30 @@ class SpectralChi2Likelihood(StarKitModel):
         return loglikelihood
 
     
-class SpectralL1Likelihood(StarKitModel):
+class SpectralL1Likelihood(SpectralChi2Likelihood):
     # this likelihood is for the L1 norm, which is appropriate for
     # Laplacian noise, or to have less sensitvity to outliers. 
     inputs = ('wavelength', 'flux')
     outputs = ('loglikelihood', )
 
-    def __init__(self, observed):
-        super(SpectralL1Likelihood, self).__init__()
-        self.observed_wavelength = observed.wavelength.to(u.angstrom).value
-        self.observed_flux = observed.flux.value
-        self.observed_uncertainty = getattr(observed, 'uncertainty', None)
-        if self.observed_uncertainty is not None:
-            self.observed_uncertainty = self.observed_uncertainty.value
-        else:
-            self.observed_uncertainty = np.ones_like(self.observed_wavelength)
-
 
     def evaluate(self, wavelength, flux):
         loglikelihood =  -1.0*np.sum(
             np.abs(self.observed_flux - flux) / self.observed_uncertainty)
+        if np.isnan(loglikelihood):
+            return -1e300
+        return loglikelihood
+
+class SpectralScaledChi2Likelihood(SpectralChi2Likelihood):
+    inputs = ('wavelength', 'flux')
+    outputs = ('loglikelihood', )
+
+
+    def evaluate(self, wavelength, flux):
+        inv_sigma2 = 1.0/(self.observed_uncertainty**2 + self.observed_flux**2*np.exp(2*self.lnf))
+        return -0.5 * np.sum(((flux - salt1.flux.value)**2*inv_sigma2 * - np.log(inv_sigma2)))
+        loglikelihood =  -0.5 * np.sum(
+            ((self.observed_flux - flux) / self.observed_uncertainty)**2)
         if np.isnan(loglikelihood):
             return -1e300
         return loglikelihood
