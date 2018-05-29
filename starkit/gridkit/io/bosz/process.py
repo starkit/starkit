@@ -1,16 +1,13 @@
 import os
 
 import numpy as np
-import pandas as pd
-from scipy import ndimage as nd
 from scipy.interpolate import interp1d
 
 from astropy import units as u
-from astropy.io import fits
 
 from starkit.gridkit.io.process import BaseProcessGrid
 from starkit.gridkit.io.bosz.base import convert_bz2_memmap
-from starkit.gridkit.util import convolve_grid_to_R
+from starkit.gridkit.util import convolve_to_resolution
 
 class BOSZProcessGrid(BaseProcessGrid):
     """
@@ -41,7 +38,7 @@ class BOSZProcessGrid(BaseProcessGrid):
 
     def interp_wavelength(self, flux):
         cut_flux = flux[self.start_idx:self.stop_idx]
-        processed_flux = convolve_grid_to_R(cut_flux, self.R_initial, self.R_initial_sampling, self.R)
+        processed_flux = convolve_to_resolution(cut_flux, self.R_initial, self.R_initial_sampling, self.R)
         output_flux = interp1d(self.cut_wavelength, processed_flux)(
             self.output_wavelength)
         return output_flux

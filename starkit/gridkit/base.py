@@ -78,7 +78,8 @@ class BaseTelluricGrid(BaseSpectralGrid):
         self.raw_fluxes = self.fluxes.copy()
 
     def adapt_to_grid(self, stellar_grid):
-        pass
+        for flux in self.raw_fluxes:
+            pass
 
     def evaluate(self, *args):
         return self.wavelength.value, self.interpolator(np.array(

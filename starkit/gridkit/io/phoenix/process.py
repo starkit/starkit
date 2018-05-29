@@ -7,7 +7,7 @@ from astropy import units as u
 from astropy.io import fits
 
 from starkit.gridkit.io.process import BaseProcessGrid
-from starkit.gridkit.util import convolve_grid_to_R
+from starkit.gridkit.util import convolve_to_resolution
 
 
 class PhoenixProcessGrid(BaseProcessGrid):

@@ -11,7 +11,7 @@ from starkit.base.operations.base import (SpectralOperationModel,
 from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
-from starkit.gridkit.util import convolve_grid_to_R
+from starkit.gridkit.util import convolve_to_resolution
 
 __all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate', 'Normalize']
 
@@ -58,7 +58,7 @@ class InstrumentRConstant(SpectrographOperationModel):
         if self.grid_R is None:
             raise NotImplementedError('grid_R not given - this mode is not '
                                       'implemented yet')
-        convolved_flux = convolve_grid_to_R(flux, self.grid_R, self.grid_sampling, self.R)
+        convolved_flux = convolve_to_resolution(flux, self.grid_R, self.grid_sampling, self.R)
 
         return wavelength, convolved_flux
 

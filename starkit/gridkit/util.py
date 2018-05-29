@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import ndimage as nd
 
-def convolve_grid_to_R(flux, source_R, source_R_sampling, target_R):
+def convolve_to_resolution(flux, source_R, source_R_sampling, target_R):
     """
     Requires the grid to be in logarithmic wavelength scaling. Here we define
     the resolution R as lambda/delta_lambda
