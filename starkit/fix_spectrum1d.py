@@ -5,7 +5,6 @@ class SKSpectrum1D(object):
     @classmethod
     def from_array(cls, wavelength, flux, uncertainty=None):
         """
-
         Parameters
         ----------
         wavelength: astropy quantity
@@ -15,8 +14,8 @@ class SKSpectrum1D(object):
         Returns
         -------
             : SKSpectrum1D object
-
         """
+
         return cls(wavelength, flux, uncertainty)
 
     def __init__(self, wavelength, flux, uncertainty):

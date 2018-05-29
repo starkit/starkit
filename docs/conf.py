@@ -54,7 +54,7 @@ setup_cfg = dict(conf.items('metadata'))
 # -- General configuration ----------------------------------------------------
 
 # By default, highlight as Python 3.
-highlight_language = 'python3'
+highlight_language = 'python2'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.2'
@@ -91,7 +91,20 @@ package = sys.modules[setup_cfg['package_name']]
 version = package.__version__.split('-', 1)[0]
 # The full version, including alpha/beta/rc tags.
 release = package.__version__
+extensions += [
+    'nbsphinx',
+    'sphinx.ext.mathjax',
+]
 
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
+nbsphinx_prolog = """
+The notebook is available here: 
+https://github.com/starkit/starkit/tree/master/docs/{{ env.doc2path(env.docname, base=None) }}
+
+----
+"""
+
+nbsphinx_execute = 'never'
 
 # -- Options for HTML output --------------------------------------------------
 
@@ -114,9 +127,9 @@ release = package.__version__
 
 # Please update these texts to match the name of your package.
 html_theme_options = {
-    'logotext1': 'package',  # white,  semi-bold
-    'logotext2': '-template',  # orange, light
-    'logotext3': ':docs'   # white,  light
+    'logotext1': 'Star',  # white,  semi-bold
+    'logotext2': 'Kit',  # orange, light
+    'logotext3': ':documentation'   # white,  light
     }
 
 

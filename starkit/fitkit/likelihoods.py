@@ -7,8 +7,8 @@ class SpectralChi2Likelihood(StarKitModel):
     inputs = ('wavelength', 'flux')
     outputs = ('loglikelihood', )
 
-    def __init__(self, observed):
-        super(SpectralChi2Likelihood, self).__init__()
+    def __init__(self, observed, *args, **kwargs):
+        super(SpectralChi2Likelihood, self).__init__(*args, **kwargs)
         self.observed_wavelength = observed.wavelength.to(u.angstrom).value
         self.observed_flux = observed.flux.value
         self.observed_uncertainty = getattr(observed, 'uncertainty', None)
@@ -53,21 +53,11 @@ class SpectralChi2LikelihoodAddErr(StarKitModel):
         return loglikelihood
 
     
-class SpectralL1Likelihood(StarKitModel):
+class SpectralL1Likelihood(SpectralChi2Likelihood):
     # this likelihood is for the L1 norm, which is appropriate for
     # Laplacian noise, or to have less sensitvity to outliers. 
     inputs = ('wavelength', 'flux')
     outputs = ('loglikelihood', )
-
-    def __init__(self, observed):
-        super(SpectralL1Likelihood, self).__init__()
-        self.observed_wavelength = observed.wavelength.to(u.angstrom).value
-        self.observed_flux = observed.flux.value
-        self.observed_uncertainty = getattr(observed, 'uncertainty', None)
-        if self.observed_uncertainty is not None:
-            self.observed_uncertainty = self.observed_uncertainty.value
-        else:
-            self.observed_uncertainty = np.ones_like(self.observed_wavelength)
 
 
     def evaluate(self, wavelength, flux):
@@ -76,6 +66,41 @@ class SpectralL1Likelihood(StarKitModel):
         if np.isnan(loglikelihood):
             return -1e300
         return loglikelihood
+
+class SpectralScaledChi2Likelihood(SpectralChi2Likelihood):
+    inputs = ('wavelength', 'flux')
+    outputs = ('loglikelihood', )
+    lnf = modeling.Parameter()
+
+    def __init__(self, observed, lnf=0.0):
+        super(SpectralScaledChi2Likelihood, self).__init__(observed, lnf=lnf)
+
+
+    def evaluate(self, wavelength, flux, lnf):
+        """
+        Calculating likelihood and scaling the uncertainties (as shown in http://dfm.io/emcee/current/user/line/)
+        This likelihood function is simply a Gaussian where the variance is underestimated by some fractional amount: f.
+        One can fit for the natural logarithm of f.
+
+        Parameters
+        ----------
+        wavelength : numpy.ndarray
+            wavelength
+        flux : numpy.ndarray
+            flux
+
+        Returns
+        -------
+            : float
+            log likelihood
+        """
+        inv_sigma2 = 1.0/(self.observed_uncertainty**2 + self.observed_flux**2 * np.exp(2 * lnf))
+        loglikelihood = -0.5 * (np.sum((flux - self.observed_flux)**2 * inv_sigma2 - np.log(inv_sigma2)))
+
+        if np.isnan(loglikelihood):
+            return -1e300
+        else:
+            return loglikelihood
 
 class PhotometryColorLikelihood(StarKitModel):
     inputs = ('photometry',)
