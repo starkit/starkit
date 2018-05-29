@@ -71,9 +71,9 @@ class BaseSpectralGrid(modeling.Model):
 class BaseTelluricGrid(BaseSpectralGrid):
     input = ('wavelength', 'flux')
 
-    vrad = modeling.Parameter()
+    vrad_telluric = modeling.Parameter()
 
-    def __init__(self, wavelength, index, fluxes, vrad=0.0, **kwargs):
+    def __init__(self, wavelength, index, fluxes, target_wavelength=None, target_R=None, vrad=0.0, **kwargs):
         super(BaseTelluricGrid, self).__init__(wavelength, index, fluxes, vrad=vrad, **kwargs)
         self.raw_fluxes = self.fluxes.copy()
 
@@ -106,6 +106,7 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
         : SpectralGrid object
 
     """
+
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
     meta = pd.read_hdf(hdf_fname, 'meta')
@@ -170,3 +171,51 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
         parameter.prior = uniform_prior
 
     return spec_grid
+
+def read_grid(hdf_fname):
+    """
+    Load the grid information from hdf
+
+    Parameters
+    ----------
+    hdf_fname: str
+        filename and path to the HDF file
+
+    Returns
+    -------
+        wavelength : astropy.units.Quantity
+        meta : pandas.Series
+        index : pandas.DataFrame
+        fluxes : astropy.units.Quantity
+
+    """
+
+    logger.info('Reading index')
+    index = pd.read_hdf(hdf_fname, 'index')
+    meta = pd.read_hdf(hdf_fname, 'meta')
+    logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
+
+    with h5py.File(hdf_fname) as fh:
+        logger.info('Reading Fluxes')
+        fluxes = fh['fluxes'].__array__()
+    logger.info('Fluxes shape {0}'.format(fluxes.shape))
+    flux_unit = u.Unit(meta['flux_unit'])
+    wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
+    wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
+
+    return wavelength, meta, index, fluxes * flux_unit
+
+"""
+    if wavelength_type is None:
+        logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
+            meta['wavelength_type']))
+        wavelength_type = meta['wavelength_type']
+    if wavelength_type not in ['air', 'vacuum']:
+        raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
+                         "{0}".format(wavelength_type))
+    if not meta['wavelength_type'] == wavelength_type:
+        wave_conv = wavelength_conversions['{0}2{1}'.format(
+            meta['wavelength_type'], wavelength_type)]
+
+        wavelength = wave_conv(wavelength)
+"""
