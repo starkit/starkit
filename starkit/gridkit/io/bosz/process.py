@@ -60,4 +60,4 @@ class BOSZProcessGrid(BaseProcessGrid):
         if not os.path.exists(fname_npy):
             convert_bz2_memmap(fname)
         flux = np.load(fname_npy)
-        return flux
+        return flux * np.pi

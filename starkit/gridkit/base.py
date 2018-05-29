@@ -11,7 +11,7 @@ from astropy.modeling import Parameter
 from starkit.fitkit.priors import UniformPrior
 from starkit.utils.vacuumair_conversion import (convert_air2vacuum,
                                                 convert_vacuum2air)
-
+from starkit.gridkit.util import convolve_to_resolution
 
 wavelength_conversions = {'air2vacuum':convert_air2vacuum,
                           'vacuum2air':convert_vacuum2air}
@@ -21,16 +21,68 @@ class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
     outputs = ('wavelength', 'flux')
 
-    def __init__(self, wavelength, index, fluxes, **kwargs):
-        self.R = kwargs.pop('R', None)
-        self.R_sampling = kwargs.pop('R_sampling', None)
-        self.flux_unit = kwargs.pop('flux_unit', None)
+    def __init__(self, wavelength, index, fluxes, meta, wavelength_type=None, **kwargs):
+        super(BaseSpectralGrid, self).__init__(**kwargs)
+        if meta['grid_type'] != 'log':
+            raise ValueError('No other grid_type than log is supported - meta specifies {0} however'.format(
+                meta['grid_type']))
+        self.R = meta['R']
+        self.R_sampling = meta['R_sampling']
+
+        self.meta_grid = meta
         self.index = index
         self.fluxes = fluxes
 
-        super(BaseSpectralGrid, self).__init__(**kwargs)
+        self.setup_wavelength_type(wavelength, wavelength_type)
+
         self.interpolator = self._generate_interpolator(index, fluxes)
-        self.wavelength = wavelength
+
+    @property
+    def wavelength_type(self):
+        return self._wavelength_type
+
+    @wavelength_type.setter
+    def wavelength_type(self, wavelength_type):
+        if wavelength_type not in ['air', 'vacuum']:
+            raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
+                             "{0}".format(wavelength_type))
+        self._wavelength_type = wavelength_type
+
+        self.wavelength = getattr(self, 'wavelength_{0}'.format(self._wavelength_type)).copy()
+
+    def setup_wavelength_type(self, wavelength, wavelength_type):
+        """
+        Setting the initial wavelength_type and setting the attributes
+        wavelength_air and wavelength_vacuum.
+
+        Parameters
+        ----------
+        wavelength: astropy.units.Quantity
+        wavelength_type: str
+
+        Returns
+        -------
+            : None
+
+        """
+
+
+
+        if wavelength_type is None:
+            logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
+                self.meta_grid['wavelength_type']))
+            wavelength_type = self.meta_grid['wavelength_type']
+
+        setattr(self, 'wavelength_{0}'.format(self.meta_grid['wavelength_type']), wavelength)
+
+        wavelength_types = {'air', 'vacuum'}
+        wavelength_types.remove(self.meta_grid['wavelength_type'])
+        non_grid_wavelength_type = wavelength_types.pop()
+        non_grid_wavelength = wavelength_conversions['{0}2{1}'.format(self.meta_grid['wavelength_type'],
+                                                                      non_grid_wavelength_type)](wavelength)
+
+        setattr(self, 'wavelength_{0}'.format(non_grid_wavelength_type), non_grid_wavelength)
+        self.wavelength_type = wavelength_type
 
     def get_grid_extent(self):
         extents = []
@@ -48,13 +100,11 @@ class BaseSpectralGrid(modeling.Model):
         return priors
 
     def evaluate(self, *args):
-
-        return self.wavelength.value, self.interpolator(np.array(
-            args).reshape(len(self.param_names)))[0]
+        return self.wavelength.value, np.squeeze(self.interpolator(np.array(args)))
 
     @staticmethod
     def _generate_interpolator(index, fluxes):
-        return interpolate.LinearNDInterpolator(index, fluxes)
+        return interpolate.LinearNDInterpolator(index, fluxes.value)
 
     @property
     def velocity_per_pix(self):
@@ -69,83 +119,96 @@ class BaseSpectralGrid(modeling.Model):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
 class BaseTelluricGrid(BaseSpectralGrid):
-    input = ('wavelength', 'flux')
+
 
     vrad_telluric = modeling.Parameter()
 
-    def __init__(self, wavelength, index, fluxes, target_wavelength=None, target_R=None, vrad=0.0, **kwargs):
-        super(BaseTelluricGrid, self).__init__(wavelength, index, fluxes, vrad=vrad, **kwargs)
-        self.raw_fluxes = self.fluxes.copy()
+    def __init__(self, wavelength, index, fluxes, meta, wavelength_type=None, target_wavelength=None, target_R=None,
+                 vrad_telluric=0.0, **kwargs):
 
-    def adapt_to_grid(self, stellar_grid):
-        for flux in self.raw_fluxes:
-            pass
+        super(BaseTelluricGrid, self).__init__(wavelength, index, fluxes, meta, wavelength_type=wavelength_type,
+                                               vrad_telluric=vrad_telluric, **kwargs)
+        self.raw_wavelength = wavelength.copy()
+        self.raw_fluxes = fluxes.copy()
 
-    def evaluate(self, *args):
-        return self.wavelength.value, self.interpolator(np.array(
-            args).reshape(len(self.param_names)))[0]
+        if target_R is not None:
+            self.reconvolve_fluxes(target_R)
 
-def load_telluric_grid(hdf_fname, wavelength_type=None):
-    return load_grid(hdf_fname, wavelength_type=wavelength_type,
-                     base_class=BaseTelluricGrid)
+        if target_wavelength is not None:
+            self.resample_fluxes(target_wavelength)
 
-def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
+    def reconvolve_fluxes(self, target_R):
+        """
+        Reconvolve Fluxes to target
+        Parameters
+        ----------
+        target_R
+
+        Returns
+        -------
+
+        """
+        for i, flux in enumerate(self.raw_fluxes.value):
+            self.fluxes[i] = convolve_to_resolution(flux, self.R, self.R_sampling, target_R)
+        self.R = target_R
+        self.R_sampling = None
+
+
+    def resample_fluxes(self, target_wavelength):
+        """
+        Resample Telluric absorption on target wavelength_grid.
+
+        Parameters
+        ----------
+        target_wavelength: astropy.units.Quantity
+            target wavelength_grid
+
+        """
+        wavelength_interp = interpolate.interp1d(self.wavelength, self.raw_fluxes, bounds_error=False,
+                                                 fill_value=np.nan)
+
+
+        self.fluxes = wavelength_interp(target_wavelength)
+        self.setup_wavelength_type(target_wavelength, self.wavelength_type)
+
+
+    def evaluate_raw(self, *args):
+        return self.wavelength.value, np.squeeze(self.interpolator(np.array(
+            args)))
+
+
+
+
+
+
+
+def construct_grid_class_dict(meta, index):
     """
-    Load the grid from an HDF file
+    Construct a SpectralGrid class with the parameter attributes and initial parameters set.
 
     Parameters
     ----------
-    hdf_fname: ~str
-        filename and path to the HDF file
-    wavelength_type: str
-        use 'air' or 'vacuum' wavelength and convert if necessary (by inspecting
-        what the grid uses in meta)
+    meta: pandas.Series
+        normal grid metadata
+    index: pandas.Dataframe
+        Grid index with parameters
+    base_class: type
+        Base class to use to construct the grid class
 
     Returns
     -------
-        : SpectralGrid object
-
+    class_dict : dict
+    initial_parameters: dict
+        dictionary for initializing the base_class
     """
 
-    logger.info('Reading index')
-    index = pd.read_hdf(hdf_fname, 'index')
-    meta = pd.read_hdf(hdf_fname, 'meta')
-    logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
-    interpolate_parameters = meta['parameters']
-
-    with h5py.File(hdf_fname) as fh:
-        logger.info('Reading Fluxes')
-        fluxes = fh['fluxes'].__array__()
-    logger.info('Fluxes shape {0}'.format(fluxes.shape))
-    flux_unit = u.Unit(meta['flux_unit'])
-    wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
-    wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
-
-    if wavelength_type is None:
-        logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
-            meta['wavelength_type']))
-        wavelength_type = meta['wavelength_type']
-    if wavelength_type not in ['air', 'vacuum']:
-        raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
-                         "{0}".format(wavelength_type))
-    if not meta['wavelength_type'] == wavelength_type:
-        wave_conv = wavelength_conversions['{0}2{1}'.format(
-            meta['wavelength_type'], wavelength_type)]
-
-        wavelength = wave_conv(wavelength)
-
-
-    if meta['grid_type'] == 'log':
-        R = meta['R']
-        R_sampling = meta['R_sampling']
-    else:
-        raise ValueError('No other grid_type than log is supported')
-
+    interpolation_parameters = meta['parameters']
+    initial_parameters = {item: index[item].iloc[0]
+                          for item in interpolation_parameters}
     parameter_defaults = {param: index.loc[index.index[0], param]
-                            for param in interpolate_parameters}
-
+                          for param in interpolation_parameters}
     class_dict = {}
-    for param in interpolate_parameters:
+    for param in interpolation_parameters:
         if parameter_defaults[param] is None:
             param_descriptor = Parameter()
         else:
@@ -153,24 +216,9 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
 
         class_dict[param] = param_descriptor
 
-    class_dict['__init__'] = base_class.__init__
 
-    SpectralGrid = type('SpectralGrid', (base_class, ), class_dict)
+    return class_dict, initial_parameters
 
-    initial_parameters = {item: index[item].iloc[0]
-                          for item in interpolate_parameters}
-    logger.info('Initializing spec grid')
-    spec_grid = SpectralGrid(wavelength, index[interpolate_parameters], fluxes,
-                        R=R, R_sampling=R_sampling, flux_unit=flux_unit,
-                        **initial_parameters)
-
-    logger.info('Setting grid extent')
-    for param in interpolate_parameters:
-        uniform_prior = UniformPrior(index[param].min(), index[param].max())
-        parameter = getattr(spec_grid, param)
-        parameter.prior = uniform_prior
-
-    return spec_grid
 
 def read_grid(hdf_fname):
     """
@@ -198,6 +246,7 @@ def read_grid(hdf_fname):
     with h5py.File(hdf_fname) as fh:
         logger.info('Reading Fluxes')
         fluxes = fh['fluxes'].__array__()
+
     logger.info('Fluxes shape {0}'.format(fluxes.shape))
     flux_unit = u.Unit(meta['flux_unit'])
     wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
@@ -205,17 +254,80 @@ def read_grid(hdf_fname):
 
     return wavelength, meta, index, fluxes * flux_unit
 
-"""
-    if wavelength_type is None:
-        logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
-            meta['wavelength_type']))
-        wavelength_type = meta['wavelength_type']
-    if wavelength_type not in ['air', 'vacuum']:
-        raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
-                         "{0}".format(wavelength_type))
-    if not meta['wavelength_type'] == wavelength_type:
-        wave_conv = wavelength_conversions['{0}2{1}'.format(
-            meta['wavelength_type'], wavelength_type)]
+def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
+    """
+    Load the grid from an HDF file
 
-        wavelength = wave_conv(wavelength)
-"""
+    Parameters
+    ----------
+    hdf_fname: ~str
+        filename and path to the HDF file
+    wavelength_type: str
+        use 'air' or 'vacuum' wavelength and convert if necessary (by inspecting
+        what the grid uses in meta)
+
+    Returns
+    -------
+        : SpectralGrid object
+
+    """
+
+    wavelength, meta, index, fluxes = read_grid(hdf_fname)
+
+    class_dict, initial_parameters = construct_grid_class_dict(meta, index)
+    class_dict['__init__'] = base_class.__init__
+
+    SpectralGrid = type('SpectralGrid', (base_class,), class_dict)
+
+    logger.info('Initializing spec grid')
+
+    spec_grid = SpectralGrid(wavelength, index[meta['parameters']].values, fluxes, meta,
+                             wavelength_type=wavelength_type,  **initial_parameters)
+
+    return spec_grid
+
+def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_class=BaseTelluricGrid):
+    """
+    Load the grid from an HDF file
+
+    Parameters
+    ----------
+    hdf_fname: ~str
+        filename and path to the HDF file
+
+    stellar_grid: BaseSpectralGrid
+        spectral_grid to adapt to
+
+    wavelength_type: str
+        use 'air' or 'vacuum' wavelength and convert if necessary (by inspecting
+        what the grid uses in meta)
+
+    Returns
+    -------
+        : SpectralGrid object
+
+    """
+
+    wavelength, meta, index, fluxes = read_grid(hdf_fname)
+
+    class_dict, initial_parameters = construct_grid_class_dict(meta, index)
+    if stellar_grid is not None:
+        class_dict['input'] = ('wavelength', 'flux')
+        initial_parameters['target_wavelength'] = stellar_grid.wavelength
+        initial_parameters['target_R'] = stellar_grid.R
+        if wavelength_type is not None and stellar_grid is not None:
+            logger.warn('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
+        initial_parameters['wavelength_type'] = stellar_grid.wavelength_type
+        class_dict['evaluate'] = base_class.evaluate_transmission
+    else:
+        class_dict['input'] = tuple()
+        class_dict['evaluate'] = base_class.evaluate_raw
+        initial_parameters['wavelength_type'] = wavelength_type
+
+    TelluricGrid = type('TelluricGrid', (BaseTelluricGrid,), class_dict)
+
+    logger.info('Initializing spec grid')
+
+    spec_grid = TelluricGrid(wavelength, index[meta['parameters']].values, fluxes, meta, **initial_parameters)
+
+    return spec_grid
