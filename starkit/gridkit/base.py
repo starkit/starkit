@@ -68,6 +68,14 @@ class BaseSpectralGrid(modeling.Model):
         for i in xrange(self.fluxes.shape[0]):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
+class BaseTelluricGrid(BaseSpectralGrid):
+    input = ('wavelength', 'flux')
+
+    vrad = modeling.Parameter()
+
+    def evaluate(self, *args):
+        return self.wavelength.value, self.interpolator(np.array(
+            args).reshape(len(self.param_names)))[0]
 
 def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     """
