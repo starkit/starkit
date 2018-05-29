@@ -20,6 +20,7 @@ Input/Output
 
     io/reading_phoenix.ipynb
     io/reading_bosz.ipynb
+    io/reading_moehler_telluric.ipynb
     io/gridkit_fileformat
 
 
