@@ -11,6 +11,7 @@ from starkit.base.operations.base import (SpectralOperationModel,
 from starkit.fix_spectrum1d import SKSpectrum1D
 
 from starkit.utils.spectral import prepare_observed
+from starkit.gridkit.util import convolve_grid_to_R
 
 __all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate', 'Normalize']
 
@@ -57,12 +58,9 @@ class InstrumentRConstant(SpectrographOperationModel):
         if self.grid_R is None:
             raise NotImplementedError('grid_R not given - this mode is not '
                                       'implemented yet')
-        rescaled_R = 1 / np.sqrt((1/R)**2 - (1 / self.grid_R)**2 )
+        convolved_flux = convolve_grid_to_R(flux, self.grid_R, self.grid_sampling, self.R)
 
-        sigma = ((self.grid_R / rescaled_R) * self.grid_sampling /
-                     (2 * np.sqrt(2 * np.log(2))))
-
-        return wavelength, nd.gaussian_filter1d(flux, sigma)
+        return wavelength, convolved_flux
 
 class InstrumentDeltaLambdaConstant(SpectrographOperationModel):
     """

@@ -73,9 +73,16 @@ class BaseTelluricGrid(BaseSpectralGrid):
 
     vrad = modeling.Parameter()
 
+    def __init__(self, wavelength, index, fluxes, vrad=0.0, **kwargs):
+        super(BaseTelluricGrid, self).__init__(wavelength, index, fluxes, vrad=vrad, **kwargs)
+        self.raw_fluxes = self.fluxes
     def evaluate(self, *args):
         return self.wavelength.value, self.interpolator(np.array(
             args).reshape(len(self.param_names)))[0]
+
+def load_telluric_grid(hdf_fname, wavelength_type=None):
+    return load_grid(hdf_fname, wavelength_type=wavelength_type,
+                     base_class=BaseTelluricGrid)
 
 def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     """

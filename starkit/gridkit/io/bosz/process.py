@@ -10,6 +10,7 @@ from astropy.io import fits
 
 from starkit.gridkit.io.process import BaseProcessGrid
 from starkit.gridkit.io.bosz.base import convert_bz2_memmap
+from starkit.gridkit.util import convolve_grid_to_R
 
 class BOSZProcessGrid(BaseProcessGrid):
     """
@@ -40,11 +41,7 @@ class BOSZProcessGrid(BaseProcessGrid):
 
     def interp_wavelength(self, flux):
         cut_flux = flux[self.start_idx:self.stop_idx]
-        rescaled_R = 1 / np.sqrt((1/self.R)**2 - (1/self.R_initial)**2)
-        sigma = ((self.R_initial / rescaled_R) * self.R_initial_sampling
-                 / (2 * np.sqrt(2 * np.log(2))))
-
-        processed_flux = nd.gaussian_filter1d(cut_flux, sigma)
+        processed_flux = convolve_grid_to_R(cut_flux, self.R_initial, self.R_initial_sampling, self.R)
         output_flux = interp1d(self.cut_wavelength, processed_flux)(
             self.output_wavelength)
         return output_flux
