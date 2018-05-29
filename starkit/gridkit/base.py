@@ -69,7 +69,7 @@ class BaseSpectralGrid(modeling.Model):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
 
-def load_grid(hdf_fname, wavelength_type='vacuum'):
+def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     """
     Load the grid from an HDF file
 
@@ -100,6 +100,10 @@ def load_grid(hdf_fname, wavelength_type='vacuum'):
     wavelength = pd.read_hdf(hdf_fname, 'wavelength').values[:, 0]
     wavelength = u.Quantity(wavelength, meta['wavelength_unit'])
 
+    if wavelength_type is None:
+        logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
+            meta['wavelength_type']))
+        wavelength_type = meta['wavelength_type']
     if wavelength_type not in ['air', 'vacuum']:
         raise ValueError("Wavelength_type can either be 'vacuum' or 'air' not "
                          "{0}".format(wavelength_type))
@@ -128,9 +132,9 @@ def load_grid(hdf_fname, wavelength_type='vacuum'):
 
         class_dict[param] = param_descriptor
 
-    class_dict['__init__'] = BaseSpectralGrid.__init__
+    class_dict['__init__'] = base_class.__init__
 
-    SpectralGrid = type('SpectralGrid', (BaseSpectralGrid, ), class_dict)
+    SpectralGrid = type('SpectralGrid', (base_class, ), class_dict)
 
     initial_parameters = {item: index[item].iloc[0]
                           for item in interpolate_parameters}
