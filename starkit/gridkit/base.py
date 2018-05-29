@@ -100,7 +100,7 @@ class BaseSpectralGrid(modeling.Model):
         return priors
 
     def evaluate(self, *args):
-        return self.wavelength.value, np.squeeze(self.interpolator(np.array(args)))
+        return self.wavelength.value, np.squeeze(self.interpolator(np.squeeze(np.array(args))))
 
     @staticmethod
     def _generate_interpolator(index, fluxes):
@@ -120,11 +120,8 @@ class BaseSpectralGrid(modeling.Model):
 
 class BaseTelluricGrid(BaseSpectralGrid):
 
-
-    vrad_telluric = modeling.Parameter()
-
-    def __init__(self, wavelength, index, fluxes, meta, wavelength_type=None, target_wavelength=None, target_R=None,
-                 vrad_telluric=0.0, **kwargs):
+    def __init__(self, wavelength, index, fluxes, meta, wavelength_type=None, target_wavelength=None,
+                 target_wavelength_type=None, target_R=None, vrad_telluric=0.0, **kwargs):
 
         super(BaseTelluricGrid, self).__init__(wavelength, index, fluxes, meta, wavelength_type=wavelength_type,
                                                vrad_telluric=vrad_telluric, **kwargs)
@@ -135,21 +132,32 @@ class BaseTelluricGrid(BaseSpectralGrid):
             self.reconvolve_fluxes(target_R)
 
         if target_wavelength is not None:
+            if target_wavelength_type is None:
+                raise ValueError('target_wavelength_type can not by None if target_wavelength is specified')
+            self.wavelength_type = target_wavelength_type
             self.resample_fluxes(target_wavelength)
+
+        self.interpolator = self._generate_interpolator(index, self.fluxes)
+        self.c_in_kms = const.c.to(u.km / u.s).value
 
     def reconvolve_fluxes(self, target_R):
         """
         Reconvolve Fluxes to target
+
         Parameters
         ----------
-        target_R
+        target_R: float
 
         Returns
         -------
 
         """
+
+        new_fluxes = np.empty_like(self.raw_fluxes.value)
         for i, flux in enumerate(self.raw_fluxes.value):
-            self.fluxes[i] = convolve_to_resolution(flux, self.R, self.R_sampling, target_R)
+            new_fluxes[i] = convolve_to_resolution(flux, self.R, self.R_sampling, target_R)
+
+        self.fluxes = new_fluxes * self.fluxes.unit
         self.R = target_R
         self.R_sampling = None
 
@@ -167,22 +175,31 @@ class BaseTelluricGrid(BaseSpectralGrid):
         wavelength_interp = interpolate.interp1d(self.wavelength, self.raw_fluxes, bounds_error=False,
                                                  fill_value=np.nan)
 
-
-        self.fluxes = wavelength_interp(target_wavelength)
+        self.fluxes = wavelength_interp(target_wavelength) * self.fluxes.unit
         self.setup_wavelength_type(target_wavelength, self.wavelength_type)
 
 
     def evaluate_raw(self, *args):
-        return self.wavelength.value, np.squeeze(self.interpolator(np.array(
-            args)))
+        return self.wavelength.value, np.squeeze(self.interpolator(np.squeeze(np.array(args))))
+
+    def evaluate_transmission(self, wavelength, flux, vrad_telluric, *args):
+
+
+        beta = vrad_telluric / self.c_in_kms
+        doppler_factor = np.sqrt((1 + beta) / (1 - beta))
+
+        transmission = np.squeeze(self.interpolator(np.squeeze(np.array(args))))
+        doppler_transmission_interp = interpolate.interp1d(wavelength * doppler_factor, transmission,
+                                                           bounds_error=False, fill_value=np.nan)
+
+        return wavelength, flux * doppler_transmission_interp(wavelength)
 
 
 
 
 
 
-
-def construct_grid_class_dict(meta, index):
+def construct_grid_class_dict(meta, index, class_dict=None):
     """
     Construct a SpectralGrid class with the parameter attributes and initial parameters set.
 
@@ -207,7 +224,10 @@ def construct_grid_class_dict(meta, index):
                           for item in interpolation_parameters}
     parameter_defaults = {param: index.loc[index.index[0], param]
                           for param in interpolation_parameters}
-    class_dict = {}
+
+    if class_dict is None:
+        class_dict = {}
+
     for param in interpolation_parameters:
         if parameter_defaults[param] is None:
             param_descriptor = Parameter()
@@ -273,9 +293,11 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     """
 
     wavelength, meta, index, fluxes = read_grid(hdf_fname)
-
-    class_dict, initial_parameters = construct_grid_class_dict(meta, index)
+    class_dict = {}
     class_dict['__init__'] = base_class.__init__
+
+    class_dict, initial_parameters = construct_grid_class_dict(meta, index, class_dict=class_dict)
+
 
     SpectralGrid = type('SpectralGrid', (base_class,), class_dict)
 
@@ -309,25 +331,30 @@ def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_
     """
 
     wavelength, meta, index, fluxes = read_grid(hdf_fname)
+    class_dict = {}
+    class_dict['vrad_telluric'] = modeling.Parameter(default=0.0)
+    class_dict, initial_parameters = construct_grid_class_dict(meta, index, class_dict=class_dict)
+    class_dict['__init__'] = base_class.__init__
 
-    class_dict, initial_parameters = construct_grid_class_dict(meta, index)
     if stellar_grid is not None:
-        class_dict['input'] = ('wavelength', 'flux')
+        class_dict['inputs'] = ('wavelength', 'flux')
+        class_dict['evaluate'] = base_class.evaluate_transmission
         initial_parameters['target_wavelength'] = stellar_grid.wavelength
         initial_parameters['target_R'] = stellar_grid.R
         if wavelength_type is not None and stellar_grid is not None:
             logger.warn('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
-        initial_parameters['wavelength_type'] = stellar_grid.wavelength_type
-        class_dict['evaluate'] = base_class.evaluate_transmission
+        initial_parameters['wavelength_type'] = meta['wavelength_type']
+        initial_parameters['target_wavelength_type'] = stellar_grid.meta_grid['wavelength_type']
+
     else:
-        class_dict['input'] = tuple()
+        class_dict['inputs'] = tuple()
         class_dict['evaluate'] = base_class.evaluate_raw
         initial_parameters['wavelength_type'] = wavelength_type
 
-    TelluricGrid = type('TelluricGrid', (BaseTelluricGrid,), class_dict)
+    TelluricGrid = type('TelluricGrid', (base_class,), class_dict)
 
     logger.info('Initializing spec grid')
 
-    spec_grid = TelluricGrid(wavelength, index[meta['parameters']].values, fluxes, meta, **initial_parameters)
+    telluric_grid = TelluricGrid(wavelength, index[meta['parameters']].values, fluxes, meta, **initial_parameters)
 
-    return spec_grid
+    return telluric_grid
