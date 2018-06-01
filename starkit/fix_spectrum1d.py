@@ -1,3 +1,4 @@
+import numpy as np
 from astropy import units as u
 
 class SKSpectrum1D(object):
@@ -43,4 +44,28 @@ class SKSpectrum1D(object):
             new_uncertainty = None
 
         return SKSpectrum1D(self.wavelength[spectral_slice], self.flux[spectral_slice],
+                            new_uncertainty)
+
+
+    def get_nan_cleaned(self):
+        """
+        Get a new spectrum that has all NaNs removed
+
+        Returns
+        -------
+            : SKSpectrum1D
+
+        """
+
+        nan_filter = ~np.isnan(self.wavelength)
+        nan_filter = nan_filter & ~np.isnan(self.flux)
+        if self.uncertainty is not None:
+            nan_filter = nan_filter & ~np.isnan(self.uncertainty)
+
+        if self.uncertainty is None:
+            new_uncertainty = None
+        else:
+            new_uncertainty = self.uncertainty[nan_filter]
+
+        return SKSpectrum1D(self.wavelength[nan_filter], self.flux[nan_filter],
                             new_uncertainty)
