@@ -222,18 +222,21 @@ def construct_grid_class_dict(meta, index, class_dict=None):
     interpolation_parameters = meta['parameters']
     initial_parameters = {item: index[item].iloc[0]
                           for item in interpolation_parameters}
+
     parameter_defaults = {param: index.loc[index.index[0], param]
                           for param in interpolation_parameters}
+
+    parameter_bounds = {param: (index[param].min(), index[param].max())
+                        for param in interpolation_parameters}
 
     if class_dict is None:
         class_dict = {}
 
     for param in interpolation_parameters:
-        if parameter_defaults[param] is None:
-            param_descriptor = Parameter()
-        else:
-            param_descriptor = Parameter(default=parameter_defaults[param])
-
+        cur_param_default = parameter_defaults.get(param, None)
+        cur_param_bound = parameter_bounds.get(param, None)
+        param_descriptor = Parameter(default=cur_param_default,
+                                     bounds=cur_param_bound)
         class_dict[param] = param_descriptor
 
 

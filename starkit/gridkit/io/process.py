@@ -64,7 +64,8 @@ class BaseProcessGrid(object):
         """
         fluxes = np.empty((len(self.index), len(self.output_wavelength)), dtype=np.float64)
 
-        for i, fname in tqdm(enumerate(self.index.filename)):
+        for i, fname in tqdm(enumerate(self.index.filename),
+                             total=len(self.index)):
             flux = self.load_flux(fname)
             fluxes[i] = self.interp_wavelength(flux)
         return fluxes

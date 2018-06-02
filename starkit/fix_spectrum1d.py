@@ -46,6 +46,36 @@ class SKSpectrum1D(object):
         return SKSpectrum1D(self.wavelength[spectral_slice], self.flux[spectral_slice],
                             new_uncertainty)
 
+    def slice_wavelength(self, start_wavelength=None, stop_wavelength=None):
+        """
+        Slice the spectrum according to wavelength
+
+        Parameters
+        ----------
+        start_wavelength: astropy.units.Quantity or float
+            if float is given the assumed wavelength unit will be that of the
+            spectrum
+        stop_wavelength
+            if float is given the assumed wavelength unit will be that of the
+            spectrum
+
+        Returns
+        -------
+            : SKSpectrum
+        """
+        if start_wavelength is None:
+            start = None
+        else:
+            start_wavelength = u.Quantity(start_wavelength, unit=self.wavelength.unit)
+            start = self.wavelength.searchsorted(start_wavelength, side='left')
+
+        if stop_wavelength is None:
+            stop = None
+        else:
+            stop_wavelength = u.Quantity(stop_wavelength, unit=self.wavelength.unit)
+            stop = self.wavelength.searchsorted(stop_wavelength, side='right')
+
+        return self.slice_index(start=start, stop=stop)
 
     def get_nan_cleaned(self):
         """

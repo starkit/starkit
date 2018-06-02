@@ -1,5 +1,8 @@
 import numpy as np
 from scipy import stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ParameterExplorer(object):
 
@@ -16,10 +19,9 @@ class ParameterExplorer(object):
 
         self.model = model
         self.likelihood = likelihood
-        self.priors = priors
-        self.priors.update(self._generate_grid_uniform_priors())
 
         self.full_likelihood = model | likelihood
+
 
         self.param_names_raw = self.full_likelihood.param_names
 
@@ -33,17 +35,29 @@ class ParameterExplorer(object):
             [getattr(self.full_likelihood, param_name).value
              for param_name in self.param_names_raw])
 
+        self.priors = self._generate_grid_uniform_priors()
+        self.priors.update(priors)
+
+
+        param_no_prior = set(self.param_names) - set(self.priors.keys())
+
+        if len(param_no_prior) > 0:
+            logger.warn('Prior not set for parameters {0}'.format(
+                ', '.join(param_no_prior)))
+
+
 
     def _generate_grid_uniform_priors(self):
         """
         Get the uniform priors from the grid
         """
-        spectral_grid = self.model[0]
-        param_names = spectral_grid.param_names
-        bounds = spectral_grid.get_grid_extent()
-        priors = {pname:stats.uniform(loc=bound[0], scale=bound[1]-bound[0]).ppf
-                  for pname, bound in zip(param_names, bounds)}
-
+        priors = {}
+        for pname, pname_raw in zip(self.param_names, self.param_names_raw):
+            bound = self.full_likelihood.bounds[pname_raw]
+            if bound[0] is None or bound[1] is None:
+                continue
+            priors[pname] = stats.uniform(loc=bound[0],
+                                          scale=bound[1]-bound[0]).ppf
 
         return priors
 
