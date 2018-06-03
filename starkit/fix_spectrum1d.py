@@ -91,6 +91,7 @@ class SKSpectrum1D(object):
         nan_filter = nan_filter & ~np.isnan(self.flux)
         if self.uncertainty is not None:
             nan_filter = nan_filter & ~np.isnan(self.uncertainty)
+            nan_filter = nan_filter & (self.uncertainty > 0.0)
 
         if self.uncertainty is None:
             new_uncertainty = None
