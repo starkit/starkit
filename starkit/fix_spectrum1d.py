@@ -8,7 +8,7 @@ class SKSpectrum1D(object):
         """
         Parameters
         ----------
-        wavelength: astropy quantity
+        wavelength: astropy.units.Quantity
         flux: astropy quantity
         uncertainty: astropy quantity
 
@@ -37,6 +37,20 @@ class SKSpectrum1D(object):
     uncertainty = property(uncertainty_getter, uncertainty_setter)
 
     def slice_index(self, start=None, stop=None, step=None):
+        """
+        Slice the spectrum according to index
+
+        Parameters
+        ----------
+        start: int
+        stop: int
+        step: int
+
+        Returns
+        -------
+            : SKSpectrum
+        """
+
         spectral_slice = slice(start, stop, step)
         if self.uncertainty is not None:
             new_uncertainty = self.uncertainty[spectral_slice]
