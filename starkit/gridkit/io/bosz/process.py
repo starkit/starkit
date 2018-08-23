@@ -15,7 +15,7 @@ class BOSZProcessGrid(BaseProcessGrid):
     """
 
     R_initial = 300000
-    R_initial_sampling=2
+    R_initial_sampling=1
     def __init__(self, index, input_wavelength, meta, wavelength_start=0*u.angstrom, wavelength_stop=np.inf*u.angstrom,
                  R=5000.0, R_sampling=4):
         """

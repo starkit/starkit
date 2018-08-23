@@ -135,6 +135,3 @@ class Distance(StellarOperationModel):
         conversion = self.lum_density2cgs / (4 * np.pi *
                                              (distance * self.pc2cm)**2)
         return wavelength, flux * conversion
-
-
-
