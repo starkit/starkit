@@ -312,13 +312,16 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
                              wavelength_type=wavelength_type,  **initial_parameters)
 
     if 'format_version' not in spec_grid.meta_grid.keys():
-        logger.warn('No format_version in meta data for this grid. Please get an updated grid. This will fail in the future.')
-        warnings.warn('No format_version in meta data for this grid. Please get an updated grid. This will fail in the future.', DeprecationWarning)
+        logger.warn('No format_version in meta data for this grid. Please get an'+\
+                    ' updated grid. This will fail in the future.')
+        warnings.warn('No format_version in meta data for this grid. Please get '+\
+                      'an updated grid. This will fail in the future.', DeprecationWarning)
     else:
         current_version = starkit.gridkit.FORMAT_VERSION
         grid_version = spec_grid.meta_grid['format_version']
         if current_version[1] != grid_version[1]:
-            raise ValueError('Grid major versions do not match! Curent code format version: {0} grid format version: {1} '.format(current_version, grid_version))
+            raise ValueError('Grid major versions do not match! Curent code '+\
+                             'format version: {0} grid format version: {1} '.format(current_version, grid_version))
         
     return spec_grid
 
