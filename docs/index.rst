@@ -30,4 +30,4 @@ Examples
 
 .. toctree::
     :maxdepth: 2
-    examples/
+    examples/starkit_photometry.ipynb
