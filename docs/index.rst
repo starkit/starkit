@@ -24,4 +24,10 @@ Input/Output
     io/gridkit_fileformat
 
 
+--------
+Examples
+--------
 
+.. toctree::
+    :maxdepth: 2
+    examples/
