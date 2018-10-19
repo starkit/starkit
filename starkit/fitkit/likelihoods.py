@@ -24,6 +24,33 @@ class SpectralChi2Likelihood(StarKitModel):
         if np.isnan(loglikelihood):
             return -1e300
         return loglikelihood
+    
+class SpectralChi2LikelihoodAddErr(StarKitModel):
+    ## additive error model
+    
+    inputs = ('wavelength', 'flux')
+    outputs = ('loglikelihood', )
+
+    add_err = modeling.Parameter(default=0.0)
+    
+    def __init__(self, observed, add_err = 0.0):
+        super(SpectralChi2LikelihoodAddErr, self).__init__(add_err=add_err)
+        self.observed_wavelength = observed.wavelength.to(u.angstrom).value
+        self.observed_flux = observed.flux.value
+        self.observed_uncertainty = getattr(observed, 'uncertainty', None)
+        if self.observed_uncertainty is not None:
+            self.observed_uncertainty = self.observed_uncertainty.value
+        else:
+            self.observed_uncertainty = np.ones_like(self.observed_wavelength)
+
+
+    def evaluate(self, wavelength, flux, add_err):
+        norm = 1.0/np.sqrt(2.0*np.pi*(self.observed_uncertainty**2+add_err**2))
+        loglikelihood =  np.sum(np.log(norm) + -0.5 * (
+            ((self.observed_flux - flux)**2 / (self.observed_uncertainty**2 + add_err**2))))
+        if np.isnan(loglikelihood):
+            return -1e300
+        return loglikelihood
 
     
 class SpectralL1Likelihood(SpectralChi2Likelihood):
