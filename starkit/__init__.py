@@ -4,22 +4,27 @@
 This is an Astropy affiliated package.
 """
 
-# Affiliated packages may add whatever they like to this file, but
-# should keep this content at the top.
-# ----------------------------------------------------------------------------
+import os
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 from ._astropy_init import *
-# ----------------------------------------------------------------------------
 
-# For egg_info test builds to pass, put package imports here.
-from starkit.base.assemble_model import assemble_model
-from starkit.fix_spectrum1d import SKSpectrum1D
-import starkit.base.operations as operations
+if not on_rtd:
+    # Affiliated packages may add whatever they like to this file, but
+    # should keep this content at the top.
+    # ----------------------------------------------------------------------------
+    
+    # ----------------------------------------------------------------------------
 
-import logging
+    # For egg_info test builds to pass, put package imports here.
+    from starkit.base.assemble_model import assemble_model
+    from starkit.fix_spectrum1d import SKSpectrum1D
+    import starkit.base.operations as operations
 
-logger = logging.getLogger('starkit')
-logger.setLevel(logging.INFO)
-console_handler = logging.StreamHandler()
-console_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(console_formatter)
-logger.addHandler(console_handler)
+    import logging
+
+    logger = logging.getLogger('starkit')
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)

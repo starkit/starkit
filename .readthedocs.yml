@@ -1,5 +1,6 @@
-conda:
-    file: starkit_env27.yml
+#conda:
+#    file: starkit_env27.yml
+requirements_file: docs/rtd-pip-requirements
 python:
    pip_install: true
    version: 2.7

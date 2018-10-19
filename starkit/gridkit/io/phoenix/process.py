@@ -6,8 +6,10 @@ from scipy.interpolate import interp1d
 from astropy import units as u
 from astropy.io import fits
 
-
 from starkit.gridkit.io.process import BaseProcessGrid
+from starkit.gridkit.util import convolve_to_resolution
+
+
 class PhoenixProcessGrid(BaseProcessGrid):
 
     uv_wavelength = (500, 3000)
