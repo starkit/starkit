@@ -1,7 +1,7 @@
 from astropy import modeling
 
 class GridConnector(modeling.Model):
-    inputs = tuple('teff', 'logg', 'feh', 'radius')
+    inputs = tuple('teff', 'logg', 'mh', 'radius')
     outputs = ('wavelength', 'flux')
 
     def __init__(self, grid, **kwargs):
@@ -9,6 +9,6 @@ class GridConnector(modeling.Model):
         self.grid = grid
 
 
-    def evaluate(self, teff, logg, feh, radius):
-        return self.grid.evaluate(teff, logg, feh, radius)
+    def evaluate(self, teff, logg, mh, radius):
+        return self.grid.evaluate(teff, logg, mh, radius)
 
