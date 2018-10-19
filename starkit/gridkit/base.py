@@ -318,7 +318,7 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
         current_version = starkit.gridkit.FORMAT_VERSION
         grid_version = spec_grid.meta_grid['format_version']
         if current_version[1] != grid_version[1]:
-            raise ValueError('Grid major versions do not match! Curent code format version: '+current_version+' grid format version: '+grid_version)
+            raise ValueError('Grid major versions do not match! Curent code format version: {0} grid format version: {1} '.format(current_version, grid_version))
         
     return spec_grid
 
