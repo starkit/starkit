@@ -3,15 +3,17 @@ import logging
 from astropy import modeling
 from astropy import units as u, constants as const
 import pandas as pd
+from exceptions import ValueError, DeprecationWarning
 import h5py
 from scipy import interpolate
 import numpy as np
-
+import warnings
 from astropy.modeling import Parameter
 from starkit.fitkit.priors import UniformPrior
 from starkit.utils.vacuumair_conversion import (convert_air2vacuum,
                                                 convert_vacuum2air)
 from starkit.gridkit.util import convolve_to_resolution
+import starkit
 
 wavelength_conversions = {'air2vacuum':convert_air2vacuum,
                           'vacuum2air':convert_vacuum2air}
@@ -306,6 +308,15 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     spec_grid = SpectralGrid(wavelength, index[meta['parameters']].values, fluxes, meta,
                              wavelength_type=wavelength_type,  **initial_parameters)
 
+    if 'format_version' not in spec_grid.meta_grid.keys():
+        logger.warn('No format_version in meta data for this grid. Please get an updated grid. This will fail in the future.')
+        warnings.warn('No format_version in meta data for this grid. Please get an updated grid. This will fail in the future.', DeprecationWarning)
+    else:
+        current_version = starkit.gridkit.FORMAT_VERSION
+        grid_version = spec_grid.meta_grid['format_version']
+        if current_version[1] != grid_version[1]:
+            raise ValueError('Grid major versions do not match! Curent code format version: '+current_version+' grid format version: '+grid_version)
+        
     return spec_grid
 
 def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_class=BaseTelluricGrid):

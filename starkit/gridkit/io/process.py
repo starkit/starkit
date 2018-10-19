@@ -8,7 +8,7 @@ from astropy import units as u
 from tqdm import tqdm
 from scipy import ndimage as nd
 from scipy.interpolate import interp1d
-
+import starkit
 
 class BaseProcessGrid(object):
 
@@ -101,6 +101,7 @@ class BaseProcessGrid(object):
         meta['R_sampling'] = self.R_sampling
         meta['grid_type'] = 'log'
         meta['uuid'] = str(uuid.uuid4())
+        meta['format_version'] = starkit.gridkit.FORMAT_VERSION
         return meta
 
     def get_index(self):
