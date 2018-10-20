@@ -102,7 +102,9 @@ class BaseSpectralGrid(modeling.Model):
         return priors
 
     def evaluate(self, *args):
-        return self.wavelength.value, np.squeeze(self.interpolator(np.squeeze(np.array(args))))
+        wavelength = self.wavelength.value
+        flux = np.squeeze(self.interpolator(np.squeeze(np.array(args))))
+        return wavelength, flux
 
     @staticmethod
     def _generate_interpolator(index, fluxes):
@@ -240,6 +242,9 @@ def construct_grid_class_dict(meta, index, class_dict=None):
         param_descriptor = Parameter(default=cur_param_default,
                                      bounds=cur_param_bound)
         class_dict[param] = param_descriptor
+    if u.Unit(meta['flux_unit']) == u.erg / u.s / u.cm ** 2 / u.angstrom:
+        radius_descriptor = Parameter(default=1, bounds=[1e-6, 1e9])
+        class_dict['radius'] = radius_descriptor
 
 
     return class_dict, initial_parameters
