@@ -18,6 +18,8 @@ import starkit
 wavelength_conversions = {'air2vacuum':convert_air2vacuum,
                           'vacuum2air':convert_vacuum2air}
 logger = logging.getLogger(__name__)
+RSUN2CM =  u.Rsun.to(u.cm)
+
 
 class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
@@ -104,7 +106,9 @@ class BaseSpectralGrid(modeling.Model):
     def evaluate(self, *args):
         wavelength = self.wavelength.value
         flux = np.squeeze(self.interpolator(np.squeeze(np.array(args))))
-        return wavelength, flux
+        radius_cm = self.radius * RSUN2CM
+        surface = 4 * np.pi * radius_cm**2
+        return wavelength, flux * surface
 
     @staticmethod
     def _generate_interpolator(index, fluxes):
