@@ -30,7 +30,8 @@ archivePrefix = "arXiv",
 phoenix_meta = {'bibtex':phoenix_bibtex,
                 'parameters':['teff', 'logg', 'mh', 'alpha'],
                 'wavelength_unit':'Angstrom',
-                'wavelength_type':'vacuum'}
+                'wavelength_type':'vacuum',
+                'flux_unit': 'erg/s/cm^2/angstrom'}
 
 
 def make_raw_index():

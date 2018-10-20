@@ -33,9 +33,10 @@ archivePrefix = "arXiv",
 """
 
 bosz_meta = {'bibtex':bosz_bibtex,
-                'parameters':['teff', 'logg', 'mh', 'ch', 'alpha', 'rot', 'micro'],
-                'wavelength_unit':'Angstrom',
-                'wavelength_type':'vacuum'}
+             'parameters':['teff', 'logg', 'mh', 'ch', 'alpha', 'rot', 'micro'],
+             'wavelength_unit':'Angstrom',
+             'wavelength_type':'vacuum',
+             'flux_unit': 'erg/s/cm^2/angstrom'}
 
 
 def make_raw_index():
