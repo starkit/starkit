@@ -34,3 +34,10 @@ For to download a full development version of starkit please do::
     cd starkit
     python setup.py develop
 
+
+## Example publications that use StarKit:
+
+- Do, Tuan; Kerzendorf, Wolfgang; Konopacky, Quinn; Marcinik, Joseph M.; Ghez, Andrea; Lu, Jessica R.; Morris, Mark R., [Super-solar Metallicity Stars in the Galactic Center Nuclear Star Cluster: Unusual Sc, V, and Y Abundances](https://ui.adsabs.harvard.edu/#abs/2018ApJ...855L...5D/abstract)
+- Feldmeier-Krause, A.; Kerzendorf, W.; Neumayer, N.; Schödel, R.; Nogueras-Lara, F.; Do, T.; de Zeeuw, P. T.; Kuntschner, H., [KMOS view of the Galactic Centre - II. Metallicity distribution of late-type stars](https://ui.adsabs.harvard.edu/#abs/2017MNRAS.464..194F/abstract)
+
+
