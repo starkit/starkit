@@ -13,7 +13,7 @@ class StellarOperationModel(SpectralOperationModel):
 
 class RotationalBroadening(StellarOperationModel):
 	"""
-	The rotational boradening kernel was taken from 
+	The rotational broadening kernel was taken from 
 	Observation and Analysis of Stellar Photospheres
 	by David Gray
 	"""
