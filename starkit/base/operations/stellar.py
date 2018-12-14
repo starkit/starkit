@@ -12,6 +12,11 @@ class StellarOperationModel(SpectralOperationModel):
     pass
 
 class RotationalBroadening(StellarOperationModel):
+	"""
+	The rotational boradening kernel was taken from 
+	Observation and Analysis of Stellar Photospheres
+	by David Gray
+	"""
     operation_name = 'rotation'
     vrot = modeling.Parameter()
     limb_darkening = modeling.Parameter(fixed=True, default=0.6)
