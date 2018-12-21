@@ -1,9 +1,7 @@
-StarKit
-=======
+# StarKit
 
-************
-Installation
-************
+
+## Installation
 
 We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
 the necessary requirements for Starkit to work.
