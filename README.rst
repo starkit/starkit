@@ -13,16 +13,11 @@ for starkit in the following way. This will create an environment called `starki
 
     conda env create --file https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml python=2
     source activate starkit
-    pip install specutils
 
-For now until a new version of Astropy comes out that fixes these problems::
 
-    conda install cython
-    pip install astropy==1.1.2
-
-If you are using ipython, also install::
+Then you can install any other packages you like with
   
-    conda install ipython 
+    conda install <your package>
 
 Once this is installed, there are two ways to install starkit. For simple use::
 
