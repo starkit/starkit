@@ -11,11 +11,10 @@ dependencies:
 - pytables
 - h5py=2.6
 - matplotlib=2
-- astropy=2
+- astropy=1.1.2
 - numexpr=2.6
 - pytest=3.0
 - pyyaml=3.12
-- progressbar2=3.34
 - tqdm=4
 
 # RTD requirements
