@@ -12,7 +12,12 @@ Once you have anaconda installed please make a new environment with the prerequi
 for starkit in the following way. This will create an environment called `starkit`::
 
     curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml
-    conda env create --file starkit_env27.yml
+    
+    # install using yml file into an environment called starkit. 
+    # If you want to call it something else, or already have a starkit enivornment, 
+    # you can change the -n argument
+    
+    conda env create --file starkit_env27.yml -n starkit
     source activate starkit
 
 
