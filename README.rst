@@ -11,7 +11,8 @@ the necessary requirements for Starkit to work.
 Once you have anaconda installed please make a new environment with the prerequisites
 for starkit in the following way. This will create an environment called `starkit`::
 
-    conda env create --file https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml python=2
+    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml
+    conda env create --file starkit_env27.yml
     source activate starkit
 
 
