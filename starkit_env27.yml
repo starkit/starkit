@@ -1,14 +1,12 @@
 name: starkit
 
 channels:
-    - defaults
+    - conda-forge
 
 dependencies:
 - python=2.7
 - numpy=1.12
-- scipy=1
-- pandas
-- pytables
+
 - h5py=2.6
 - matplotlib=2
 - astropy=1.1.2
@@ -16,6 +14,11 @@ dependencies:
 - pytest=3.0
 - pyyaml=3.12
 - tqdm=4
+- jupyter
+- notebook
+- scipy
+- pandas
+- pytables
 
 # RTD requirements
 
