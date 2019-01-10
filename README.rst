@@ -15,7 +15,7 @@ for starkit in the following way. This will create an environment called `starki
     source activate starkit
 
 
-Then you can install any other packages you like with
+Then you can install any other packages you like with::
   
     conda install <your package>
 
