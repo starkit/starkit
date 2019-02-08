@@ -18,7 +18,7 @@ for starkit in the following way. This will create an environment called `starki
     # you can change the -n argument
     
     conda env create --file starkit_env27.yml -n starkit
-    source activate starkit
+    conda activate starkit
 
 
 Then you can install any other packages you like with::
