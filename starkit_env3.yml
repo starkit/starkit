@@ -1,0 +1,40 @@
+name: starkit
+
+channels:
+    - conda-forge
+
+dependencies:
+- python=3
+- numpy=1.16
+- h5py=2.9
+- astropy=3
+- tqdm=4
+- scipy=1.2
+- pandas=0.24
+- pytables=3.4
+
+# Analysis requirements
+- jupyter=1
+- notebook=5
+- matplotlib=3
+
+# Documentation requirements
+
+- sphinx_bootstrap_theme=0.6
+- coveralls=1
+- sphinx=1
+- nbconvert=5
+- numpydoc=0.8
+- docutils=0.14
+- nbformat=4
+- nbsphinx=0.4
+
+#Testing requirements
+- coverage=4
+- requests=2
+- docopt=0.6
+- pytest-cov=2
+- pytest=4
+
+# - pip:
+  
