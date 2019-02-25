@@ -5,7 +5,7 @@ StarKit
 Installation
 ************
 
-We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
+We recommend you use `Anaconda <https://www.anaconda.com/distribution/>`_ to install
 the necessary requirements for Starkit to work.
 
 Once you have anaconda installed please make a new environment with the prerequisites
@@ -18,7 +18,7 @@ for starkit in the following way. This will create an environment called `starki
     # you can change the -n argument
     
     conda env create --file starkit_env27.yml -n starkit
-    source activate starkit
+    conda activate starkit
 
 
 Then you can install any other packages you like with::
