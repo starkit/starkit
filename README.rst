@@ -1,6 +1,9 @@
 StarKit
 =======
 
+.. image:: https://travis-ci.com/starkit/starkit.svg?branch=master
+   :target: https://travis-ci.com/starkit/starkit
+
 ************
 Installation
 ************
