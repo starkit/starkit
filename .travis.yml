@@ -6,6 +6,7 @@ env:
         # overidden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
         - PIP_INSTALL='pip install'
+        - secure: "W+8ZpAZPXi2q0dXhpPDY6IT1AWiYUdXK0KdGIPBwDOp9BR49fZSR2pO2razeSIgES6ZZdLQPxrV+SvorLegoK18I5ZkmOvCJDxl42hghSXzASFImNtM5EAY6C6pdEmnYNuahBxqL7hDRVh66DVNW0IGP3+5UIjDv31uJa65Y7KAptM8N0hdaDH/7FmBYqVsTIl8B+KOAiC5g6NXqSk5+nzwLnf32HoACS6sdZWlU0xl/xTDFcKOnTkHWtzYpCxm7RqaXoI92HgVx526sPpWs2SxvaknNMW0h0MPYbrzRs3wN+0fZXEwpzrMxnPkCuMzlKIXwyrGNLKY363rTgd9LpsTsNy+riW7r1euXyDpDspzvIY0bDisQCux8W3Qt2pZdZkGRWKc9Fmudpm6KKtm6W95vuqUODQ/wN2kL6rKuacSdXRinRrp35v+AyistPhqAXu6m8P8/7gQtwbxVD1AIOPwD/5fM8dG4ZGGAhCDVmHwhfKUiWFVKWjlHWUSVVNuNmMjf0rNOIpALJCxY7HxVT/nQzujcCglLhjkWN8XrE4j6zMi2RNzhE/a6vQThRKza9wLHxPWzXRB4NTgQFBzXh7VVtP4q1VqIcOS5/x/MjF6DeJfgC9XKRz2nXk16Isd4ZFtfGTwM3tGm7Z7RgmJ5JoioDV6Sxuq6ORfw9SPh7zg="
     matrix:
         - SETUP_CMD='egg_info'
 
@@ -14,6 +15,10 @@ matrix:
         # Do a coverage test in Python 2.
         - python: 2.7
           env: SETUP_CMD='test --coverage'
+        
+        # Generate docs
+        - python: 2.7
+          env: SETUP_CMD='build_docs'
 
 before_install:
 
@@ -48,6 +53,7 @@ install:
 
 script:
    - python setup.py $SETUP_CMD
+   - if [[ $SETUP_CMD == 'build_docs' ]]; then source deploy_docs.sh; fi
 
 after_success:
     # If coveralls.io is set up for this package, uncomment the line
