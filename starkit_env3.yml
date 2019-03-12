@@ -4,7 +4,7 @@ channels:
     - conda-forge
 
 dependencies:
-- python=3.7.2
+- python=3.6
 - numpy=1.16
 - h5py=2.9
 - astropy=3
