@@ -36,5 +36,6 @@ dependencies:
 - pytest-cov=2
 - pytest=4
 
-# - pip:
+- pip:
+  - corner
   
