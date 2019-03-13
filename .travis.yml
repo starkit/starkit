@@ -37,7 +37,7 @@ before_install:
 install:
 
     # CONDA
-    - conda env create -n starkit --file ./starkit_env27.yml
+    - conda env create -n starkit --file ./starkit_env3.yml
     - source activate starkit
 
     # OPTIONAL DEPENDENCIES
