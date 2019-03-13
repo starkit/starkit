@@ -3,7 +3,7 @@ import logging
 from astropy import modeling
 from astropy import units as u, constants as const
 import pandas as pd
-from exceptions import ValueError, DeprecationWarning
+# from exceptions import ValueError, DeprecationWarning
 import h5py
 from scipy import interpolate
 import numpy as np
