@@ -1,30 +1,22 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Installation &#8212; starkit v0.0.dev172</title>
-    
+    <title>Installation &#8212; starkit v0.0.dev167</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.dev172',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,8 +27,7 @@
 <script type="text/javascript" src="_static/copybutton.js"></script>
 
 
-  </head>
-  <body role="document">
+  </head><body>
 <div class="topbar">
   <a class="brand" title="Documentation Home" href="index.html"><span id="logotext1">Star</span><span id="logotext2">Kit</span><span id="logotext3">:documentation</span></a>
   <ul>
@@ -71,7 +62,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">starkit v0.0.dev172</a>
+	<a href="index.html">starkit v0.0.dev167</a>
 	 &#187;
       </li>
       
@@ -91,17 +82,17 @@
 the necessary requirements for Starkit to work.</p>
 <p>Once you have anaconda installed please make a new environment with the prerequisites
 for starkit in the following way:</p>
-<div class="highlight-python2"><div class="highlight"><pre><span></span>curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml
+<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml
 conda env create -n starkit --file starkit_env27.yml
 source activate starkit
 </pre></div>
 </div>
 <p>Once this is installed, there are two ways to install starkit. For simple use:</p>
-<div class="highlight-python2"><div class="highlight"><pre><span></span>pip install git+https://github.com/starkit/starkit
+<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/starkit/starkit
 </pre></div>
 </div>
 <p>For to download a full development version of starkit please do:</p>
-<div class="highlight-python2"><div class="highlight"><pre><span></span>git clone https://github.com/starkit/starkit
+<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/starkit/starkit
 cd starkit
 python setup.py develop
 </pre></div>
@@ -130,8 +121,8 @@ python setup.py develop
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Wolfgang Kerzendorf, Tuan Do.<br/>
-    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3. &nbsp;
-    Last built 11 Mar 2019. <br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5. &nbsp;
+    Last built 13 Mar 2019. <br/>
   </p>
 </footer>
   </body>
