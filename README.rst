@@ -8,7 +8,7 @@ StarKit
 Installation
 ************
 
-We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
+We recommend you use `Anaconda <https://www.anaconda.com/distribution/>`_ to install
 the necessary requirements for Starkit to work.
 
 Once you have anaconda installed please make a new environment with the prerequisites
