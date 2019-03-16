@@ -106,18 +106,14 @@ class CCM89Extinction(StellarOperationModel):
     def __init__(self, a_v=0.0, r_v=3.1):
         super(CCM89Extinction, self).__init__(a_v=a_v, r_v=r_v)
 
-
     def evaluate(self, wavelength, flux, a_v, r_v):
-        from specutils import extinction
+        from dust_extinction.parameter_averages import CCM89
         wavelength = np.array(wavelength)
-        extinction_factor = np.ones_like(wavelength)
-        valid_wavelength = ((wavelength > 910) & (wavelength < 33333))
+        ext = CCM89(Rv = r_v)
+        flux_ext = flux*ext.extinguish(wavelength, Av=a_v)
+        return wavelength, flux_ext
 
-        extinction_factor[valid_wavelength] = 10 ** (-0.4 * extinction.extinction_ccm89(
-            wavelength[valid_wavelength] * u.angstrom, a_v=np.abs(a_v),
-            r_v=np.abs(r_v)))
 
-        return wavelength, extinction_factor * flux
 
 class Distance(StellarOperationModel):
 
