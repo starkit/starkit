@@ -1,0 +1,5 @@
+
+Some IMP things you should know before downloading dustmaps from net - 
+
+1. It uses a library \'93HEAPLY\'94 which is only compatible with Mac and linux (i.e. it cannot be downloaded on windows)
+2. Moreover, it is available only for python version 3.6 and less.
