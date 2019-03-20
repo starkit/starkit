@@ -11,7 +11,7 @@ def getEBV_effect(rtAs_n,dec_n):
      ----------
      rightAscension: angular distance of a particular point measured eastward along equator
      declination: angular distance of a point north or south of the celestial equator
-     frame:  system of metrics to calculate the magnitude of reddening (here)
+     
 
      source: https://en.wikipedia.org/wiki/International_Celestial_Reference_System
      '''
