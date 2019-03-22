@@ -118,11 +118,10 @@ class CCM89Extinction(StellarOperationModel):
         >>>wave = np.array([0.5,0.6])*u.micron
         >>>flux = np.random.random(2)*u.Unit('W m-2 angstrom-1 sr-1')
         >>>ext = CCM89Extinction()
-        >>>ext.eavluate(wave,flux,1.0,3.1)
+        >>>ext.evaluate(wave,flux,1.0,3.1)
         (array([0.5, 0.6]), <Quantity [0.14010337, 0.23022791] W / (Angstrom m2 sr)>)
 
         '''
-
 
 
 class Distance(StellarOperationModel):
