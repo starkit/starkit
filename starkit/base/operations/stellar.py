@@ -137,6 +137,5 @@ class Distance(StellarOperationModel):
 
 
     def evaluate(self, wavelength, flux, distance):
-        conversion = self.lum_density2cgs / (4 * np.pi *
-                                             (distance * self.pc2cm)**2)
+        conversion = self.lum_density2cgs / (4 * np.pi * (distance * self.pc2cm)**2)
         return wavelength, flux * conversion
