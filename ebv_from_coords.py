@@ -3,7 +3,6 @@ Function to generate the value of extinction E(B-V) from sky coordinates in Righ
 Must have downloaded SFD Dustmap
 '''
 
-from __future__ import print_function
 from astropy.coordinates import SkyCoord
 from dustmaps.sfd import SFDQuery 
 import astropy.units as u
