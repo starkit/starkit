@@ -29,6 +29,7 @@ except ImportError:
 conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
+metadata={str(k): str(v) for k, v in metadata.items()} #Making sure parsed data is in string not unicode
 
 PACKAGENAME = metadata.get('package_name', 'packagename')
 DESCRIPTION = metadata.get('description', 'Astropy affiliated package')
