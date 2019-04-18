@@ -19,6 +19,10 @@ matrix:
         # Generate docs
         - python: 2.7
           env: SETUP_CMD='build_docs'
+          
+        # Do a coverage test in Python 3.
+        - python: 3.6
+          env: SETUP_CMD='test --coverage'
 
 before_install:
 
@@ -37,7 +41,8 @@ before_install:
 install:
 
     # CONDA
-    - conda env create -n starkit --file ./starkit_env3.yml
+    - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then conda env create -n starkit --file ./starkit_env27.yml;
+      elif [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then conda env create -n starkit --file ./starkit_env3.yml; fi
     - source activate starkit
 
     # OPTIONAL DEPENDENCIES
