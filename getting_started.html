@@ -1,22 +1,30 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Getting Started &#8212; starkit v0.0.dev161</title>
+    
+    <title>Getting Started &#8212; starkit v0.0.dev155</title>
+    
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.dev155',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
@@ -27,7 +35,8 @@
 <script type="text/javascript" src="_static/copybutton.js"></script>
 
 
-  </head><body>
+  </head>
+  <body role="document">
 <div class="topbar">
   <a class="brand" title="Documentation Home" href="index.html"><span id="logotext1">Star</span><span id="logotext2">Kit</span><span id="logotext3">:documentation</span></a>
   <ul>
@@ -62,7 +71,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">starkit v0.0.dev161</a>
+	<a href="index.html">starkit v0.0.dev155</a>
 	 &#187;
       </li>
       
@@ -82,18 +91,18 @@
 <h2>Working with the grid<a class="headerlink" href="#working-with-the-grid" title="Permalink to this headline">¶</a></h2>
 <p>After successful creation of an HDF5 Grid (please see <a class="reference internal" href="io/index.html#io"><span class="std std-ref">Input/Output Documentation</span></a> for details)
 one can load the grid using:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.gridkit import load_grid
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.gridkit import load_grid
 &gt;&gt;&gt; grid = load_grid(&#39;mygrid.h5&#39;)
 &gt;&gt;&gt; grid
 &lt;SpectralGrid(teff=6200.0, logg=4.0, mh=0.5)&gt;
 </pre></div>
 </div>
-<p>The values for <code class="xref py py-obj docutils literal notranslate"><span class="pre">teff</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">logg</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">mh</span></code> are the defaults for the grid, but have
+<p>The values for <code class="xref py py-obj docutils literal"><span class="pre">teff</span></code>, <code class="xref py py-obj docutils literal"><span class="pre">logg</span></code> and <code class="xref py py-obj docutils literal"><span class="pre">mh</span></code> are the defaults for the grid, but have
 no other special meaning and can be changed.
 StarKit heavily uses astropy.modeling please refer to its
 <a class="reference external" href="http://astropy.readthedocs.org/en/latest/modeling/">reference guide</a>.</p>
 <p>One can then just evaluate the grid at a certain parameter point:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; grid.teff = 5780.
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; grid.teff = 5780.
 &gt;&gt;&gt; grid.logg = 4.4
 &gt;&gt;&gt; grid.mh = 0.0
 &gt;&gt;&gt; wave, flux = grid()
@@ -102,7 +111,7 @@ StarKit heavily uses astropy.modeling please refer to its
 </div>
 <p>StarKit works with a so called plugin-architecture that can modify the generated
 spectrum. For example, one can use the doppler shift plugin:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import DopplerShift, RotationalBroadening
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import DopplerShift, RotationalBroadening
 &gt;&gt;&gt; doppler = DopplerShift(vrad=0)
 &gt;&gt;&gt; doppler.vrad = 20
 &gt;&gt;&gt; new_wave, new_flux = doppler(wave, flux)
@@ -110,13 +119,13 @@ spectrum. For example, one can use the doppler shift plugin:</p>
 </div>
 <p>These plugins can then be concatenated (again see
 <a class="reference external" href="http://astropy.readthedocs.org/en/latest/modeling/">reference guide</a>):</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; my_model = grid | doppler
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; my_model = grid | doppler
 &gt;&gt;&gt; my_model
 &lt;CompoundModel0(teff_0=5780.0, logg_0=4.4, mh_0=0.0, vrad_1=20.0)&gt;
 </pre></div>
 </div>
 <p>You can then add further plugins to the model:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import RotationalBroadening, CCM89Extinction
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import RotationalBroadening, CCM89Extinction
 &gt;&gt;&gt; rotation = RotationalBroadening.from_grid(grid, vrot=200) # it is imperative to load from_grid here as it needs to
 &gt;&gt;&gt; extinction = CCM89Extinction(a_v=1.0, r_v=3.1)
 &gt;&gt;&gt; my_model = grid | rotation | doppler | extinction
@@ -136,7 +145,7 @@ spectrum. For example, one can use the doppler shift plugin:</p>
 </pre></div>
 </div>
 <p>There is a convenience function to assemble models:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit import assemble_model
+<div class="highlight-python2"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit import assemble_model
 &gt;&gt;&gt; my_model = assemble_model(grid, vrad=20, a_v=0.3, vrot=300)
 &gt;&gt;&gt; my_model.__class__
 &lt;class &#39;starkit.base.assemble_model.CompoundModel5&#39;&gt;
@@ -188,8 +197,8 @@ Components:
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Wolfgang Kerzendorf, Tuan Do.<br/>
-    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5. &nbsp;
-    Last built 15 Apr 2019. <br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3. &nbsp;
+    Last built 18 Apr 2019. <br/>
   </p>
 </footer>
   </body>

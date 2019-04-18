@@ -1,22 +1,30 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Integrating photometry in StarKit &#8212; starkit v0.0.dev161</title>
+    
+    <title>Integrating photometry in StarKit &#8212; starkit v0.0.dev155</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.dev155',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -26,7 +34,8 @@
 <script type="text/javascript" src="../_static/copybutton.js"></script>
 
 
-  </head><body>
+  </head>
+  <body role="document">
 <div class="topbar">
   <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">Star</span><span id="logotext2">Kit</span><span id="logotext3">:documentation</span></a>
   <ul>
@@ -56,7 +65,7 @@
 	
       </li>
       <li>
-	<a href="../index.html">starkit v0.0.dev161</a>
+	<a href="../index.html">starkit v0.0.dev155</a>
 	 &#187;
       </li>
       <li><a href="index.html" accesskey="U">Examples</a> &#187;</li>
@@ -126,18 +135,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -177,9 +186,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -187,7 +196,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -236,40 +245,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <p>The notebook is available here:
 <a class="reference external" href="https://github.com/starkit/starkit/tree/master/docs/examples/starkit_photometry.ipynb">https://github.com/starkit/starkit/tree/master/docs/examples/starkit_photometry.ipynb</a></p>
@@ -277,10 +252,11 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="Integrating-photometry-in-StarKit">
 <h1>Integrating photometry in StarKit<a class="headerlink" href="#Integrating-photometry-in-StarKit" title="Permalink to this headline">¶</a></h1>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [39]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">starkit</span> <span class="kn">import</span> <span class="n">assemble_model</span>
 <span class="kn">from</span> <span class="nn">starkit.gridkit</span> <span class="kn">import</span> <span class="n">load_grid</span>
 <span class="kn">from</span> <span class="nn">starkit.base.operations.imager</span> <span class="kn">import</span> <span class="n">Photometry</span>
@@ -292,28 +268,31 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[115]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [115]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">GRID_PATH</span> <span class="o">=</span> <span class="s1">&#39;/Users/wkerzend/projects/starkit/grids/phoenix_t2300_12000_w19000_25000_R10000.h5&#39;</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[116]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [116]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">grid</span><span class="o">.</span><span class="n">flux_unit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;erg/s/angstrom&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">load_grid</span><span class="p">(</span><span class="n">GRID_PATH</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -335,20 +314,22 @@ div.rendered_html tbody tr:hover {
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [70]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">decam_filters</span><span class="o">=</span><span class="n">wsynphot</span><span class="o">.</span><span class="n">FilterSet</span><span class="p">([</span><span class="s1">&#39;Keck/NIRC2/Kp&#39;</span><span class="p">])</span>
 <span class="n">phot_operation</span> <span class="o">=</span> <span class="n">Photometry</span><span class="p">(</span><span class="n">filter_set</span><span class="o">=</span><span class="n">decam_filters</span><span class="p">,</span> <span class="n">mag_type</span><span class="o">=</span><span class="s1">&#39;vega&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [71]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">photometry</span> <span class="o">=</span> <span class="p">(</span><span class="mf">20.3444</span><span class="p">,</span> <span class="mf">18.6799</span><span class="p">,</span> <span class="mf">17.6418</span><span class="p">,</span> <span class="mf">17.2215</span><span class="p">,</span> <span class="mf">17.0349</span><span class="p">)</span>
 <span class="n">photometry_uncert</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0861</span><span class="p">,</span> <span class="mf">0.0845</span><span class="p">,</span> <span class="mf">0.0346</span><span class="p">,</span> <span class="mf">0.0532</span><span class="p">,</span> <span class="mf">0.0659</span><span class="p">)</span>
 
@@ -357,28 +338,31 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[72]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [72]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">spectral_model</span> <span class="o">=</span> <span class="n">assemble_model</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">2500.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[73]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [73]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">phot_model</span> <span class="o">=</span> <span class="n">spectral_model</span> <span class="o">|</span> <span class="n">phot_operation</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[117]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [117]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">phot_model</span><span class="o">.</span><span class="n">teff_0</span> <span class="o">=</span> <span class="mi">9940</span>
 <span class="n">phot_model</span><span class="o">.</span><span class="n">logg_0</span> <span class="o">=</span> <span class="mf">4.33</span>
 <span class="n">phot_model</span><span class="o">.</span><span class="n">mh_0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>
@@ -388,28 +372,31 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[118]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [118]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span><span class="n">phot_model</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[118]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[118]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<div class="output_area highlight-none"><div class="highlight"><pre>
 <span></span>array([-1.2789739])
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre>
+<div class="input_area highlight-ipython2"><div class="highlight"><pre>
 <span></span>
 </pre></div>
 </div>
@@ -438,8 +425,8 @@ div.rendered_html tbody tr:hover {
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2019, Wolfgang Kerzendorf, Tuan Do.<br/>
-    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5. &nbsp;
-    Last built 15 Apr 2019. <br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3. &nbsp;
+    Last built 18 Apr 2019. <br/>
   </p>
 </footer>
   </body>
