@@ -7,4 +7,4 @@ source activate python36
 
 conda install -c conda-forge doctr --yes
 
-doctr deploy . --built-docs build/sphinx/html 
+doctr deploy . --built-docs docs/_build/html 
