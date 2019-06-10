@@ -1,0 +1,37 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'
+strategy:
+  matrix:
+    Python27:
+      python.version: '2.7'
+    Python36:
+      python.version: '3.6'
+
+steps:
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: |
+      sudo chown -R $USER $CONDA
+      conda update -y conda
+    displayName: Update conda and activate it
+
+  - bash: |
+      if [[ $(python.version) == 2.7 ]]; then ENV_FILE=starkit_env27.yml
+      elif [[ $(python.version) == 3.6 ]]; then ENV_FILE=starkit_env3.yml; fi
+      conda env create -n starkit --file ./$ENV_FILE
+    displayName: 'Create starkit environment'
+
+  - bash: |
+      source activate starkit
+      pip install coverage coveralls
+    displayName: Install Coverage dependencies
+
+  - bash: |
+      source activate starkit
+      python setup.py test --coverage
+    displayName: Test starkit
