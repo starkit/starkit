@@ -1,8 +1,8 @@
 StarKit
 =======
 
-.. image:: https://travis-ci.com/starkit/starkit.svg?branch=master
-   :target: https://travis-ci.com/starkit/starkit
+.. image:: https://dev.azure.com/starkit/starkit/_apis/build/status/starkit-CI?branchName=master
+   :target: https://dev.azure.com/starkit/starkit/_build/latest?definitionId=2&branchName=master
 
 ************
 Installation
