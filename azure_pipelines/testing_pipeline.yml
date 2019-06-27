@@ -6,9 +6,9 @@ pool:
 strategy:
   matrix:
     Python27:
-      python.version: '2.7'
+      ENV_FILE: 'starkit_env27.yml'
     Python36:
-      python.version: '3.6'
+      ENV_FILE: 'starkit_env3.yml'
 
 steps:
   - bash: |
@@ -21,8 +21,6 @@ steps:
     displayName: Update conda and activate it
 
   - bash: |
-      if [[ $(python.version) == 2.7 ]]; then ENV_FILE=starkit_env27.yml
-      elif [[ $(python.version) == 3.6 ]]; then ENV_FILE=starkit_env3.yml; fi
       conda env create -n starkit --file ./$ENV_FILE
     displayName: 'Create starkit environment'
 
