@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Getting Started &#8212; starkit v0.0.dev190</title>
+    <title>Getting Started &#8212; starkit v0.0.dev191</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -62,7 +62,7 @@
 	 |
       </li>
       <li>
-	<a href="index.html">starkit v0.0.dev190</a>
+	<a href="index.html">starkit v0.0.dev191</a>
 	 &#187;
       </li>
       
@@ -82,10 +82,10 @@
 <h2>Working with the grid<a class="headerlink" href="#working-with-the-grid" title="Permalink to this headline">¶</a></h2>
 <p>After successful creation of an HDF5 Grid (please see <a class="reference internal" href="io/index.html#io"><span class="std std-ref">Input/Output Documentation</span></a> for details)
 one can load the grid using:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.gridkit import load_grid
-&gt;&gt;&gt; grid = load_grid(&#39;mygrid.h5&#39;)
-&gt;&gt;&gt; grid
-&lt;SpectralGrid(teff=6200.0, logg=4.0, mh=0.5)&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">starkit.gridkit</span> <span class="k">import</span> <span class="n">load_grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">load_grid</span><span class="p">(</span><span class="s1">&#39;mygrid.h5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span>
+<span class="go">&lt;SpectralGrid(teff=6200.0, logg=4.0, mh=0.5)&gt;</span>
 </pre></div>
 </div>
 <p>The values for <code class="xref py py-obj docutils literal notranslate"><span class="pre">teff</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">logg</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">mh</span></code> are the defaults for the grid, but have
@@ -93,66 +93,66 @@ no other special meaning and can be changed.
 StarKit heavily uses astropy.modeling please refer to its
 <a class="reference external" href="http://astropy.readthedocs.org/en/latest/modeling/">reference guide</a>.</p>
 <p>One can then just evaluate the grid at a certain parameter point:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; grid.teff = 5780.
-&gt;&gt;&gt; grid.logg = 4.4
-&gt;&gt;&gt; grid.mh = 0.0
-&gt;&gt;&gt; wave, flux = grid()
-&gt;&gt;&gt; plot(wave, flux)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">teff</span> <span class="o">=</span> <span class="mf">5780.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">logg</span> <span class="o">=</span> <span class="mf">4.4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">mh</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wave</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="n">grid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>StarKit works with a so called plugin-architecture that can modify the generated
 spectrum. For example, one can use the doppler shift plugin:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import DopplerShift, RotationalBroadening
-&gt;&gt;&gt; doppler = DopplerShift(vrad=0)
-&gt;&gt;&gt; doppler.vrad = 20
-&gt;&gt;&gt; new_wave, new_flux = doppler(wave, flux)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">starkit.base.operations.stellar</span> <span class="k">import</span> <span class="n">DopplerShift</span><span class="p">,</span> <span class="n">RotationalBroadening</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doppler</span> <span class="o">=</span> <span class="n">DopplerShift</span><span class="p">(</span><span class="n">vrad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doppler</span><span class="o">.</span><span class="n">vrad</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_wave</span><span class="p">,</span> <span class="n">new_flux</span> <span class="o">=</span> <span class="n">doppler</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>These plugins can then be concatenated (again see
 <a class="reference external" href="http://astropy.readthedocs.org/en/latest/modeling/">reference guide</a>):</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; my_model = grid | doppler
-&gt;&gt;&gt; my_model
-&lt;CompoundModel0(teff_0=5780.0, logg_0=4.4, mh_0=0.0, vrad_1=20.0)&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span> <span class="o">=</span> <span class="n">grid</span> <span class="o">|</span> <span class="n">doppler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span>
+<span class="go">&lt;CompoundModel0(teff_0=5780.0, logg_0=4.4, mh_0=0.0, vrad_1=20.0)&gt;</span>
 </pre></div>
 </div>
 <p>You can then add further plugins to the model:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit.base.operations.stellar import RotationalBroadening, CCM89Extinction
-&gt;&gt;&gt; rotation = RotationalBroadening.from_grid(grid, vrot=200) # it is imperative to load from_grid here as it needs to
-&gt;&gt;&gt; extinction = CCM89Extinction(a_v=1.0, r_v=3.1)
-&gt;&gt;&gt; my_model = grid | rotation | doppler | extinction
-&gt;&gt;&gt; my_model
-&lt;CompoundModel3(teff_0=2300.0, logg_0=0.0, mh_0=0.5, alpha_0=0.0, vrot_1=200.0, limb_darkening_1=0.6, vrad_2=200.0, a_v_3=1.0, r_v_3=3.1)&gt;
-&gt;&gt;&gt; my_model.param_names
-(u&#39;teff_0&#39;,
- u&#39;logg_0&#39;,
- u&#39;mh_0&#39;,
- u&#39;alpha_0&#39;,
- u&#39;vrot_1&#39;,
- u&#39;limb_darkening_1&#39;,
- u&#39;vrad_2&#39;,
- u&#39;a_v_3&#39;,
- u&#39;r_v_3&#39;)
- &gt;&gt;&gt; my_model.vrot_1 = 300
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">starkit.base.operations.stellar</span> <span class="k">import</span> <span class="n">RotationalBroadening</span><span class="p">,</span> <span class="n">CCM89Extinction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rotation</span> <span class="o">=</span> <span class="n">RotationalBroadening</span><span class="o">.</span><span class="n">from_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">vrot</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> <span class="c1"># it is imperative to load from_grid here as it needs to</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extinction</span> <span class="o">=</span> <span class="n">CCM89Extinction</span><span class="p">(</span><span class="n">a_v</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">r_v</span><span class="o">=</span><span class="mf">3.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span> <span class="o">=</span> <span class="n">grid</span> <span class="o">|</span> <span class="n">rotation</span> <span class="o">|</span> <span class="n">doppler</span> <span class="o">|</span> <span class="n">extinction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span>
+<span class="go">&lt;CompoundModel3(teff_0=2300.0, logg_0=0.0, mh_0=0.5, alpha_0=0.0, vrot_1=200.0, limb_darkening_1=0.6, vrad_2=200.0, a_v_3=1.0, r_v_3=3.1)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span><span class="o">.</span><span class="n">param_names</span>
+<span class="go">(u&#39;teff_0&#39;,</span>
+<span class="go"> u&#39;logg_0&#39;,</span>
+<span class="go"> u&#39;mh_0&#39;,</span>
+<span class="go"> u&#39;alpha_0&#39;,</span>
+<span class="go"> u&#39;vrot_1&#39;,</span>
+<span class="go"> u&#39;limb_darkening_1&#39;,</span>
+<span class="go"> u&#39;vrad_2&#39;,</span>
+<span class="go"> u&#39;a_v_3&#39;,</span>
+<span class="go"> u&#39;r_v_3&#39;)</span>
+<span class="go"> &gt;&gt;&gt; my_model.vrot_1 = 300</span>
 </pre></div>
 </div>
 <p>There is a convenience function to assemble models:</p>
-<div class="highlight-python2 notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from starkit import assemble_model
-&gt;&gt;&gt; my_model = assemble_model(grid, vrad=20, a_v=0.3, vrot=300)
-&gt;&gt;&gt; my_model.__class__
-&lt;class &#39;starkit.base.assemble_model.CompoundModel5&#39;&gt;
-Name: CompoundModel5
-Inputs: ()
-Outputs: (&#39;wavelength&#39;, &#39;flux&#39;)
-Fittable parameters: (u&#39;teff_0&#39;, u&#39;logg_0&#39;, u&#39;mh_0&#39;, u&#39;alpha_0&#39;, u&#39;vrot_1&#39;, u&#39;limb_darkening_1&#39;, u&#39;vrad_2&#39;, u&#39;a_v_3&#39;, u&#39;r_v_3&#39;)
-Expression: [0] | [1] | [2] | [3]
-Components:
-    [0]: &lt;SpectralGrid(teff=2300.0, logg=0.0, mh=0.5, alpha=0.0)&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">starkit</span> <span class="k">import</span> <span class="n">assemble_model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span> <span class="o">=</span> <span class="n">assemble_model</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">vrad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">a_v</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">vrot</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_model</span><span class="o">.</span><span class="vm">__class__</span>
+<span class="go">&lt;class &#39;starkit.base.assemble_model.CompoundModel5&#39;&gt;</span>
+<span class="go">Name: CompoundModel5</span>
+<span class="go">Inputs: ()</span>
+<span class="go">Outputs: (&#39;wavelength&#39;, &#39;flux&#39;)</span>
+<span class="go">Fittable parameters: (u&#39;teff_0&#39;, u&#39;logg_0&#39;, u&#39;mh_0&#39;, u&#39;alpha_0&#39;, u&#39;vrot_1&#39;, u&#39;limb_darkening_1&#39;, u&#39;vrad_2&#39;, u&#39;a_v_3&#39;, u&#39;r_v_3&#39;)</span>
+<span class="go">Expression: [0] | [1] | [2] | [3]</span>
+<span class="go">Components:</span>
+<span class="go">    [0]: &lt;SpectralGrid(teff=2300.0, logg=0.0, mh=0.5, alpha=0.0)&gt;</span>
 
-    [1]: &lt;RotationalBroadening(vrot=300.0, limb_darkening=0.6)&gt;
+<span class="go">    [1]: &lt;RotationalBroadening(vrot=300.0, limb_darkening=0.6)&gt;</span>
 
-    [2]: &lt;DopplerShift(vrad=20.0)&gt;
+<span class="go">    [2]: &lt;DopplerShift(vrad=20.0)&gt;</span>
 
-    [3]: &lt;CCM89Extinction(a_v=0.3, r_v=3.1)&gt;
+<span class="go">    [3]: &lt;CCM89Extinction(a_v=0.3, r_v=3.1)&gt;</span>
 </pre></div>
 </div>
 </div>
@@ -189,7 +189,7 @@ Components:
   <p>
     &copy; Copyright 2019, Wolfgang Kerzendorf, Tuan Do.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5. &nbsp;
-    Last built 19 Jun 2019. <br/>
+    Last built 03 Jul 2019. <br/>
   </p>
 </footer>
   </body>
