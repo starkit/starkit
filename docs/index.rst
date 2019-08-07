@@ -18,11 +18,7 @@ Input/Output
 .. toctree::
     :maxdepth: 5
 
-    io/reading_phoenix.ipynb
-    io/reading_bosz.ipynb
-    io/reading_moehler_telluric.ipynb
-    io/gridkit_fileformat
-
+    io/index.rst
 
 --------
 Examples
