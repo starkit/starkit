@@ -2,6 +2,7 @@
 Getting Started
 ***************
 
+.. _working-with-grid:
 
 Working with the grid
 ^^^^^^^^^^^^^^^^^^^^^
