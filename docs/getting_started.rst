@@ -28,6 +28,8 @@ One can then just evaluate the grid at a certain parameter point::
     >>> wave, flux = grid()
     >>> plot(wave, flux)
 
+To change the grid parameters interactively and plot the resulting spectrum, you can use the example notebook: :doc:`/examples/interactive_spectrum`.
+
 StarKit works with a so called plugin-architecture that can modify the generated
 spectrum. For example, one can use the doppler shift plugin::
 
