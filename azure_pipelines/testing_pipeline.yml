@@ -1,0 +1,29 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+steps:
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: |
+      sudo chown -R $USER $CONDA
+      conda update -y conda
+    displayName: Update conda and activate it
+
+  - bash: |
+      conda env create -n starkit --file ./starkit_env3.yml
+    displayName: 'Create starkit environment'
+
+  - bash: |
+      source activate starkit
+      pip install coverage coveralls
+    displayName: Install Coverage dependencies
+
+  - bash: |
+      source activate starkit
+      python setup.py test --coverage
+    displayName: Test starkit
