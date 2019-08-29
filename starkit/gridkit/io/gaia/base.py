@@ -31,7 +31,7 @@ class GaiaSpecLibIO(BaseSpectralGridIO):
 
     def get_fluxes(self):
         fluxes = [tuple(float(item) for item in self.raw_data[i].split())
-                  for i in xrange(1, len(self.raw_data), 2)
+                  for i in range(1, len(self.raw_data), 2)
                   if self.raw_data[i].strip() != '']
         return np.array(fluxes) * u.W / u.m**2 / u.nm
 
@@ -49,7 +49,7 @@ class GaiaSpecLibIO(BaseSpectralGridIO):
 
     def get_index(self, index_columns=['teff', 'logg', 'zmetal']):
         raw_indices = [self.raw_data[i]
-                       for i in xrange(0, len(self.raw_data), 2)
+                       for i in range(0, len(self.raw_data), 2)
                        if self.raw_data[i].strip() != '']
         index = []
 

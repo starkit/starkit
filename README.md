@@ -1,32 +1,26 @@
-StarKit
-=======
-
-.. image:: https://dev.azure.com/starkit/starkit/_apis/build/status/starkit-CI?branchName=master
-   :target: https://dev.azure.com/starkit/starkit/_build/latest?definitionId=2&branchName=master
+# StarKit
 
 
-Installation
-************
+## Installation
 
-We recommend you use `Anaconda <https://www.anaconda.com/distribution/>`_ to install
+We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
 the necessary requirements for Starkit to work.
 
 Once you have anaconda installed please make a new environment with the prerequisites
 for starkit in the following way. This will create an environment called `starkit`::
 
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env3.yml
-    
-    # install using yml file into an environment called starkit. 
-    # If you want to call it something else, or already have a starkit enivornment, 
-    # you can change the -n argument
-    
-    conda env create --file starkit_env3.yml -n starkit
+    conda env create --file https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml python=2
     source activate starkit
+    pip install specutils
 
+For now until a new version of Astropy comes out that fixes these problems::
 
-Then you can install any other packages you like with::
+    conda install cython
+    pip install astropy==1.1.2
+
+If you are using ipython, also install::
   
-    conda install <your package>
+    conda install ipython 
 
 Once this is installed, there are two ways to install starkit. For simple use::
 
@@ -39,10 +33,9 @@ For to download a full development version of starkit please do::
     python setup.py develop
 
 
-Example publications that use StarKit
-**************************************
+## Example publications that use StarKit:
 
 - Do, Tuan; Kerzendorf, Wolfgang; Konopacky, Quinn; Marcinik, Joseph M.; Ghez, Andrea; Lu, Jessica R.; Morris, Mark R., [Super-solar Metallicity Stars in the Galactic Center Nuclear Star Cluster: Unusual Sc, V, and Y Abundances](https://ui.adsabs.harvard.edu/#abs/2018ApJ...855L...5D/abstract)
 - Feldmeier-Krause, A.; Kerzendorf, W.; Neumayer, N.; Schödel, R.; Nogueras-Lara, F.; Do, T.; de Zeeuw, P. T.; Kuntschner, H., [KMOS view of the Galactic Centre - II. Metallicity distribution of late-type stars](https://ui.adsabs.harvard.edu/#abs/2017MNRAS.464..194F/abstract)
 
-A test grid can be found at https://zenodo.org/record/2557923/files/phoenix_t4000_10000_w3000_9000_r3000.h5?download=1. If you use this grid please make sure that the Phoenix grid is also cited
+
