@@ -107,7 +107,7 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
         raise ValueError('Given parameters {0} not understood - please do not '
                          'add grid parameters as these are already given by '
                          'the grid'.format(
-            ', '.join(parameters.keys())))
+            ', '.join(list(parameters.keys()))))
 
 
     if imager_operations is not None and spectrograph_operations is not None:

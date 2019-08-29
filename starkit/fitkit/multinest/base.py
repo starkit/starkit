@@ -26,7 +26,7 @@ else:
 
 def multinest_evaluate(self, model_param, ndim, nparam):
     # returns the likelihood of observing the data given the model param_names
-    model_param = np.array([model_param[i] for i in xrange(nparam)])
+    model_param = np.array([model_param[i] for i in range(nparam)])
     parameters = self.parameters.copy()
     parameters[~self.fixed_mask()] = model_param
     loglikelihood = self.evaluate(*parameters)

@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 from glob import glob
 from astropy.io import fits
 import pandas as pd
