@@ -1,0 +1,241 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Integrating photometry in StarKit #"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:33:20.164414Z",
+     "start_time": "2018-10-19T17:33:20.136675Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "from starkit import assemble_model\n",
+    "from starkit.gridkit import load_grid\n",
+    "from starkit.base.operations.imager import Photometry\n",
+    "import wsynphot\n",
+    "\n",
+    "import pandas as pd\n",
+    "from astropy import units as u"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 115,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T18:17:17.168189Z",
+     "start_time": "2018-10-19T18:17:17.162987Z"
+    },
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "GRID_PATH = '/Users/wkerzend/projects/starkit/grids/phoenix_t2300_12000_w19000_25000_R10000.h5'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 116,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T18:17:18.150986Z",
+     "start_time": "2018-10-19T18:17:18.145142Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "grid.flux_unit = u.Unit('erg/s/angstrom')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:18:09.681064Z",
+     "start_time": "2018-10-19T17:18:08.249229Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;37mINFO\u001b[0m   ]  Reading index (\u001b[1mbase.py\u001b[0m:266)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;37mINFO\u001b[0m   ]  Discovered columns teff, logg, mh (\u001b[1mbase.py\u001b[0m:269)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;37mINFO\u001b[0m   ]  Reading Fluxes (\u001b[1mbase.py\u001b[0m:272)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;37mINFO\u001b[0m   ]  Fluxes shape (5175, 10978) (\u001b[1mbase.py\u001b[0m:275)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;37mINFO\u001b[0m   ]  Initializing spec grid (\u001b[1mbase.py\u001b[0m:309)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;33mWARNING\u001b[0m]  **** NO WAVELENGTH TYPE SET DEFAULTING TO GRID (vacuum) ****\n",
+      "\n",
+      " (\u001b[1mbase.py\u001b[0m:75)\n",
+      "[\u001b[1mstarkit.gridkit.base\u001b[0m][\u001b[1;33mWARNING\u001b[0m]  No format_version in meta data for this grid. Please get an updated grid. This will fail in the future. (\u001b[1mbase.py\u001b[0m:316)\n"
+     ]
+    }
+   ],
+   "source": [
+    "grid = load_grid(GRID_PATH)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:40:33.319476Z",
+     "start_time": "2018-10-19T17:40:33.297365Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "decam_filters=wsynphot.FilterSet(['Keck/NIRC2/Kp'])\n",
+    "phot_operation = Photometry(filter_set=decam_filters, mag_type='vega')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:40:33.815232Z",
+     "start_time": "2018-10-19T17:40:33.809182Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "photometry = (20.3444, 18.6799, 17.6418, 17.2215, 17.0349)\n",
+    "photometry_uncert = (0.0861, 0.0845, 0.0346, 0.0532, 0.0659)\n",
+    "\n",
+    "magset = wsynphot.MagnitudeSet(decam_filters, photometry, photometry_uncert)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:40:34.937534Z",
+     "start_time": "2018-10-19T17:40:34.306070Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "spectral_model = assemble_model(grid, distance=2500.0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T17:40:35.975815Z",
+     "start_time": "2018-10-19T17:40:34.941468Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "phot_model = spectral_model | phot_operation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 117,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T18:35:48.337964Z",
+     "start_time": "2018-10-19T18:35:48.331669Z"
+    },
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "phot_model.teff_0 = 9940\n",
+    "phot_model.logg_0 = 4.33\n",
+    "phot_model.mh_0 = -0.5\n",
+    "phot_model.distance_1 = 3.5\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 118,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2018-10-19T18:35:48.740364Z",
+     "start_time": "2018-10-19T18:35:48.681042Z"
+    },
+    "collapsed": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-1.2789739])"
+      ]
+     },
+     "execution_count": 118,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "phot_model()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.11"
+  },
+  "toc": {
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": false,
+   "toc_cell": false,
+   "toc_position": {},
+   "toc_section_display": "block",
+   "toc_window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
