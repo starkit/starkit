@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e   # Exit with nonzero exit code if anything fails
 
 # Build the documentation from the SOURCE_BRANCH
 # and push it to TARGET_BRANCH.
@@ -48,5 +49,7 @@ fi
 
 # Otherwise, commit and push
 git commit -m "Deploy to GitHub Pages: ${SHA}"
-git push $SSH_REPO $TARGET_BRANCH
-cd ..
+# Don't push if it's a PR build because it doesn't have access rights to do so
+if [ $BUILD_REASON != "PullRequest" ]; then
+  git push $SSH_REPO $TARGET_BRANCH
+fi
