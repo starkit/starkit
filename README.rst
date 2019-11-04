@@ -23,10 +23,11 @@ for starkit in the following way. This will create an environment called `starki
     conda env create --file starkit_env3.yml -n starkit
     source activate starkit
 
-For now until a new version of Astropy comes out that fixes some problems of memory leak, you need to do::
-
-    conda install cython
-    pip install specutils
+For now until a new version of Astropy comes out that fixes some problems of memory leak, you need to install `specutils` from our fork::
+    
+    git clone https://github.com/followthesheep/specutils
+    cd specutils
+    python setup.py install
 
 Then you can additionally install any other packages you like with::
   
