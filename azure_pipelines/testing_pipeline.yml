@@ -11,7 +11,7 @@ steps:
 
   - bash: |
       sudo chown -R $USER $CONDA
-      conda update -y conda
+    # conda update -y conda
     displayName: Update conda and activate it
 
   - bash: |
