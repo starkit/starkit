@@ -34,6 +34,7 @@ dependencies:
 - docopt=0.6
 - pytest-cov=2
 - pytest=4
+- pytest-astropy
 
 - pip:
   - git+https://github.com/astropy/astropy
