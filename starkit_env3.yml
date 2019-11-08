@@ -7,11 +7,10 @@ dependencies:
 - python=3.6
 - numpy=1
 - h5py=2.9
-- astropy=1.1.2
 - tqdm=4
 - scipy=1.2
 - pandas=0.24
-- pytables=3.4
+- pytables=3
 
 # Analysis requirements
 - jupyter=1
@@ -37,5 +36,5 @@ dependencies:
 - pytest=4
 
 - pip:
+  - git+https://github.com/astropy/astropy
   - corner
-  
