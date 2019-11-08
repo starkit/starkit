@@ -37,5 +37,5 @@ dependencies:
 - pytest-astropy
 
 - pip:
-  - git+https://github.com/astropy/astropy
+  - git+https://github.com/astropy/astropy@34ff157#egg=astropy
   - corner
