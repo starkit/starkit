@@ -75,6 +75,9 @@ class RotationalBroadening(StellarOperationModel):
         return wavelength, nd.convolve1d(flux, profile)
 
 class DopplerShift(StellarOperationModel):
+    '''
+    Module to model the velocity of the star with the relativistic redshift correction. 
+    '''
 
     operation_name = 'doppler'
 
@@ -90,6 +93,24 @@ class DopplerShift(StellarOperationModel):
         doppler_factor = np.sqrt((1+beta) / (1-beta))
         return wavelength * doppler_factor, flux
 
+class RadialVelocity(StellarOperationModel):
+    '''
+    Module to model the classical definition of radial velocity
+    '''
+    operation_name = 'rv'
+
+    vrad = modeling.Parameter()
+
+    def __init__(self, vrad):
+        super(DopplerShift, self).__init__(vrad=vrad)
+        self.c_in_kms = const.c.to(u.km / u.s).value
+
+
+    def evaluate(self, wavelength, flux, vrad):
+        beta = vrad / self.c_in_kms
+        doppler_factor = (1.0 + beta)
+        return wavelength * doppler_factor, flux
+    
 
 
 class CCM89Extinction(StellarOperationModel):
