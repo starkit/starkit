@@ -14,7 +14,7 @@ def set_engines_cpu_affinity():
         else:
             from multiprocessing import cpu_count
             p = psutil.Process(os.getpid())
-            p.set_cpu_affinity(range(cpu_count()))
+            p.set_cpu_affinity(list(range(cpu_count())))
 
 
 from starkit.fitkit.multinest.base import MultiNest

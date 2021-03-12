@@ -113,7 +113,7 @@ class PriorCollection(object):
         # will be given an array of values from 0 to 1 and transforms it
         # according to the prior distribution
 
-        for i in xrange(nparam):
+        for i in range(nparam):
             cube[i] = self.priors[i](cube[i])
 
     def _generate_prior_str(self):

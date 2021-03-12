@@ -1,0 +1,49 @@
+# Specify branches to trigger for Continuous Deployment (including those for PRs)
+trigger:
+- master
+
+pr:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+# Before setting up this pipeline (creating this yml file 1st time), make sure to generate a ssh key locally 
+# And add public key (from generated rsa pair of keys) to github at repo>settings>deploy_key
+# Use steps at: https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ssh-key?view=azure-devops#example-setup-using-github
+
+steps:
+  # Download a secure file to a temporary location on the build/release agent (VM)
+  - task: DownloadSecureFile@1
+    inputs: 
+      secureFile: 'id_sk_azure_rsa'
+  # id_sk_azure_rsa is the generated private key file i.e. added & authorized from library tab of azure pipelines
+
+  # Install an SSH key prior to a build/release to give azure access to deploy
+  - task: InstallSSHKey@0
+    inputs:
+      hostName: $(gh_host)
+      sshPublicKey: $(public_key)
+      #sshPassphrase: Optional (since not used while generating ssh key)
+      sshKeySecureFile: 'id_sk_azure_rsa'
+  # gh_host & public_key are secret variables defined in the azure pipeline page for masking actual values
+
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: |
+      sudo chown -R $USER $CONDA
+      conda update -y conda
+    displayName: Update conda and activate it
+
+  # Build & deploy docs from python3 environment. Hence use starkit_env3.yml
+  - bash: |
+      curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env3.yml
+      conda env create -n starkit --file ./starkit_env3.yml
+    displayName: 'Create starkit python3 environment'
+
+  - bash: |
+      source activate starkit
+      bash azure_pipelines/deploy_docs.sh
+    displayName: Build starkit docs & Deploy to gh-pages

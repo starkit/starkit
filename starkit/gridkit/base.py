@@ -3,7 +3,7 @@ import logging
 from astropy import modeling
 from astropy import units as u, constants as const
 import pandas as pd
-from exceptions import ValueError, DeprecationWarning
+# from exceptions import ValueError, DeprecationWarning
 import h5py
 from scipy import interpolate
 import numpy as np
@@ -117,7 +117,7 @@ class BaseSpectralGrid(modeling.Model):
             return const.c / self.R / self.R_sampling
 
     def _renormalize_grid(self):
-        for i in xrange(self.fluxes.shape[0]):
+        for i in range(self.fluxes.shape[0]):
             self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
 class BaseTelluricGrid(BaseSpectralGrid):
@@ -311,7 +311,7 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     spec_grid = SpectralGrid(wavelength, index[meta['parameters']].values, fluxes, meta,
                              wavelength_type=wavelength_type,  **initial_parameters)
 
-    if 'format_version' not in spec_grid.meta_grid.keys():
+    if 'format_version' not in list(spec_grid.meta_grid.keys()):
         logger.warn('No format_version in meta data for this grid. Please get an'+\
                     ' updated grid. This will fail in the future.')
         warnings.warn('No format_version in meta data for this grid. Please get '+\

@@ -15,12 +15,10 @@ from astropy import units as u
 
 logger = logging.getLogger(__name__)
 
-class BaseSpectralGridIO(object):
+class BaseSpectralGridIO(object, metaclass=ABCMeta):
     """
     Base class for reading in the spectral grid information
     """
-
-    __metaclass__ = ABCMeta
 
     GridBase = None
 
@@ -124,7 +122,7 @@ class BaseSpectralGridDBIO(BaseSpectralGridIO):
                            len(sample_spectrum_flux)) * 8 * u.byte
 
         if size_of_spectra > warning_threshold:
-            continue_query = raw_input('The size of the spectra are {0:.2f}. '
+            continue_query = input('The size of the spectra are {0:.2f}. '
                                        'Continue [y/N]'.format(
                 size_of_spectra.to(warning_threshold.unit)))
             if continue_query.strip().lower() != 'y':

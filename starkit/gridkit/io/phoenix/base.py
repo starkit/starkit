@@ -1,3 +1,4 @@
+
 from glob import glob
 from astropy.io import fits
 import pandas as pd
@@ -44,7 +45,7 @@ def make_raw_index():
     """
     all_fnames = glob('PHOENIX-ACES-AGSS-COND-2011/Z*/*.fits')
     phoenix_index = pd.DataFrame(index=np.arange(len(all_fnames)), columns=['teff', 'logg', 'mh', 'alpha', 'filename'])
-    print "Reading Phoenix grid..."
+    print("Reading Phoenix grid...")
     progressbar = ProgressBar(max_value=len(all_fnames))
     for i, fname in progressbar(enumerate(all_fnames)):
         spec_header = fits.getheader(fname)
