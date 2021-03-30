@@ -102,7 +102,7 @@ class RadialVelocity(StellarOperationModel):
     vrad = modeling.Parameter()
 
     def __init__(self, vrad):
-        super(DopplerShift, self).__init__(vrad=vrad)
+        super(RadialVelocity, self).__init__(vrad=vrad)
         self.c_in_kms = const.c.to(u.km / u.s).value
 
 
