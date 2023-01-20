@@ -61,8 +61,8 @@ class RotationalBroadening(StellarOperationModel):
 
 
     def evaluate(self, wavelength, flux, v_rot, limb_darkening):
-        v_rot = np.asscalar(v_rot)
-        limb_darkening = np.asscalar(limb_darkening)
+        v_rot = float(v_rot)
+        limb_darkening = float(limb_darkening)
 
         if self.velocity_per_pix is None:
             raise NotImplementedError('Regridding not implemented yet')
