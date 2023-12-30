@@ -13,14 +13,22 @@ the necessary requirements for Starkit to work.
 
 Once you have anaconda installed please make a new environment with the prerequisites
 for starkit in the following way. This will create an environment called `starkit`::
+    # for Linux and Python 3
+    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix.yml
 
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env3.yml
+    # for MacOS and Python 3
+    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix_macos.yml
     
     # install using yml file into an environment called starkit. 
     # If you want to call it something else, or already have a starkit enivornment, 
     # you can change the -n argument
+
+    # for Linux
+    conda env create --file starkit_gridfix.yml -n starkit
+
+    # for MacOS
+    conda env create --file starkit_gridfix_macos.yml -n starkit
     
-    conda env create --file starkit_env3.yml -n starkit
     source activate starkit
 
 For now until a new version of Astropy comes out that fixes some problems of memory leak, you need to install `specutils` from our fork::
