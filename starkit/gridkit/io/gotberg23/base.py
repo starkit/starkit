@@ -54,7 +54,11 @@ gotberg23_bibtex = """
 
 gotberg23_meta = {
     'bibtex':gotberg23_bibtex,
-    'parameters':['teff', 'logg', 'xh_surf'],
+    'parameters':[
+        'teff', 'logg',                     # Teff and logg at tau=2/3
+        'teff_tau20', 'logg_tau20',         # Teff and logg at tau=20
+        'xh_surf', 'xhe_surf', 'z_surf',    # Hydrogen, Helium, and Z abundance
+    ],
     'wavelength_unit':'Angstrom',
     'wavelength_type':'vacuum',
     'flux_unit': 'erg/s/cm^2/angstrom',
@@ -62,7 +66,8 @@ gotberg23_meta = {
 
 
 def make_raw_index(
-        res=300000.0
+        res=300000.0,
+        grid_params_file='S41_spectral_model_grid_parameters.txt',
     ):
     """
     Read all Gotberg+ 23 grid files and generate a raw index with filename association.
@@ -71,54 +76,72 @@ def make_raw_index(
     -------
         bosz_index : pd.DataFrame
     """
-    all_fnames = glob('compressed_grid/*/SED.txt')
-
-    nfiles = len(all_fnames)
-    teff_arr = np.zeros(nfiles)
-    logg_arr = np.zeros(nfiles)
-    xh_surf_arr = np.zeros(nfiles)
-    res_arr = np.zeros(nfiles)
     
-    for i, filename in enumerate(all_fnames):
-        # Determine model params from the model name in the directory name
-        model_name = filename.split('/')[1]
-        model_params = model_name.split('_')
-        
-        logg = float(model_params[0].replace('logg', ''))
-        teff = float(model_params[1].replace('T', ''))
-        
-        xh_surf_str = model_params[2].replace('H', '')
-        xh_surf = float('0.' + xh_surf_str[1:])
-        
-        
-        teff_arr[i] = teff
-        logg_arr[i] = logg
-        xh_surf_arr[i] = xh_surf
-        res_arr[i] = float(res)
-
-    return pd.DataFrame({
+    # Read in spectral model grid parameters file as Table
+    params_table = Table.read(
+        grid_params_file,
+        format='ascii',
+        delimiter='\s',
+        data_start=2,
+    )
+    
+    
+    # Construct file names from model name files
+    models_directory = 'S41_spectra_spectral_model_grid'
+    
+    filenames = list(params_table['Model_name'])
+    
+    for i, model_name in enumerate(params_table['Model_name']):
+        filenames[i] = '{0}/SED_{1}.txt'.format(
+            models_directory,
+            model_name.replace('Teff', 'T'),
+        )
+    
+    # Extract all other parameters from the params table
+    teff_arr = params_table['Teff(tau=2/3)'].data
+    logg_arr = params_table['log_geff(tau=2/3)'].data
+    rad_arr = params_table['Reff(tau=2/3)'].data
+    
+    teff_tau20_arr = params_table['Teff(tau=20)'].data
+    logg_tau20_arr = params_table['log_geff(tau=20)'].data
+    rad_tau20_arr = params_table['Reff(tau=20)'].data
+    
+    xh_surf_arr = params_table['X_H'].data
+    xhe_surf_arr = params_table['X_He'].data
+    z_surf_arr = params_table['Z'].data
+    
+    res_arr = np.full_like(teff_arr, fill_value=res)
+    
+    # Construct and output pandas data frame
+    output_pd_df = pd.DataFrame({
         'teff':teff_arr,
         'logg':logg_arr,
+        'rad':rad_arr,
+        'teff_tau20':teff_tau20_arr,
+        'logg_tau20':logg_tau20_arr,
+        'rad_tau20':rad_tau20_arr,
         'xh_surf':xh_surf_arr,
+        'xhe_surf':xhe_surf_arr,
+        'z_surf':z_surf_arr,
         'res':res_arr,
-        'filename':all_fnames,
+        'filename':filenames,
     })
+    
+    return output_pd_df
 
-def make_grid_info(fname='./gotberg23_info.h5'):
+def make_grid_info(fname='./gotberg23_info_v1p0.h5'):
     """
     Make the HDF5 Grid Info file
-
+    
     Parameters
     ----------
     fname: str
-
+    
     """
     
     raw_index = make_raw_index()
-    # wtab = pd.read_csv(
-    #     raw_index.loc[0, 'filename'],
-    #     header=0, comment='#',
-    # )
+    
+    # Use the first model file's wavelength column as reference
     
     wtab = Table.read(
         raw_index.loc[0, 'filename'],
@@ -168,7 +191,7 @@ def cache_gotberg23_grid(delete=False):
     -------
 
     """
-    all_fnames = glob('compressed_grid/*/SED.txt')
+    all_fnames = glob('S41_spectra_spectral_model_grid/SED*.txt')
     bar = ProgressBar(maxval=len(all_fnames))
     for i, fname in bar(enumerate(all_fnames)):
         convert_sed_memmap(fname)
