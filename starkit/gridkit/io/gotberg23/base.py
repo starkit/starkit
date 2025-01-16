@@ -55,9 +55,7 @@ gotberg23_bibtex = """
 gotberg23_meta = {
     'bibtex':gotberg23_bibtex,
     'parameters':[
-        'teff', 'logg',                     # Teff and logg at tau=2/3
-        'teff_tau20', 'logg_tau20',         # Teff and logg at tau=20
-        'xh_surf', 'xhe_surf', 'z_surf',    # Hydrogen, Helium, and Z abundance
+        'teff', 'logg', 'xh_surf',
     ],
     'wavelength_unit':'Angstrom',
     'wavelength_type':'vacuum',
