@@ -20,11 +20,12 @@ class Gotberg23ProcessGrid(BaseProcessGrid):
     R_initial_sampling=1
     def __init__(
             self, index, input_wavelength, meta,
-            wavelength_start=0*u.angstrom, wavelength_stop=np.inf*u.angstrom,
+            wavelength_start=0*u.angstrom,
+            wavelength_stop=np.inf*u.angstrom,
             R=5000.0, R_sampling=4,
         ):
         """
-
+        
         Parameters
         ----------
         index : pandas.DataFrame
@@ -49,12 +50,20 @@ class Gotberg23ProcessGrid(BaseProcessGrid):
         -------
             fluxes : numpy.ndarray
         """
-        fluxes = np.empty((len(self.index), len(self.output_wavelength)), dtype=np.float64)
-
-        for i, fname in tqdm(enumerate(self.index.filename),
-                             total=len(self.index)):
-            (cut_wavelength, flux) = self.load_flux(fname)
+        fluxes = np.empty(
+            (len(self.index), len(self.output_wavelength)),
+            dtype=np.float64,
+        )
+        
+        for i, fname in tqdm(
+                enumerate(self.index.filename),
+                total=len(self.index),
+            ):
+            (cut_wavelength, flux) = self.load_flux(
+                fname, self.index.rad[i],
+            )
             fluxes[i] = self.interp_wavelength(flux, cut_wavelength)
+        
         return fluxes
     
     def interp_wavelength(self, flux, cut_wavelength):
@@ -67,13 +76,16 @@ class Gotberg23ProcessGrid(BaseProcessGrid):
             self.output_wavelength)
         return output_flux
     
-    def load_flux(self, fname):
+    def load_flux(self, fname, star_rad):
         """
         load the 1D flux array from file
 
         Parameters
         ----------
         fname : str
+        star_rad : float
+            Effective stellar radius at tau=2/3 optical depth, in units of
+            solar radii
 
         Returns
         -------
@@ -99,5 +111,17 @@ class Gotberg23ProcessGrid(BaseProcessGrid):
             convert_sed_memmap(fname)
         flux = np.load(fname_npy)
         
-        # Return cut wavelength and loaded flux
-        return (cut_wavelength, flux * np.pi)
+        # Apply correction to flux
+        # ---
+        # Gotberg23 grid calculates flux density (flux_lambda) at a distance of
+        # 1 kpc. So, need to apply correction in order to determine flux density
+        # at the stellar surface (similar to how it is done for BOSZ grid)
+        # ---
+        # Correction Factor = (dist / R_star)^2
+        
+        flux_corr_factor = (u.kpc / (star_rad * u.solRad))**2
+        flux_corr_factor = flux_corr_factor.to(1)
+        
+        # Return cut wavelength and loaded flux * flux_corr_factor
+        
+        return (cut_wavelength, flux*flux_corr_factor)
