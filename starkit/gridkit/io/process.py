@@ -97,7 +97,7 @@ class BaseProcessGrid(object):
             if len(self.index[param].unique()) > 1:
                 parameters.append(param)
         meta['parameters'] = parameters
-        meta['flux_unit'] = 'erg/s/angstrom'
+        meta['flux_unit'] = 'erg/s/cm^2/angstrom'
         meta['R'] = self.R
         meta['R_sampling'] = self.R_sampling
         meta['grid_type'] = 'log'
