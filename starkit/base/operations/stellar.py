@@ -53,8 +53,8 @@ class RotationalBroadening(StellarOperationModel):
             self.velocity_per_pix = None
 
     def rotational_profile(self, vrot, limb_darkening):
-        vrot = float(vrot)
-        limb_darkening = float(limb_darkening)
+        vrot = _as_scalar_float(vrot, "vrot")
+        limb_darkening = _as_scalar_float(limb_darkening, "limb_darkening")
         vrot_by_c = np.maximum(0.0001, np.abs(vrot)) / self.c_in_kms
 
         half_width_pix = np.round((vrot /
@@ -72,7 +72,7 @@ class RotationalBroadening(StellarOperationModel):
 
     def evaluate(self, wavelength, flux, v_rot, limb_darkening):
         v_rot = _as_scalar_float(v_rot, "v_rot")
-        limb_darkening = float(limb_darkening)
+        limb_darkening = _as_scalar_float(limb_darkening, "limb_darkening")
 
         if self.velocity_per_pix is None:
             raise NotImplementedError('Regridding not implemented yet')
@@ -99,6 +99,7 @@ class DopplerShift(StellarOperationModel):
 
 
     def evaluate(self, wavelength, flux, vrad):
+        vrad = _as_scalar_float(vrad, "vrad")
         beta = vrad / self.c_in_kms
         doppler_factor = np.sqrt((1+beta) / (1-beta))
         return wavelength * doppler_factor, flux
@@ -117,6 +118,7 @@ class RadialVelocity(StellarOperationModel):
 
 
     def evaluate(self, wavelength, flux, vrad):
+        vrad = _as_scalar_float(vrad, "vrad")
         beta = vrad / self.c_in_kms
         doppler_factor = (1.0 + beta)
         return wavelength * doppler_factor, flux
@@ -140,6 +142,8 @@ class CCM89Extinction(StellarOperationModel):
 
     def evaluate(self, wavelength, flux, a_v, r_v):
         from specutils import extinction
+        a_v = _as_scalar_float(a_v, "a_v")
+        r_v = _as_scalar_float(r_v, "r_v")
         wavelength = np.array(wavelength)
         extinction_factor = np.ones_like(wavelength)
         valid_wavelength = ((wavelength > 910) & (wavelength < 33333))
@@ -168,6 +172,7 @@ class Distance(StellarOperationModel):
 
 
     def evaluate(self, wavelength, flux, distance):
+        distance = _as_scalar_float(distance, "distance")
         conversion = self.lum_density2cgs / (4 * np.pi *
                                              (distance * self.pc2cm)**2)
         return wavelength, flux * conversion
