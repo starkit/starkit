@@ -60,8 +60,18 @@ class RotationalBroadening(StellarOperationModel):
         return profile / profile.sum()
 
 
+    def _as_scalar_float(x, name):
+        arr = np.asarray(x)
+        if arr.ndim == 0:
+            return float(arr)
+        if arr.size == 1:
+            return float(arr.reshape(()))
+        raise ValueError(
+            f"{name} must be a scalar or length-1 array, got shape {arr.shape} and value {x!r}"
+        )
+    
     def evaluate(self, wavelength, flux, v_rot, limb_darkening):
-        v_rot = float(v_rot)
+        v_rot = _as_scalar_float(v_rot, "v_rot")
         limb_darkening = float(limb_darkening)
 
         if self.velocity_per_pix is None:
