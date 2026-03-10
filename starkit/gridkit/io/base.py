@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 import pandas as pd
 import h5py
-from specutils import Spectrum1D
+from starkit.fix_spectrum1d import SKSpectrum1D
 
 from astropy import units as u
 
@@ -144,7 +144,7 @@ class BaseSpectralGridDBIO(BaseSpectralGridIO):
                                for key in param_names])
 
         parameters = pd.DataFrame(parameters, columns= param_names)
-        output_sample_spectrum = Spectrum1D.from_array(
+        output_sample_spectrum = SKSpectrum1D.from_array(
             plugin.output_wavelength * u.angstrom, sample_spectrum_flux)
 
         return output_sample_spectrum, parameters, fluxes

@@ -3,12 +3,29 @@ import logging
 import time
 
 import numpy as np
-from jbopt.de import de
-from jbopt.classic import classical
+
+try:
+    import jbopt
+    from jbopt.de import de
+    from jbopt.classic import classical
+    _JBOPT_ERROR = None
+except Exception as e:
+    jbopt = None
+    de = None
+    classical = None
+    _JBOPT_ERROR = e
 
 from starkit.fitkit.priors import PriorCollection
 
 logger = logging.getLogger(__name__)
+
+
+def _require_jbopt():
+    if jbopt is None:
+        raise ImportError(
+            "jbopt is not available in this environment. "
+            "The installed jbopt appears incompatible with Python 3."
+        ) from _JBOPT_ERROR
 
 
 def fit_evaluate(self, model_param):
@@ -16,33 +33,37 @@ def fit_evaluate(self, model_param):
     parameters = self.parameters.copy()
     parameters[~self.fixed_mask()] = model_param
 
-
     loglikelihood = self.evaluate(*parameters)
     return float(loglikelihood)
 
+
 def fixed_mask(self):
-    return np.array([getattr(self, param_name).fixed
-                      for param_name in self.param_names])
+    return np.array([
+        getattr(self, param_name).fixed
+        for param_name in self.param_names
+    ])
 
 
 class JBOptPriorCollection(PriorCollection):
 
     def prior_transform(self, cube):
         cube = np.asarray(cube)
-        super(JBOptPriorCollection, self).prior_transform(cube,
-                                                          None, len(cube))
+        super(JBOptPriorCollection, self).prior_transform(cube, None, len(cube))
         return cube
+
 
 class JBOpt(object):
 
     def __init__(self, likelihood, priors, output_basename='test_all'):
-
         self.likelihood = likelihood
         self.likelihood.fit_evaluate = types.MethodType(
-            fit_evaluate, self.likelihood)
+            fit_evaluate, self.likelihood
+        )
 
-        self.likelihood.fixed_mask = types.MethodType(fixed_mask,
-                                                      self.likelihood)
+        self.likelihood.fixed_mask = types.MethodType(
+            fixed_mask, self.likelihood
+        )
+
         if not hasattr(priors, 'prior_transform'):
             self.priors = JBOptPriorCollection(priors)
         else:
@@ -50,16 +71,19 @@ class JBOpt(object):
 
         self.fit_parameter_names = [
             item for i, item in enumerate(self.likelihood.param_names)
-            if not self.likelihood.fixed_mask()[i]]
+            if not self.likelihood.fixed_mask()[i]
+        ]
 
-        self.args = dict(loglikelihood=self.likelihood.fit_evaluate,
-                         transform=self.priors.prior_transform,
-                         prior=lambda x: 0,
-                         parameter_names=self.fit_parameter_names,
-                         )
-
+        self.args = dict(
+            loglikelihood=self.likelihood.fit_evaluate,
+            transform=self.priors.prior_transform,
+            prior=lambda x: 0,
+            parameter_names=self.fit_parameter_names,
+        )
 
     def run(self, output_basename, method='de', start=None, nsteps=2000, verbose=0):
+        _require_jbopt()
+
         if start is None:
             start = [0.5] * len(self.fit_parameter_names)
 
@@ -74,19 +98,23 @@ class JBOpt(object):
         elif method in ('cobyla', 'ralg', 'mma', 'auglag', 'minuit',
                         'neldermead'):
             self.result = self._run_classical(method)
-
+        else:
+            raise ValueError("Unknown jbopt method: {0}".format(method))
 
         logger.info('Fit took {0:.2f}s'.format(time.time() - start_time))
         self.result['best_values'] = self.priors.prior_transform(
-            self.result['start'])
+            self.result['start']
+        )
         self.likelihood.parameters[~self.likelihood.fixed_mask()] = (
-            self.result['best_values'])
+            self.result['best_values']
+        )
 
         return self.result
 
     def _run_de(self):
-
+        _require_jbopt()
         return de(**self.args)
 
     def _run_classical(self, method):
+        _require_jbopt()
         return classical(method=method, **self.args)
