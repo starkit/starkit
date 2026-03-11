@@ -46,7 +46,7 @@ def make_raw_index(mh=-0.08,alpha=-0.05,res=300000.0,spectra_dir='spectra',
     he_h_arr = np.zeros(nfiles)
     #pattern = re.compile('a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
     #pattern_dir = re.compile('metal_(.....)\/carbon_(.....)\/alpha_(.....)')
-    tab = pd.read_csv(metadata,delim_whitespace=True,skiprows=23)
+    tab = pd.read_csv(metadata, sep=r'\s+', skiprows=23)
 
     for i in np.arange(nfiles):
         filename = all_fnames[i]
@@ -84,7 +84,7 @@ def make_grid_info(fname,spectra_dir='spectra',metadata='ogrid_metadata'):
     """
 
     raw_index = make_raw_index(spectra_dir=spectra_dir,metadata=metadata)
-    wtab = pd.read_csv(raw_index.loc[0, 'filename'], delim_whitespace=True)
+    wtab = pd.read_csv(raw_index.loc[0, 'filename'], sep=r'\s+')
     wavelength = wtab['wavelength']
 
     with pd.HDFStore(fname) as fh:
@@ -107,7 +107,7 @@ def convert_bz2_memmap(fname):
     if os.path.exists(fname_npy):
         pass
     else:
-        flux = pd.read_csv(fname, usecols=(1,), delim_whitespace=True, dtype=np.float64)
+        flux = pd.read_csv(fname, usecols=(1,), sep=r'\s+', dtype=np.float64)
         flux = flux.values[:,0]
         np.save(fname_npy, flux)
 

@@ -12,6 +12,25 @@ Modernized installation procedure in this fork, to support python 3.12 more clea
    git remote add upstream https://github.com/starkit/starkit.git
    python -m pip install -e .
 
+Install the most common optional features as well::
+
+   python -m pip install -e '.[all]'
+
+Optional extras currently available::
+
+   all         Common optional features (ipyparallel, jbopt, progressbar2, psutil)
+   grid_io     Grid preparation helpers (progressbar2)
+   parallel    Distributed fitting helpers (ipyparallel, psutil)
+   optimizers  Additional optimizer support (jbopt)
+   photometry  Photometry support (wsynphot)
+
+If you plan to use OpenMPI, also install ``mpi4py``::
+
+   python -m pip install mpi4py
+
+The photometry extra depends on ``wsynphot``, which may need to be installed
+separately depending on how that project is distributed.
+
 
 Example publications that use StarKit
 **************************************
