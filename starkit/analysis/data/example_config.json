@@ -1,0 +1,86 @@
+{
+  "run": {
+    "name": "example_star",
+    "grid_path": "/path/to/grid.h5",
+    "mpi": true,
+    "mpi_processes": 4,
+    "work_dir": "/tmp/starkit_analysis_example",
+    "clean_up": true
+  },
+  "input_spectrum": {
+    "path": "/path/to/spectrum.dat",
+    "format": "ascii_columns",
+    "wavelength_type": "air",
+    "columns": {
+      "wavelength": 0,
+      "flux": 1,
+      "uncertainty": null
+    },
+    "skiprows": 1,
+    "wavelength_unit": "Angstrom",
+    "flux_unit": "erg / (cm2 s Angstrom)",
+    "snr": 30.0
+  },
+  "segments": {
+    "path": "/path/to/seg.txt",
+    "mode": "file",
+    "wavelength_reference_path": null,
+    "wavelength_type": null,
+    "resample_to_grid": true
+  },
+  "masking": {
+    "wavelength_type": null,
+    "include_regions_path": null,
+    "exclude_regions_path": "/path/to/exclude.txt",
+    "regions_json_path": null
+  },
+  "model": {
+    "likelihood": "chi2",
+    "instrument_resolution": null,
+    "rotational_broadening": false,
+    "rotational_velocity": 0.0,
+    "doppler_shift": false,
+    "radial_velocity": 0.0,
+    "crop_to_observed_range": true,
+    "interpolate": true,
+    "normalize_npol": null,
+    "normalize_parts": null
+  },
+  "priors": {
+    "mh": {
+      "type": "uniform",
+      "min": -0.2,
+      "max": 0.6
+    },
+    "alphafe": {
+      "type": "uniform",
+      "min": -0.2,
+      "max": 0.4
+    },
+    "cfe": {
+      "type": "fixed",
+      "value": 0.0
+    },
+    "nfe": {
+      "type": "uniform",
+      "min": 0.0,
+      "max": 1.0
+    },
+    "ratio": {
+      "type": "uniform",
+      "min": 10.0,
+      "max": 20.0
+    }
+  },
+  "outputs": {
+    "directory": "/path/to/output",
+    "wavelength_type": null,
+    "write_hdf5": true,
+    "write_plot": true,
+    "write_corner_plot": true,
+    "write_bestfit_spectrum": true,
+    "write_masked_observed": true,
+    "write_run_summary": true,
+    "filenames": {}
+  }
+}

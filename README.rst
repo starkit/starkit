@@ -19,17 +19,32 @@ Install the most common optional features as well::
 Optional extras currently available::
 
    all         Common optional features (ipyparallel, jbopt, progressbar2, psutil)
+   analysis_mpi MPI support for the analysis workflow (mpi4py)
    grid_io     Grid preparation helpers (progressbar2)
    parallel    Distributed fitting helpers (ipyparallel, psutil)
    optimizers  Additional optimizer support (jbopt)
    photometry  Photometry support (wsynphot)
 
-If you plan to use OpenMPI, also install ``mpi4py``::
+If you plan to use MPI analysis, install the corresponding extra::
 
-   python -m pip install mpi4py
+   python -m pip install -e '.[analysis_mpi]'
 
 The photometry extra depends on ``wsynphot``, which may need to be installed
 separately depending on how that project is distributed.
+
+
+Analysis workflow
+*****************
+
+StarKit includes a JSON-driven analysis workflow. Inspect a grid, validate a
+configuration, and run an analysis with::
+
+   starkit-analysis inspect-grid /path/to/grid.h5 --template-out analysis.json
+   starkit-analysis validate analysis.json
+   starkit-analysis run analysis.json
+
+The same interface is available through ``python -m starkit.analysis``. See
+the analysis workflow documentation for configuration and output details.
 
 
 Example publications that use StarKit
