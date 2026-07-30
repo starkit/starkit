@@ -96,7 +96,7 @@ class MultiNestResult(object):
 
         posterior_data = pd.read_csv(
             '{0}_.txt'.format(basename),
-            delim_whitespace=True, names=['weights']+['loglikelihood']+parameter_names)
+            sep=r'\s+', names=['weights']+['loglikelihood']+parameter_names)
         posterior_data.index = np.arange(len(posterior_data))
         return posterior_data
 
@@ -109,7 +109,7 @@ class MultiNestResult(object):
 
         posterior_data = pd.read_csv(
             '{0}_post_equal_weights.dat'.format(basename),
-            delim_whitespace=True, names=parameter_names + ['x'])
+            sep=r'\s+', names=parameter_names + ['x'])
         posterior_data.index = np.arange(len(posterior_data))
 
         # since the chain is equally weighted, we should just put equal weights

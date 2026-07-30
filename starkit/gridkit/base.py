@@ -1,3 +1,4 @@
+import json
 import logging
 
 from astropy import modeling
@@ -18,6 +19,25 @@ import starkit
 wavelength_conversions = {'air2vacuum':convert_air2vacuum,
                           'vacuum2air':convert_vacuum2air}
 logger = logging.getLogger(__name__)
+
+
+def _decode_meta_value(value):
+    if not isinstance(value, str):
+        return value
+    try:
+        return json.loads(value)
+    except ValueError:
+        return value
+
+
+def _decode_meta(meta):
+    if isinstance(meta, pd.DataFrame):
+        if meta.shape[1] == 1:
+            decoded = meta.iloc[:, 0].map(_decode_meta_value)
+            return pd.Series(decoded.values, index=meta.index)
+        return meta.applymap(_decode_meta_value)
+
+    return meta.map(_decode_meta_value)
 
 class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
@@ -266,6 +286,7 @@ def read_grid(hdf_fname):
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
     meta = pd.read_hdf(hdf_fname, 'meta')
+    meta = _decode_meta(meta)
     logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
 
     with h5py.File(hdf_fname) as fh:

@@ -118,7 +118,9 @@ def convert_bz2_memmap(fname):
     if os.path.exists(fname_npy):
         pass
     else:
-        flux = pd.read_csv(fname, header=-1, usecols=(1,), delim_whitespace=True, dtype=np.float64)
+        flux = pd.read_csv(
+            fname, header=None, usecols=(1,), sep=r'\s+', dtype=np.float64
+        )
         flux = flux.values[:,0]
         np.save(fname_npy, flux)
 

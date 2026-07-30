@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spectrum Masking Tool</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="toolbar">
+        <div class="toolbar-group">
+          <label class="button button-primary" for="spectrum-file">Open Spectrum</label>
+          <input id="spectrum-file" type="file" accept=".txt,.dat,.csv,text/plain" hidden />
+          <label class="button" for="regions-file">Import Regions JSON</label>
+          <input id="regions-file" type="file" accept=".json,application/json" hidden />
+          <button id="export-regions" class="button" type="button">Export Regions JSON</button>
+          <div id="drop-zone" class="drop-zone" aria-label="Drop spectrum or JSON file here">
+            Drop spectrum or JSON here
+          </div>
+          <div class="file-label">
+            <span class="muted">File</span>
+            <strong id="file-name">No spectrum loaded</strong>
+          </div>
+        </div>
+
+        <div class="toolbar-group">
+          <div class="mode-toggle" role="group" aria-label="Region type">
+            <button id="mode-inclusion" class="mode-button is-active" type="button">Inclusion</button>
+            <button id="mode-exclusion" class="mode-button" type="button">Exclusion</button>
+          </div>
+          <button id="delete-selected" class="button" type="button">Delete Selected</button>
+          <button id="zoom-box-toggle" class="button" type="button">Zoom Box</button>
+          <button id="zoom-in" class="button" type="button">Zoom In</button>
+          <button id="zoom-out" class="button" type="button">Zoom Out</button>
+          <button id="zoom-selected" class="button" type="button">Zoom Selected</button>
+          <label class="select-field" for="atomic-atlas-select">
+            <select id="atomic-atlas-select" class="select-input" aria-label="Atomic atlas"></select>
+          </label>
+          <button id="reset-view" class="button" type="button">Reset View</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="plot-panel">
+          <div class="plot-header">
+            <div class="plot-readout">
+              <span class="muted">Cursor wavelength</span>
+              <strong id="cursor-readout">-</strong>
+            </div>
+            <div class="plot-readout plot-y-scale">
+              <span class="muted">Y scale</span>
+              <div class="unit-toggle" role="group" aria-label="Y scale mode">
+                <button id="y-scale-auto" class="mini-button is-active" type="button">Auto</button>
+                <button id="y-scale-zero" class="mini-button" type="button">Zero</button>
+                <button id="y-scale-full" class="mini-button" type="button">Full</button>
+              </div>
+            </div>
+            <div class="plot-readout plot-instructions">
+              <span class="muted">Instructions</span>
+              <strong>Drag to create/select, wheel or buttons to zoom, Zoom Box for drag-zoom, Shift+drag to pan, switch atomic label modes as needed</strong>
+            </div>
+          </div>
+
+          <div id="plot-container" class="plot-container">
+            <canvas id="plot-canvas" aria-label="Spectrum plot"></canvas>
+            <div id="empty-state" class="empty-state">
+              Load a spectrum to begin
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-panel">
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Summary</h2>
+              <div class="unit-toggle" role="group" aria-label="Wavelength unit">
+                <button id="unit-angstrom" class="mini-button is-active" type="button">Ång</button>
+                <button id="unit-nm" class="mini-button" type="button">nm</button>
+                <button id="unit-raw" class="mini-button" type="button">raw</button>
+              </div>
+            </div>
+            <dl class="summary-grid">
+              <div>
+                <dt>Points</dt>
+                <dd id="summary-points">-</dd>
+              </div>
+              <div>
+                <dt>Wavelength</dt>
+                <dd id="summary-range">-</dd>
+              </div>
+              <div>
+                <dt>Flux</dt>
+                <dd id="summary-flux">-</dd>
+              </div>
+              <div>
+                <dt>Regions</dt>
+                <dd id="summary-regions">0</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Regions</h2>
+              <span id="selection-label" class="selection-label">No selection</span>
+            </div>
+
+            <div class="table-wrap">
+              <table class="region-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Width</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="regions-body">
+                  <tr class="placeholder-row">
+                    <td colspan="5">No regions defined</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h2>Status</h2>
+            <div id="status-box" class="status-box">Ready.</div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -10,6 +10,7 @@ techniques
 
     installation
     getting_started
+    analysis
 
 ------------
 Input/Output

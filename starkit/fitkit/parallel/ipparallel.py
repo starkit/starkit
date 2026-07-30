@@ -1,6 +1,6 @@
 import logging
 import os
-from IPython.parallel.util import interactive
+from ipyparallel.util import interactive
 
 logger = logging.getLogger(__name__)
 

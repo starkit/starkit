@@ -1,55 +1,51 @@
 StarKit
 =======
 
-.. image:: https://dev.azure.com/starkit/starkit/_apis/build/status/starkit-CI?branchName=master
-   :target: https://dev.azure.com/starkit/starkit/_build/latest?definitionId=2&branchName=master
-
-
 Installation
 ************
 
-We recommend you use `Anaconda <https://www.anaconda.com/distribution/>`_ to install
-the necessary requirements for Starkit to work.
+Modernized installation procedure in this fork, to support python 3.12 more cleanly::
 
-Once you have anaconda installed please make a new environment with the prerequisites
-for starkit in the following way. This will create an environment called `starkit`::
-    # for Linux and Python 3
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix.yml
+   # for Linux and Python 3.12
+   git clone https://github.com/thorsbro/starkit.git
+   cd starkit
+   git remote add upstream https://github.com/starkit/starkit.git
+   python -m pip install -e .
 
-    # for MacOS and Python 3
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix_macos.yml
-    
-    # install using yml file into an environment called starkit. 
-    # If you want to call it something else, or already have a starkit enivornment, 
-    # you can change the -n argument
+Install the most common optional features as well::
 
-    # for Linux
-    conda env create --file starkit_gridfix.yml -n starkit
+   python -m pip install -e '.[all]'
 
-    # for MacOS
-    conda env create --file starkit_gridfix_macos.yml -n starkit
-    
-    source activate starkit
+Optional extras currently available::
 
-For now until a new version of Astropy comes out that fixes some problems of memory leak, you need to install `specutils` from our fork::
-    
-    git clone https://github.com/followthesheep/specutils
-    cd specutils
-    python setup.py install
+   all         Common optional features (ipyparallel, jbopt, progressbar2, psutil)
+   analysis_mpi MPI support for the analysis workflow (mpi4py)
+   grid_io     Grid preparation helpers (progressbar2)
+   parallel    Distributed fitting helpers (ipyparallel, psutil)
+   optimizers  Additional optimizer support (jbopt)
+   photometry  Photometry support (wsynphot)
 
-Then you can additionally install any other packages you like with::
-  
-    conda install <your package>
+If you plan to use MPI analysis, install the corresponding extra::
 
-Once this is installed, there are two ways to install starkit. For simple use::
+   python -m pip install -e '.[analysis_mpi]'
 
-    pip install git+https://github.com/starkit/starkit
+The photometry extra depends on ``wsynphot``, which may need to be installed
+separately depending on how that project is distributed.
 
-To download a full development version of starkit, please do::
 
-    git clone https://github.com/starkit/starkit
-    cd starkit
-    python setup.py develop
+Analysis workflow
+*****************
+
+StarKit includes a JSON-driven analysis workflow. Inspect a grid, validate a
+configuration, and run an analysis with::
+
+   starkit-analysis inspect-grid /path/to/grid.h5 --template-out analysis.json
+   starkit-analysis validate analysis.json
+   starkit-analysis run analysis.json
+
+The same interface is available through ``python -m starkit.analysis``. See
+the analysis workflow documentation for configuration and output details.
+
 
 Example publications that use StarKit
 **************************************
