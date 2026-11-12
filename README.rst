@@ -4,14 +4,18 @@ StarKit
 Installation
 ************
 
-StarKit requires Python 3.10 or later. Install the development version with
-pip::
+StarKit requires Python 3.10 or later. The simplest setup is the conda
+environment in ``environment.yml``. It uses Python 3.10 and contains StarKit
+(installed in editable mode), its optional features, the MultiNest library
+and pytest::
 
    git clone https://github.com/starkit/starkit.git
    cd starkit
-   python -m pip install -e .
+   conda env create -f environment.yml
+   conda activate starkit
+   pytest
 
-Install the common optional features and pytest as well, and run the tests::
+To install with pip instead::
 
    python -m pip install -e '.[all,test]'
    pytest
@@ -26,9 +30,10 @@ Optional extras currently available::
    test        pytest
    docs        Sphinx and its extensions, for building the documentation
 
-``pymultinest`` is a Python interface to the native MultiNest library, which
-must be built separately. Its directory must be on ``LD_LIBRARY_PATH`` (Linux)
-or ``DYLD_LIBRARY_PATH`` (macOS).
+``pymultinest`` is a Python interface to the native MultiNest library. The
+conda environment includes the library. With pip, the library must be built
+separately, and its directory must be on ``LD_LIBRARY_PATH`` (Linux) or
+``DYLD_LIBRARY_PATH`` (macOS).
 
 If you plan to use OpenMPI, also install ``mpi4py``::
 
