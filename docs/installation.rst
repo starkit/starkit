@@ -32,6 +32,11 @@ build the library as described below. To update an existing environment after
 
     conda env update -f environment.yml --prune
 
+Recent versions of conda solve this environment much faster than older ones.
+If the solve takes more than a few seconds, update conda first::
+
+    conda update -n base conda
+
 Optional dependencies
 =====================
 

@@ -8,6 +8,8 @@
 name: starkit
 channels:
   - conda-forge
+  # Keep the channels from ~/.condarc (such as defaults) out of the solve.
+  - nodefaults
 dependencies:
   - python=3.10
   - pip
