@@ -15,7 +15,7 @@ dependencies:
   - astropy
   - h5py
   - numpy
-  - pandas
+  - pandas<3
   - pytables
   - scipy
   - tqdm

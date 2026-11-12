@@ -6,6 +6,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import pytest
+import tables
 from astropy import units as u
 from pandas.errors import PerformanceWarning
 
@@ -42,6 +43,33 @@ def legacy_grid(tmp_path):
     with h5py.File(path, "a") as fh:
         fh.create_dataset("fluxes", data=np.array([_linear_flux(*p) for p in points]))
     return path
+
+
+def _store_attributes_as_bytes(path):
+    """Rewrite the pandas attributes the way pandas 0.15 under Python 2 stored them.
+
+    Grids written then, including the example grid in docs/examples, store every
+    string attribute as bytes and have no encoding attribute value.
+    """
+    with tables.open_file(path, "a") as fh:
+        for node in fh.walk_nodes("/"):
+            attrs = node._v_attrs
+            for name in attrs._v_attrnamesuser:
+                value = getattr(attrs, name)
+                if name == "encoding":
+                    setattr(attrs, name, None)
+                elif isinstance(value, str):
+                    setattr(attrs, name, np.bytes_(value.encode()))
+
+
+def test_grid_with_bytes_attributes(legacy_grid):
+    # pandas 3 raises TypeError on these attributes in read_hdf, which is why
+    # starkit requires pandas < 3.
+    _store_attributes_as_bytes(legacy_grid)
+    grid = load_grid(str(legacy_grid), wavelength_type="vacuum")
+    grid.teff, grid.logg = 5250.0, 4.25
+    _, flux = grid()
+    np.testing.assert_allclose(flux, [1.05, 1.06, 1.07, 1.08, 1.09], rtol=1e-12)
 
 
 def test_legacy_grid_parameters_and_wavelengths(legacy_grid):
