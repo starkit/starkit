@@ -16,8 +16,9 @@ cmfgen_bibtex = """
 
 """
 
+# note: don't include microturbulence because it's no well sampled
 cmfgen_meta = {'bibtex':cmfgen_bibtex,
-             'parameters':['teff', 'logg', 'mh', 'micro','heh'],
+             'parameters':['teff', 'logg', 'mh', 'heh'],
              'wavelength_unit':'Angstrom',
              'wavelength_type':'vacuum',
              'flux_unit': 'erg/s/cm^2/angstrom'}
@@ -69,7 +70,7 @@ def make_raw_index(mh=-0.08,alpha=-0.05,res=300000.0,spectra_dir='spectra',
         res_arr[i] = float(res)
 
     return pd.DataFrame({'mh':mh_arr,'alpha':alpha_arr,'teff':teff_arr,
-                      'logg':logg_arr,'micro':micro_arr,
+                      'logg':logg_arr,
                       'res':res_arr,'heh':he_h_arr,'filename':all_fnames})
 
 def make_grid_info(fname,spectra_dir='spectra',metadata='ogrid_metadata'):
