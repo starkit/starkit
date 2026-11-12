@@ -2,22 +2,59 @@
 Installation
 ************
 
-We recommend you use `Anaconda <http://continuum.io/downloads>`_ to install
-the necessary requirements for Starkit to work.
-
-Once you have anaconda installed please make a new environment with the prerequisites
-for starkit in the following way::
-
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_env27.yml
-    conda env create -n starkit --file starkit_env27.yml
-    source activate starkit
-
-Once this is installed, there are two ways to install starkit. For simple use::
+StarKit requires Python 3.10 or later. Install it with pip::
 
     pip install git+https://github.com/starkit/starkit
 
-For to download a full development version of starkit please do::
+For a development version, clone the repository and install it in editable
+mode::
 
     git clone https://github.com/starkit/starkit
     cd starkit
-    python setup.py develop
+    pip install -e '.[all,test]'
+
+With conda, create an environment first and install StarKit into it with
+pip::
+
+    conda create -n starkit -c conda-forge python=3.12
+    conda activate starkit
+    pip install -e '.[all,test]'
+
+Optional dependencies
+=====================
+
+Optional features are installed as extras, for example
+``pip install -e '.[multinest]'``.
+
+``grid_io``
+    Building grids from model spectra (progressbar2, sqlalchemy).
+``multinest``
+    MultiNest fitting and corner plots (pymultinest, corner).
+``parallel``
+    Distributed fitting with ipyparallel (ipyparallel, psutil).
+``photometry``
+    Synthetic photometry (wsynphot). wsynphot is not on PyPI and may need to
+    be installed separately.
+``all``
+    ``grid_io``, ``multinest`` and ``parallel``.
+``test``
+    pytest, for running the test suite.
+``docs``
+    Sphinx and its extensions, for building this documentation.
+
+``pymultinest`` is a Python interface to the MultiNest library, which must be
+built separately. Its directory must be on ``LD_LIBRARY_PATH`` (Linux) or
+``DYLD_LIBRARY_PATH`` (macOS).
+
+Running the tests
+=================
+
+From the repository::
+
+    pytest
+
+For an installed copy::
+
+    pytest --pyargs starkit
+
+Tests that need an optional dependency are skipped when it is not installed.

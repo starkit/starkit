@@ -4,15 +4,17 @@ StarKit
 Installation
 ************
 
-Install the development version with pip::
+StarKit requires Python 3.10 or later. Install the development version with
+pip::
 
    git clone https://github.com/starkit/starkit.git
    cd starkit
    python -m pip install -e .
 
-Install the common optional features as well::
+Install the common optional features and pytest as well, and run the tests::
 
-   python -m pip install -e '.[all]'
+   python -m pip install -e '.[all,test]'
+   pytest
 
 Optional extras currently available::
 
@@ -21,6 +23,8 @@ Optional extras currently available::
    multinest   MultiNest fitting and corner plots (pymultinest, corner)
    parallel    Distributed fitting helpers (ipyparallel, psutil)
    photometry  Photometry support (wsynphot)
+   test        pytest
+   docs        Sphinx and its extensions, for building the documentation
 
 ``pymultinest`` is a Python interface to the native MultiNest library, which
 must be built separately. Its directory must be on ``LD_LIBRARY_PATH`` (Linux)
