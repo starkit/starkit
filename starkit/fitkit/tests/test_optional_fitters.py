@@ -22,5 +22,10 @@ def test_jbopt_fitter_reports_missing_jbopt_when_run():
 
 def test_ipyparallel_helpers_import():
     pytest.importorskip("ipyparallel", reason="needs the parallel extra")
-    module = importlib.import_module("starkit.fitkit.parallel.ipparallel")
+    try:
+        module = importlib.import_module("starkit.fitkit.parallel.ipparallel")
+    except SystemExit:
+        # ipparallel imports the MultiNest fitter, and pymultinest calls
+        # sys.exit() when it cannot load the MultiNest library.
+        pytest.skip("needs the MultiNest library")
     assert callable(module.interactive)
