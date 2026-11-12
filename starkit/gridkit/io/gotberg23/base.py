@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from progressbar import ProgressBar
 
-gotberg23_bibtex = """
+gotberg23_bibtex = r"""
 @article{Gotberg:2023,
 	abstract = {Massive stars (~8-25 M <SUB>⊙</SUB>) stripped of their hydrogen-rich envelopes via binary interaction are thought to be the main progenitors for merging neutron stars and stripped-envelope supernovae. We recently presented the discovery of the first set of such stripped stars in a companion paper. Here, we fit the spectra of 10 stars with new atmosphere models in order to constrain their stellar properties precisely. We find that the stellar properties align well with the theoretical expectations from binary evolution models for helium-core burning envelope-stripped stars. The fits confirm that the stars have high effective temperatures (T <SUB>eff</SUB> ~ 50-100 kK), high surface gravities ( $\mathrm log g\sim $ 5), and hydrogen-poor/helium-rich surfaces (X <SUB>H,surf</SUB> ~ 0-0.4) while showing for the first time a range of bolometric luminosities (10<SUP>3</SUP>-10<SUP>5</SUP> L <SUB>⊙</SUB>), small radii (~0.5-1 R <SUB>⊙</SUB>), and low Eddington factors (Γ<SUB> e </SUB> ~ 0.006-0.4). Using these properties, we derive intermediate current masses (~1-8 M <SUB>⊙</SUB>), which suggest that their progenitors were massive stars (~5-25 M <SUB>⊙</SUB>) and that a subset will reach core-collapse, leaving behind neutron stars or black holes. Using the model fits, we also estimate the emission rates of ionizing photons for these stars, which agree well with previous model expectations. Further, by computing models for a range of mass-loss rates, we find that the stellar winds are weaker than predicted by any existing scheme ( $ \dot M  _ \mathrm wind  \lesssim  10 ^ -9 $ M <SUB>⊙</SUB> yr<SUP>-1</SUP>). The properties of this first sample of intermediate-mass helium stars suggest they both contain progenitors of type Ib and IIb supernovae, and provide important benchmarks for binary evolution and population synthesis models.},
 	adsnote = {Provided by the SAO/NASA Astrophysics Data System},
@@ -79,7 +79,7 @@ def make_raw_index(
     params_table = Table.read(
         grid_params_file,
         format='ascii',
-        delimiter='\s',
+        delimiter=r'\s',
         data_start=2,
     )
     

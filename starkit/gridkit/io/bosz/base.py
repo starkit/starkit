@@ -58,8 +58,8 @@ def make_raw_index():
     micro_arr = np.zeros(nfiles)
     rot_arr = np.zeros(nfiles)
     res_arr = np.zeros(nfiles)
-    pattern = re.compile('a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
-    pattern_dir = re.compile('metal_(.....)\/carbon_(.....)\/alpha_(.....)')
+    pattern = re.compile(r'a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
+    pattern_dir = re.compile(r'metal_(.....)\/carbon_(.....)\/alpha_(.....)')
 
     for i in np.arange(nfiles):
         filename = all_fnames[i]
