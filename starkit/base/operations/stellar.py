@@ -67,7 +67,8 @@ def _ccm89_a_b(x):
         a[uv] = a_uv
         b[uv] = b_uv
 
-    fuv = (x > 8.0) & (x <= 10.0)
+    # CCM89 defines the far-UV curve up to x = 10; above that it is extrapolated.
+    fuv = x > 8.0
     if np.any(fuv):
         y = x[fuv] - 8.0
         a[fuv] = -1.073 - 0.628 * y + 0.137 * y ** 2 - 0.070 * y ** 3
@@ -82,19 +83,16 @@ def _ccm89_extinction_factor(wavelength, a_v, r_v):
     """
     wavelength = np.asarray(wavelength, dtype=float)
     factor = np.ones_like(wavelength, dtype=float)
-    valid = wavelength > 0.0
+    # The range starkit applied with specutils.extinction.extinction_ccm89,
+    # which extrapolates the far-UV curve down to 910 Angstrom (x = 11).
+    valid = (wavelength > 910.0) & (wavelength < 33333.0)
     if not np.any(valid):
         return factor
 
     x = 1.0 / (wavelength[valid] * 1e-4)  # inverse microns
-    ccm_valid = (x >= 0.3) & (x <= 10.0)
-    if not np.any(ccm_valid):
-        return factor
-
-    a, b = _ccm89_a_b(x[ccm_valid])
+    a, b = _ccm89_a_b(x)
     a_lambda = np.abs(a_v) * (a + b / np.abs(r_v))
-    valid_indices = np.flatnonzero(valid)
-    factor[valid_indices[ccm_valid]] = 10.0 ** (-0.4 * a_lambda)
+    factor[valid] = 10.0 ** (-0.4 * a_lambda)
     return factor
 
 

@@ -29,6 +29,7 @@ CCM89_REFERENCE = [
     (2175.0, 3.1, 3.1851012753144046),    # UV, x = 4.598 um^-1
     (1500.0, 3.1, 2.6638792147137162),    # UV with F_a, F_b, x = 6.667 um^-1
     (1100.0, 3.1, 4.2172065388623645),    # far UV, x = 9.091 um^-1
+    (950.0, 3.1, 6.045613491104225),      # far-UV curve extrapolated past x = 10
     (22000.0, 5.0, 0.13167452735577523),
     (12000.0, 5.0, 0.3493980510296897),
     (5494.5, 5.0, 1.0000008365927981),
@@ -36,6 +37,7 @@ CCM89_REFERENCE = [
     (2175.0, 5.0, 1.9742861111897607),
     (1500.0, 5.0, 1.4960346187487024),
     (1100.0, 5.0, 1.9740151765589788),
+    (950.0, 5.0, 2.6410327744569178),
 ]
 
 
@@ -61,8 +63,10 @@ def test_ccm89_uses_absolute_values_of_a_v_and_r_v():
     np.testing.assert_allclose(_extinction_mag(wavelength, -2.0, -3.1), _extinction_mag(wavelength, 2.0, 3.1))
 
 
-@pytest.mark.parametrize("wavelength", [500.0, 900.0, 40000.0, 1e5])
+@pytest.mark.parametrize("wavelength", [500.0, 900.0, 33333.2, 40000.0, 1e5])
 def test_ccm89_leaves_flux_unchanged_outside_its_range(wavelength):
+    # Extinction is applied between 910 and 33333 Angstrom, the range starkit
+    # used with specutils.
     np.testing.assert_array_equal(_extinction_mag(wavelength, 5.0, 3.1), [0.0])
 
 
