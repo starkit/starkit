@@ -1,2 +1,2 @@
-version = "0.5.dev0"
+version = "1.0"
 githash = ""
