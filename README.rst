@@ -4,32 +4,34 @@ StarKit
 Installation
 ************
 
-Modernized installation procedure in this fork, to support python 3.12 more cleanly::
+Install the development version with pip::
 
-   # for Linux and Python 3.12
-   git clone https://github.com/thorsbro/starkit.git
+   git clone https://github.com/starkit/starkit.git
    cd starkit
-   git remote add upstream https://github.com/starkit/starkit.git
    python -m pip install -e .
 
-Install the most common optional features as well::
+Install the common optional features as well::
 
    python -m pip install -e '.[all]'
 
 Optional extras currently available::
 
-   all         Common optional features (ipyparallel, jbopt, progressbar2, psutil)
-   grid_io     Grid preparation helpers (progressbar2)
+   all         grid_io, multinest and parallel together
+   grid_io     Grid preparation helpers (progressbar2, sqlalchemy)
+   multinest   MultiNest fitting and corner plots (pymultinest, corner)
    parallel    Distributed fitting helpers (ipyparallel, psutil)
-   optimizers  Additional optimizer support (jbopt)
    photometry  Photometry support (wsynphot)
+
+``pymultinest`` is a Python interface to the native MultiNest library, which
+must be built separately. Its directory must be on ``LD_LIBRARY_PATH`` (Linux)
+or ``DYLD_LIBRARY_PATH`` (macOS).
 
 If you plan to use OpenMPI, also install ``mpi4py``::
 
    python -m pip install mpi4py
 
-The photometry extra depends on ``wsynphot``, which may need to be installed
-separately depending on how that project is distributed.
+The photometry extra depends on ``wsynphot``, which is not on PyPI and may
+need to be installed separately.
 
 
 Example publications that use StarKit
