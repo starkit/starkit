@@ -1,0 +1,61 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pip:
+    # Installs the package (not editable) from PyPI wheels and tests the
+    # installed copy, so missing package data shows up here. The MultiNest
+    # library is not installed, so the MultiNest test is skipped.
+    name: pip, Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: python -m pip install '.[all,test]'
+      - name: Test the installed package
+        working-directory: ${{ runner.temp }}
+        run: python -m pytest --pyargs starkit -ra
+
+  conda:
+    # Builds environment.yml, which includes the MultiNest library from
+    # conda-forge, so the MultiNest test runs here.
+    name: conda, ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: conda-incubator/setup-miniconda@v4
+        with:
+          miniforge-version: latest
+          environment-file: environment.yml
+          activate-environment: starkit
+          conda-remove-defaults: true
+      - name: Check that pymultinest loads the MultiNest library
+        run: python -c "import pymultinest"
+      - name: Test
+        run: python -m pytest -ra
