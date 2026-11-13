@@ -18,9 +18,18 @@ import numpy as np
 
 try:
     import pymultinest
-except ImportError:
-    multinest_available = False
-    raise
+except ModuleNotFoundError as exc:
+    if exc.name != "pymultinest":
+        raise
+    raise ModuleNotFoundError(
+        "MultiNest fitting needs the pymultinest package and the MultiNest "
+        "library. To install both, create the conda environment in "
+        "environment.yml from the StarKit repository "
+        "(conda env create -f environment.yml). With pip, install pymultinest "
+        "with pip install 'starkit[multinest]' and build the library from "
+        "https://github.com/JohannesBuchner/MultiNest.",
+        name="pymultinest",
+    ) from exc
 else:
     multinest_available = True
 
