@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import types
 import tempfile
@@ -16,6 +17,14 @@ logger = getLogger(__name__)
 import numpy as np
 
 
+_MISSING_LIBRARY_MESSAGE = (
+    "pymultinest could not load the MultiNest library. In a conda "
+    "environment, install it with conda install -c conda-forge multinest. "
+    "Otherwise, build it from https://github.com/JohannesBuchner/MultiNest "
+    "and put its directory on LD_LIBRARY_PATH (Linux) or DYLD_LIBRARY_PATH "
+    "(macOS)."
+)
+
 try:
     import pymultinest
 except ModuleNotFoundError as exc:
@@ -30,8 +39,18 @@ except ModuleNotFoundError as exc:
         "https://github.com/JohannesBuchner/MultiNest.",
         name="pymultinest",
     ) from exc
-else:
-    multinest_available = True
+except SystemExit as exc:
+    # On Linux, pymultinest prints the loading error and calls sys.exit(1)
+    # when it cannot load the library.
+    raise ImportError(_MISSING_LIBRARY_MESSAGE) from exc
+
+# On macOS, pymultinest passes find_library's None to cdll.LoadLibrary when it
+# cannot find the library. That opens the Python process instead, so the
+# import succeeds and a fit fails later with "symbol not found".
+_library = getattr(sys.modules.get("pymultinest.run"), "lib", None)
+if _library is not None and _library._name is None:
+    raise ImportError(_MISSING_LIBRARY_MESSAGE)
+multinest_available = True
 
 def multinest_evaluate(self, model_param, ndim, nparam):
     # returns the likelihood of observing the data given the model param_names

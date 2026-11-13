@@ -5,8 +5,7 @@ import pytest
 
 try:
     from starkit.fitkit.multinest.base import MultiNestResult
-except (ImportError, OSError, SystemExit):
-    # pymultinest calls sys.exit() when it cannot load the MultiNest library.
+except ImportError:
     pytest.skip("needs the multinest extra and the MultiNest library", allow_module_level=True)
 
 PARAMETERS = ["teff_0", "logg_0"]
