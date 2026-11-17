@@ -113,8 +113,9 @@ below; import each one from its module by name, for example
      - none
      - Converts the spectrum to magnitudes in a set of filters, assuming the
        flux is in erg s\ :sup:`-1` cm\ :sup:`-2` Å\ :sup:`-1` at the observer
-       (see :doc:`io/flux_units`). It requires the ``photometry`` extra
-       (wsynphot); see :doc:`/examples/starkit_photometry`.
+       (see :doc:`io/flux_units`). ``mag_type`` is ``'vega'`` or ``'ab'``.
+       It requires wsynphot (see :doc:`installation`); see
+       :doc:`/examples/starkit_photometry`.
 
 For example, a Doppler shift of 20 km/s::
 

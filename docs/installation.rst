@@ -49,9 +49,6 @@ Optional features are installed as extras, for example
     MultiNest fitting and corner plots (pymultinest, corner).
 ``parallel``
     Distributed fitting with ipyparallel (ipyparallel, psutil).
-``photometry``
-    Synthetic photometry (wsynphot). wsynphot is not on PyPI and may need to
-    be installed separately.
 ``all``
     ``grid_io``, ``multinest`` and ``parallel``.
 ``test``
@@ -73,6 +70,21 @@ https://github.com/JohannesBuchner/MultiNest accepts paths of up to 1000
 characters. On macOS, putting its directory on ``DYLD_LIBRARY_PATH`` makes
 pymultinest in the conda environment load it instead of the conda-forge
 library.
+
+Synthetic photometry
+====================
+
+``Photometry`` needs wsynphot (https://github.com/starkit/wsynphot), which is
+not on PyPI and therefore cannot be a StarKit extra. As of November 2026 it
+does not install in a current environment:
+
+- its setup script imports ``imp``, which Python 3.12 removed;
+- with Python 3.11, the setup script fails because current setuptools no
+  longer provides ``pkg_resources``;
+- its code calls ``np.trapz``, which numpy 2.5 removed.
+
+Photometry can therefore be used only where wsynphot is already installed
+with numpy earlier than 2.5, until wsynphot is updated.
 
 Running the tests
 =================
