@@ -99,3 +99,7 @@ the repository::
 
 The pages are written to ``docs/_build/html``. The notebooks are included
 with their saved output; they are not run during the build.
+
+The workflow ``.github/workflows/docs.yml`` builds the documentation the same
+way for every pull request, and on every push to ``master`` publishes it at
+https://starkit.github.io/starkit/.
