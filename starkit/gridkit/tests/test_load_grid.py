@@ -131,6 +131,22 @@ def test_text_metadata_that_parses_as_json_stays_text(tmp_path):
     assert grid.meta_grid["comment"] == "null"
 
 
+@pytest.mark.parametrize("version", ["v1.0", "v1.5", "1.0"])
+def test_grid_with_the_same_major_format_version_loads(tmp_path, version):
+    path = tmp_path / "grid.h5"
+    _six_point_grid(path, extra_meta={"format_version": version})
+    grid = load_grid(str(path), wavelength_type="vacuum")
+    assert grid.meta_grid["format_version"] == version
+
+
+@pytest.mark.parametrize("version", ["v2.0", "2.0", "v10.0"])
+def test_grid_with_another_major_format_version_is_rejected(tmp_path, version):
+    path = tmp_path / "grid.h5"
+    _six_point_grid(path, extra_meta={"format_version": version})
+    with pytest.raises(ValueError, match="major versions do not match"):
+        load_grid(str(path), wavelength_type="vacuum")
+
+
 def _store_attributes_as_bytes(path):
     """Rewrite the pandas attributes the way pandas 0.15 under Python 2 stored them.
 

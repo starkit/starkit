@@ -353,11 +353,16 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
     else:
         current_version = starkit.gridkit.FORMAT_VERSION
         grid_version = spec_grid.meta_grid['format_version']
-        if current_version[1] != grid_version[1]:
-            raise ValueError('Grid major versions do not match! Curent code '+\
-                             'format version: {0} grid format version: {1} '.format(current_version, grid_version))
-        
+        if _major_version(current_version) != _major_version(grid_version):
+            raise ValueError('Grid major versions do not match! Current code '
+                             'format version: {0} grid format version: {1}'.format(current_version, grid_version))
+
     return spec_grid
+
+
+def _major_version(version):
+    """Return the major number of a format version such as 'v1.0' or '1.0'."""
+    return str(version).strip().lstrip('vV').split('.')[0]
 
 def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_class=BaseTelluricGrid):
     """
