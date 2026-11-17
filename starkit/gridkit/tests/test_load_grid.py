@@ -147,6 +147,14 @@ def test_grid_with_another_major_format_version_is_rejected(tmp_path, version):
         load_grid(str(path), wavelength_type="vacuum")
 
 
+def test_loading_without_wavelength_type_uses_no_deprecated_logging(legacy_grid):
+    # Logger.warn is a deprecated alias of Logger.warning.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        grid = load_grid(str(legacy_grid))
+    assert grid.wavelength_type == "vacuum"
+
+
 def _store_attributes_as_bytes(path):
     """Rewrite the pandas attributes the way pandas 0.15 under Python 2 stored them.
 

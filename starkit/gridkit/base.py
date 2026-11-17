@@ -105,7 +105,7 @@ class BaseSpectralGrid(modeling.Model):
 
 
         if wavelength_type is None:
-            logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
+            logger.warning("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
                 self.meta_grid['wavelength_type']))
             wavelength_type = self.meta_grid['wavelength_type']
 
@@ -346,8 +346,8 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
                              wavelength_type=wavelength_type,  **initial_parameters)
 
     if 'format_version' not in list(spec_grid.meta_grid.keys()):
-        logger.warn('No format_version in meta data for this grid. Please get an'+\
-                    ' updated grid. This will fail in the future.')
+        logger.warning('No format_version in meta data for this grid. Please get an'+\
+                       ' updated grid. This will fail in the future.')
         warnings.warn('No format_version in meta data for this grid. Please get '+\
                       'an updated grid. This will fail in the future.', DeprecationWarning)
     else:
@@ -398,7 +398,7 @@ def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_
         initial_parameters['target_wavelength'] = stellar_grid.wavelength
         initial_parameters['target_R'] = stellar_grid.R
         if wavelength_type is not None and stellar_grid is not None:
-            logger.warn('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
+            logger.warning('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
         initial_parameters['wavelength_type'] = meta['wavelength_type']
         initial_parameters['target_wavelength_type'] = stellar_grid.meta_grid['wavelength_type']
 

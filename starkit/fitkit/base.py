@@ -42,7 +42,7 @@ class ParameterExplorer(object):
         param_no_prior = set(self.param_names) - set(self.priors.keys())
 
         if len(param_no_prior) > 0:
-            logger.warn('Prior not set for parameters {0}'.format(
+            logger.warning('Prior not set for parameters {0}'.format(
                 ', '.join(param_no_prior)))
 
 
