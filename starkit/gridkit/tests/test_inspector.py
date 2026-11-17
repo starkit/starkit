@@ -7,6 +7,7 @@ import warnings
 import h5py
 import numpy as np
 import pandas as pd
+import pytest
 from pandas.errors import PerformanceWarning
 
 from starkit.gridkit.inspector import format_inspection_summary, inspect_grid
@@ -20,6 +21,7 @@ def _write_test_grid(
     flux_unit: str | None = None,
     grid_type: str | None = "log",
     log_spaced: bool = True,
+    extra_meta: dict | None = None,
 ) -> None:
     raw_meta = {
         "parameters": ["teff", "logg", "mh"],
@@ -32,6 +34,7 @@ def _write_test_grid(
     }
     if grid_type is not None:
         raw_meta["grid_type"] = grid_type
+    raw_meta.update(extra_meta or {})
     meta = pd.Series(
         raw_meta if legacy_meta else {key: json.dumps(value, sort_keys=True) for key, value in raw_meta.items()}
     )
@@ -147,3 +150,24 @@ def test_inspect_grid_warns_when_grid_type_claims_log_but_sampling_is_linear(tmp
     assert inspection.wavelength_spacing == "linear"
     assert inspection.starkit_compatible is False
     assert any("declares grid_type 'log', but the wavelength sampling looks linear" in warning for warning in inspection.warnings)
+
+
+def test_inspect_grid_keeps_text_metadata_that_parses_as_json(tmp_path: Path) -> None:
+    # As in load_grid, only metadata stored entirely as JSON text is decoded.
+    grid_path = tmp_path / "legacy_grid.h5"
+    _write_test_grid(grid_path, legacy_meta=True, extra_meta={"format_version": "1.0"})
+
+    inspection = inspect_grid(grid_path)
+
+    assert inspection.format_version == "1.0"
+
+
+def test_inspect_grid_rejects_file_without_metadata(tmp_path: Path) -> None:
+    grid_path = tmp_path / "no_meta.h5"
+    pd.DataFrame({"teff": [5000.0, 5500.0]}).to_hdf(grid_path, key="index")
+    pd.DataFrame({0: [1000.0, 1001.0]}).to_hdf(grid_path, key="wavelength")
+    with h5py.File(grid_path, "a") as handle:
+        handle.create_dataset("fluxes", data=[[1.0, 1.0], [1.0, 1.0]])
+
+    with pytest.raises(ValueError, match="not a StarKit grid: it has no 'meta' table"):
+        inspect_grid(grid_path)

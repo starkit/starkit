@@ -9,6 +9,8 @@ import h5py
 import numpy as np
 import pandas as pd
 
+from starkit.gridkit.base import _read_grid_meta
+
 
 @dataclass(frozen=True)
 class ParameterInspection:
@@ -49,15 +51,20 @@ class GridInspection:
 
 def inspect_grid(path: str | Path) -> GridInspection:
     grid_path = Path(path).expanduser().resolve()
-    meta = pd.read_hdf(grid_path, "meta")
-    index = pd.read_hdf(grid_path, "index")
-    wavelength_frame = pd.read_hdf(grid_path, "wavelength")
-
     with h5py.File(grid_path, "r") as handle:
+        missing = [key for key in ("meta", "index", "wavelength") if key not in handle]
+        if missing:
+            raise ValueError(
+                f"{grid_path} is not a StarKit grid: it has no "
+                + ", ".join(f"'{key}'" for key in missing)
+                + (" table" if len(missing) == 1 else " tables")
+            )
         flux_dataset = handle.get("fluxes")
         grid_shape = tuple(flux_dataset.shape) if flux_dataset is not None else None
 
-    meta_map = _series_to_dict(meta)
+    meta_map = _read_grid_meta(grid_path).to_dict()
+    index = pd.read_hdf(grid_path, "index")
+    wavelength_frame = pd.read_hdf(grid_path, "wavelength")
     parameter_names = _normalize_parameters(meta_map.get("parameters", []))
 
     warnings: list[str] = []
@@ -249,27 +256,6 @@ def _format_flux_unit(flux_unit: str | None) -> str:
     if flux_unit == "1":
         return "1 (dimensionless)"
     return flux_unit
-
-
-def _series_to_dict(meta: pd.Series | pd.DataFrame) -> dict[str, Any]:
-    if isinstance(meta, pd.DataFrame):
-        if meta.shape[1] == 1:
-            return _decode_meta_mapping(meta.iloc[:, 0].to_dict())
-        return _decode_meta_mapping(meta.iloc[0].to_dict())
-    return _decode_meta_mapping(meta.to_dict())
-
-
-def _decode_meta_mapping(raw_meta: dict[str, Any]) -> dict[str, Any]:
-    return {key: _decode_meta_value(value) for key, value in raw_meta.items()}
-
-
-def _decode_meta_value(value: Any) -> Any:
-    if not isinstance(value, str):
-        return value
-    try:
-        return json.loads(value)
-    except json.JSONDecodeError:
-        return value
 
 
 def _normalize_parameters(raw_parameters: Any) -> list[str]:
