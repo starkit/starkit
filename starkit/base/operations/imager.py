@@ -5,6 +5,8 @@ from starkit.fix_spectrum1d import SKSpectrum1D
 from starkit.base.operations.base import InstrumentOperationModel
 
 from scipy import interpolate
+# numpy 2.5 removed np.trapz, and numpy 1.x has no np.trapezoid.
+from scipy.integrate import trapezoid
 
 class ImagerInstrumentOperation(InstrumentOperationModel):
     pass
@@ -68,7 +70,7 @@ class Photometry(ImagerInstrumentOperation):
 
 
     def evaluate_grid(self, wavelength, flux):
-        return -2.5 * np.log10(np.trapz(self.filter_transmission * flux,
+        return -2.5 * np.log10(trapezoid(self.filter_transmission * flux,
                                  x=self.grid_wavelength, axis=1)
                         / self.wavelength_delta / self.zp_vega)
 

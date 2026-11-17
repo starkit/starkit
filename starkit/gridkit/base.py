@@ -154,10 +154,6 @@ class BaseSpectralGrid(modeling.Model):
         else:
             return const.c / self.R / self.R_sampling
 
-    def _renormalize_grid(self):
-        for i in range(self.fluxes.shape[0]):
-            self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
-
 class BaseTelluricGrid(BaseSpectralGrid):
 
     def __init__(self, wavelength, index, fluxes, meta, wavelength_type=None, target_wavelength=None,
