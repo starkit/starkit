@@ -157,3 +157,10 @@ def test_photometry_rejects_unknown_magnitude_types(wsynphot):
     with pytest.raises(ValueError, match="'vega' or 'ab'"):
         Photometry(filter_set=['Test/zp1'], mag_type='st')
 
+
+def test_photometry_reports_where_to_get_wsynphot(monkeypatch):
+    # A None entry in sys.modules makes "import wsynphot" fail as if the
+    # package were not installed.
+    monkeypatch.setitem(sys.modules, 'wsynphot', None)
+    with pytest.raises(ImportError, match='github.com/starkit/wsynphot'):
+        Photometry(filter_set=['Test/zp1'])

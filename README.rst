@@ -26,7 +26,6 @@ Optional extras currently available::
    grid_io     Grid preparation helpers (progressbar2, sqlalchemy)
    multinest   MultiNest fitting and corner plots (pymultinest, corner)
    parallel    Distributed fitting helpers (ipyparallel, psutil)
-   photometry  Photometry support (wsynphot)
    test        pytest
    docs        Sphinx, its extensions and IPython, for building the documentation
 
@@ -39,8 +38,9 @@ If you plan to use OpenMPI, also install ``mpi4py``::
 
    python -m pip install mpi4py
 
-The photometry extra depends on ``wsynphot``, which is not on PyPI and may
-need to be installed separately.
+Synthetic photometry (``Photometry``) needs ``wsynphot``, which is not on PyPI
+and does not currently install with recent Python, setuptools and numpy
+versions; see the installation instructions in the documentation.
 
 
 Grid flux units

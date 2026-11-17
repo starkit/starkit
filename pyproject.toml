@@ -30,7 +30,8 @@ dependencies = [
 grid_io = ["progressbar2", "sqlalchemy"]
 multinest = ["corner", "pymultinest"]
 parallel = ["ipyparallel", "psutil"]
-photometry = ["wsynphot"]
+# Photometry needs wsynphot, which is not on PyPI and so cannot be an extra
+# (see docs/installation.rst).
 all = ["starkit[grid_io,multinest,parallel]"]
 test = ["pytest"]
 # ipython provides the syntax highlighting of the notebook code cells.

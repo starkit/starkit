@@ -35,8 +35,15 @@ class Photometry(ImagerInstrumentOperation):
         self.mag_type = mag_type
         try:
             from wsynphot import FilterSet
-        except ImportError:
-            raise ImportError('The photometry plugin needs wsynphot')
+        except ModuleNotFoundError as exc:
+            if exc.name != 'wsynphot':
+                raise
+            raise ModuleNotFoundError(
+                'Photometry needs wsynphot, which is not on PyPI. Install it '
+                'from https://github.com/starkit/wsynphot; see '
+                'https://starkit.github.io/starkit/installation.html.',
+                name='wsynphot',
+            ) from exc
 
         if hasattr(filter_set, 'calculate_{0}_magnitudes'.format(mag_type)):
             self.filter_set = filter_set
