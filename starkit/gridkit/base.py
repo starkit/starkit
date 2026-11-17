@@ -1,3 +1,4 @@
+import json
 import logging
 
 from astropy import modeling
@@ -18,6 +19,39 @@ import starkit
 wavelength_conversions = {'air2vacuum':convert_air2vacuum,
                           'vacuum2air':convert_vacuum2air}
 logger = logging.getLogger(__name__)
+
+
+def _decode_meta_value(value):
+    if not isinstance(value, str):
+        return value
+    try:
+        return json.loads(value)
+    except ValueError:
+        return value
+
+
+def _decode_meta(meta):
+    """Return grid metadata as a Series, decoding metadata stored as JSON text.
+
+    StarKit writes the metadata as a Series of Python objects (a list of
+    parameter names, numbers for R and R_sampling), which is returned
+    unchanged. Metadata stored entirely as text, one JSON value per entry, in
+    a Series or a one-column DataFrame, is decoded. Text values in the first
+    layout, such as "1.0", therefore stay text.
+    """
+    if isinstance(meta, pd.DataFrame):
+        if meta.shape[1] != 1:
+            raise ValueError('Grid metadata is a table with {0} columns; expected a '
+                             'Series or a one-column table'.format(meta.shape[1]))
+        meta = pd.Series(meta.iloc[:, 0].values, index=meta.index)
+    if all(isinstance(value, str) for value in meta.values):
+        return meta.map(_decode_meta_value)
+    return meta
+
+
+def _read_grid_meta(hdf_fname):
+    """Read and decode the metadata of a grid file."""
+    return _decode_meta(pd.read_hdf(hdf_fname, 'meta'))
 
 class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
@@ -71,7 +105,7 @@ class BaseSpectralGrid(modeling.Model):
 
 
         if wavelength_type is None:
-            logger.warn("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
+            logger.warning("**** NO WAVELENGTH TYPE SET DEFAULTING TO GRID ({0}) ****\n\n".format(
                 self.meta_grid['wavelength_type']))
             wavelength_type = self.meta_grid['wavelength_type']
 
@@ -119,10 +153,6 @@ class BaseSpectralGrid(modeling.Model):
 
         else:
             return const.c / self.R / self.R_sampling
-
-    def _renormalize_grid(self):
-        for i in range(self.fluxes.shape[0]):
-            self.fluxes[i] /= np.trapz(self.fluxes[i], self.wavelength)
 
 class BaseTelluricGrid(BaseSpectralGrid):
 
@@ -269,7 +299,7 @@ def read_grid(hdf_fname):
 
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
-    meta = pd.read_hdf(hdf_fname, 'meta')
+    meta = _read_grid_meta(hdf_fname)
     logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
 
     with h5py.File(hdf_fname) as fh:
@@ -316,18 +346,23 @@ def load_grid(hdf_fname, wavelength_type=None, base_class=BaseSpectralGrid):
                              wavelength_type=wavelength_type,  **initial_parameters)
 
     if 'format_version' not in list(spec_grid.meta_grid.keys()):
-        logger.warn('No format_version in meta data for this grid. Please get an'+\
-                    ' updated grid. This will fail in the future.')
+        logger.warning('No format_version in meta data for this grid. Please get an'+\
+                       ' updated grid. This will fail in the future.')
         warnings.warn('No format_version in meta data for this grid. Please get '+\
                       'an updated grid. This will fail in the future.', DeprecationWarning)
     else:
         current_version = starkit.gridkit.FORMAT_VERSION
         grid_version = spec_grid.meta_grid['format_version']
-        if current_version[1] != grid_version[1]:
-            raise ValueError('Grid major versions do not match! Curent code '+\
-                             'format version: {0} grid format version: {1} '.format(current_version, grid_version))
-        
+        if _major_version(current_version) != _major_version(grid_version):
+            raise ValueError('Grid major versions do not match! Current code '
+                             'format version: {0} grid format version: {1}'.format(current_version, grid_version))
+
     return spec_grid
+
+
+def _major_version(version):
+    """Return the major number of a format version such as 'v1.0' or '1.0'."""
+    return str(version).strip().lstrip('vV').split('.')[0]
 
 def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_class=BaseTelluricGrid):
     """
@@ -363,7 +398,7 @@ def load_telluric_grid(hdf_fname, stellar_grid=None, wavelength_type=None, base_
         initial_parameters['target_wavelength'] = stellar_grid.wavelength
         initial_parameters['target_R'] = stellar_grid.R
         if wavelength_type is not None and stellar_grid is not None:
-            logger.warn('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
+            logger.warning('Ignoring requested wavelength_type in favour of spectral_grid wavelength_type')
         initial_parameters['wavelength_type'] = meta['wavelength_type']
         initial_parameters['target_wavelength_type'] = stellar_grid.meta_grid['wavelength_type']
 

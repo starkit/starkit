@@ -5,8 +5,11 @@ numpy 2, ``float()`` of such an array raises ``TypeError``, so every
 operation is exercised through a model call rather than ``evaluate`` alone.
 """
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
+from astropy import units as u
 
 from starkit.base.operations.stellar import (
     CCM89Extinction,
@@ -93,6 +96,16 @@ def test_distance_scales_flux_by_inverse_square_law():
     # 1 / (4 pi (10 pc in cm)^2)
     np.testing.assert_allclose(flux_10pc, flux * 8.357743635931359e-41, rtol=1e-12)
     np.testing.assert_allclose(flux_20pc, flux_10pc / 4.0, rtol=1e-14)
+
+
+def test_distance_from_grid_converts_the_grid_flux_unit():
+    # assemble_model builds Distance with from_grid, which reads the unit of
+    # the grid fluxes. 1 W / nm is 1e6 erg / (s Angstrom).
+    wavelength = np.array([10000.0, 20000.0])
+    flux = np.array([1.0, 3.0])
+    grid = SimpleNamespace(fluxes=np.ones((2, 2)) * u.Unit("W / nm"))
+    _, flux_10pc = Distance.from_grid(grid, distance=10.0)(wavelength, flux)
+    np.testing.assert_allclose(flux_10pc, flux * 1e6 * 8.357743635931359e-41, rtol=1e-12)
 
 
 def test_operations_reject_multi_valued_parameters():

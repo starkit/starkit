@@ -234,7 +234,7 @@ class Distance(StellarOperationModel):
 
     @classmethod
     def from_grid(cls, grid, distance=10.):
-        lum_density2cgs = grid.flux_unit.to('erg / (s * angstrom)')
+        lum_density2cgs = grid.fluxes.unit.to('erg / (s * angstrom)')
         return cls(distance=distance, lum_density2cgs=lum_density2cgs)
 
     def __init__(self, distance, lum_density2cgs=1.):
