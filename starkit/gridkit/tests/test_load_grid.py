@@ -1,5 +1,6 @@
 """Regression tests for reading grids written in the original HDF5 layout."""
 
+import itertools
 import warnings
 
 import h5py
@@ -20,12 +21,10 @@ def _linear_flux(teff, logg):
     return 1.0 + 1e-4 * (teff - 5000.0) + 0.1 * (logg - 4.0) + 0.01 * np.arange(WAVELENGTH.size)
 
 
-@pytest.fixture
-def legacy_grid(tmp_path):
-    """A grid whose metadata is a pickled object Series, as older grids were written."""
-    path = tmp_path / "legacy_grid.h5"
+def _write_legacy_grid(path, parameters, points, fluxes):
+    """Write a grid whose metadata is a pickled object Series, as older grids were written."""
     meta = pd.Series({
-        "parameters": ["teff", "logg"],
+        "parameters": list(parameters),
         "wavelength_unit": "Angstrom",
         "wavelength_type": "vacuum",
         "flux_unit": "erg / (cm2 s Angstrom)",
@@ -34,15 +33,61 @@ def legacy_grid(tmp_path):
         "grid_type": "log",
         "format_version": "v1.0",
     })
-    points = [(teff, logg) for teff in (5000.0, 5500.0, 6000.0) for logg in (4.0, 4.5)]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PerformanceWarning)
         meta.to_hdf(path, key="meta")
-    pd.DataFrame(points, columns=["teff", "logg"]).to_hdf(path, key="index")
+    pd.DataFrame(points, columns=list(parameters)).to_hdf(path, key="index")
     pd.DataFrame({0: WAVELENGTH}).to_hdf(path, key="wavelength")
     with h5py.File(path, "a") as fh:
-        fh.create_dataset("fluxes", data=np.array([_linear_flux(*p) for p in points]))
+        fh.create_dataset("fluxes", data=np.asarray(fluxes))
+
+
+@pytest.fixture
+def legacy_grid(tmp_path):
+    path = tmp_path / "legacy_grid.h5"
+    points = [(teff, logg) for teff in (5000.0, 5500.0, 6000.0) for logg in (4.0, 4.5)]
+    _write_legacy_grid(path, ["teff", "logg"], points, [_linear_flux(*p) for p in points])
     return path
+
+
+def _bosz_like_points():
+    """Parameter points with the BOSZ axes and a minimum logg that rises with teff.
+
+    Qhull cannot triangulate these points in their own units (QH6271 qhull
+    topology error), as with the BOSZ grids in issue #82.
+    """
+    teff = np.r_[np.arange(3500, 12001, 250), np.arange(12500, 20001, 500),
+                 np.arange(21000, 35001, 1000)].astype(float)
+    logg = np.arange(1.0, 5.01, 0.5)
+    mh = np.arange(-0.5, 0.76, 0.25)
+    alpha = np.arange(-0.25, 0.51, 0.25)
+
+    def min_logg(t):
+        return 1.0 if t < 8250 else 2.0 if t < 12500 else 3.0 if t < 31000 else 3.5
+
+    return np.array([p for p in itertools.product(teff, logg, mh, alpha)
+                     if p[1] >= min_logg(p[0])])
+
+
+def _linear_flux_4d(teff, logg, mh, alpha):
+    return (1.0 + 1e-5 * teff + 0.1 * logg + 0.2 * mh + 0.3 * alpha
+            + 0.01 * np.arange(WAVELENGTH.size))
+
+
+def test_grid_with_rising_minimum_logg_loads_and_interpolates(tmp_path):
+    path = tmp_path / "bosz_like_grid.h5"
+    points = _bosz_like_points()
+    _write_legacy_grid(path, ["teff", "logg", "mh", "alpha"], points,
+                       [_linear_flux_4d(*p) for p in points])
+    grid = load_grid(str(path), wavelength_type="vacuum")
+    grid.teff, grid.logg, grid.mh, grid.alpha = 5125.0, 3.25, 0.1, 0.05
+    _, flux = grid()
+    np.testing.assert_allclose(flux, _linear_flux_4d(5125.0, 3.25, 0.1, 0.05), rtol=1e-10)
+
+
+def test_grid_extent_is_in_parameter_units(legacy_grid):
+    grid = load_grid(str(legacy_grid), wavelength_type="vacuum")
+    np.testing.assert_allclose(grid.get_grid_extent(), [(5000.0, 6000.0), (4.0, 4.5)])
 
 
 def _store_attributes_as_bytes(path):
