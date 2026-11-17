@@ -87,11 +87,11 @@ class BaseSpectralGrid(modeling.Model):
         self.wavelength_type = wavelength_type
 
     def get_grid_extent(self):
-        extents = []
-        for i, param_name in enumerate(self.param_names):
-            extents.append((self.interpolator.points[:, i].min(),
-                            self.interpolator.points[:, i].max()))
-        return extents
+        # self.index holds the grid points in parameter units; the
+        # interpolator's points are rescaled.
+        index = np.asarray(self.index)
+        return [(index[:, i].min(), index[:, i].max())
+                for i in range(len(self.param_names))]
 
     def get_grid_uniform_priors(self):
         extents = self.get_grid_extent()
@@ -106,7 +106,11 @@ class BaseSpectralGrid(modeling.Model):
 
     @staticmethod
     def _generate_interpolator(index, fluxes):
-        return interpolate.LinearNDInterpolator(index, fluxes.value)
+        # Scale each parameter to the range 0 to 1 before triangulating. In
+        # their own units (teff in K, logg and abundances in dex) Qhull cannot
+        # triangulate some grids, such as BOSZ grids whose minimum logg rises
+        # with teff (QH6271 qhull topology error).
+        return interpolate.LinearNDInterpolator(index, fluxes.value, rescale=True)
 
     @property
     def velocity_per_pix(self):
