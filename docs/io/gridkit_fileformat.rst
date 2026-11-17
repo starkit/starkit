@@ -32,7 +32,8 @@ A StarKit grid is an HDF5 file with four parts:
 ``wavelength_type``
     ``'air'`` or ``'vacuum'``.
 ``flux_unit``
-    Astropy unit of ``fluxes``.
+    Astropy unit of ``fluxes``. For many grids this label is wrong; see
+    :doc:`flux_units`.
 ``format_version``
     Grid format version, currently ``'v1.0'``.
 
@@ -56,3 +57,6 @@ and the metadata, without reading the fluxes::
     from starkit.gridkit.inspector import inspect_grid, format_inspection_summary
 
     print(format_inspection_summary(inspect_grid("grid.h5")))
+
+To check what the fluxes are, use ``check_flux_scale``, described in
+:doc:`flux_units`.

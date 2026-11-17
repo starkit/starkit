@@ -33,7 +33,8 @@ parallel = ["ipyparallel", "psutil"]
 photometry = ["wsynphot"]
 all = ["starkit[grid_io,multinest,parallel]"]
 test = ["pytest"]
-docs = ["sphinx-astropy[confv1]", "nbsphinx"]
+# ipython provides the syntax highlighting of the notebook code cells.
+docs = ["sphinx-astropy[confv1]", "nbsphinx", "ipython"]
 
 [project.urls]
 Homepage = "https://github.com/starkit/starkit"
