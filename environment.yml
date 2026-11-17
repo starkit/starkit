@@ -1,0 +1,38 @@
+# Conda environment with StarKit, its optional features, the MultiNest
+# library and pytest. Create and activate it from the repository root with
+#
+#   conda env create -f environment.yml
+#   conda activate starkit
+#
+# StarKit itself is installed in editable mode from this checkout.
+name: starkit
+channels:
+  - conda-forge
+  # Keep the channels from ~/.condarc (such as defaults) out of the solve.
+  - nodefaults
+dependencies:
+  - python=3.10
+  - pip
+  # Required
+  - astropy
+  - h5py
+  - numpy
+  - pandas<3
+  - pytables
+  - scipy
+  - tqdm
+  # grid_io extra
+  - progressbar2
+  - sqlalchemy
+  # multinest extra, with the MultiNest library itself. This build limits
+  # output file paths to 100 characters; see docs/installation.rst.
+  - corner
+  - multinest
+  - pymultinest
+  # parallel extra
+  - ipyparallel
+  - psutil
+  # Tests
+  - pytest
+  - pip:
+      - -e .

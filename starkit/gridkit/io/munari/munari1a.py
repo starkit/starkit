@@ -42,7 +42,7 @@ class Munari1A(BaseSpectralGridIO):
 
 
         self.fname_pattern = re.compile(
-            'T(\d+)G(\d+)([PM])(\d+)V(\d+)K(\d+)([SA])(OD|NW)NVD01F\.ASC\.gz')
+            r'T(\d+)G(\d+)([PM])(\d+)V(\d+)K(\d+)([SA])(OD|NW)NVD01F\.ASC\.gz')
         self.process = Munari1AProcess(self.wavelength, self.R,
                                        sampling=self.R_sampling)
 

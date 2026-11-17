@@ -180,8 +180,13 @@ def make_grid_info(fname,spectra_dir='/Volumes/data/pollux_grids/cmfgen_martins/
     """
 
     raw_index = make_raw_index(spectra_dir=spectra_dir)
-    wtab = pd.read_csv(raw_index.loc[0, 'filename'], delim_whitespace=True,header=None,
-                       names=['wavelength','flux'],usecols=(0,1))
+    wtab = pd.read_csv(
+        raw_index.loc[0, 'filename'],
+        sep=r'\s+',
+        header=None,
+        names=['wavelength', 'flux'],
+        usecols=(0, 1),
+    )
     wavelength = wtab['wavelength']
 
     with pd.HDFStore(fname) as fh:
@@ -204,7 +209,14 @@ def convert_bz2_memmap(fname):
     if os.path.exists(fname_npy):
         pass
     else:
-        flux = pd.read_csv(fname, usecols=(1,), delim_whitespace=True, dtype=np.float64,header=None,names=['flux'])
+        flux = pd.read_csv(
+            fname,
+            usecols=(1,),
+            sep=r'\s+',
+            dtype=np.float64,
+            header=None,
+            names=['flux'],
+        )
         flux = flux.values[:,0]
         np.save(fname_npy, flux)
 

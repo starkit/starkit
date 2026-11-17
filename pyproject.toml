@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "starkit"
+dynamic = ["version"]
+description = "Collection of tools for working with stellar data"
+readme = "README.rst"
+license = "BSD-3-Clause"
+license-files = ["licenses/LICENSE.rst"]
+authors = [
+    { name = "Wolfgang Kerzendorf", email = "wkerzendorf@gmail.com" },
+    { name = "Tuan Do" },
+]
+requires-python = ">=3.10"
+dependencies = [
+    "astropy",
+    "h5py",
+    "numpy",
+    # pandas 3 cannot read grids written by old pandas versions, whose HDF5
+    # attributes are stored as bytes.
+    "pandas<3",
+    "scipy",
+    "tables",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+grid_io = ["progressbar2", "sqlalchemy"]
+multinest = ["corner", "pymultinest"]
+parallel = ["ipyparallel", "psutil"]
+photometry = ["wsynphot"]
+all = ["starkit[grid_io,multinest,parallel]"]
+test = ["pytest"]
+docs = ["sphinx-astropy[confv1]", "nbsphinx"]
+
+[project.urls]
+Homepage = "https://github.com/starkit/starkit"
+Documentation = "https://starkit.github.io/starkit/"
+
+[tool.setuptools.dynamic]
+version = { attr = "starkit.version.version" }
+
+[tool.setuptools.packages.find]
+include = ["starkit*"]
+
+[tool.setuptools.package-data]
+"starkit.gridkit.io.gaia" = ["data/*.csv"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["starkit"]

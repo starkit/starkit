@@ -58,8 +58,8 @@ def make_raw_index():
     micro_arr = np.zeros(nfiles)
     rot_arr = np.zeros(nfiles)
     res_arr = np.zeros(nfiles)
-    pattern = re.compile('a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
-    pattern_dir = re.compile('metal_(.....)\/carbon_(.....)\/alpha_(.....)')
+    pattern = re.compile(r'a(mp|mm)(\d+)(cp|cm)(\d+)+(op|om)(\d+)t(\d+)g(\d+)v(\d+)modrt(\d+)b(\d+)')
+    pattern_dir = re.compile(r'metal_(.....)\/carbon_(.....)\/alpha_(.....)')
 
     for i in np.arange(nfiles):
         filename = all_fnames[i]
@@ -118,7 +118,9 @@ def convert_bz2_memmap(fname):
     if os.path.exists(fname_npy):
         pass
     else:
-        flux = pd.read_csv(fname, header=-1, usecols=(1,), delim_whitespace=True, dtype=np.float64)
+        flux = pd.read_csv(
+            fname, header=None, usecols=(1,), sep=r'\s+', dtype=np.float64
+        )
         flux = flux.values[:,0]
         np.save(fname_npy, flux)
 

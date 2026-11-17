@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import types
 import tempfile
@@ -16,13 +17,40 @@ logger = getLogger(__name__)
 import numpy as np
 
 
+_MISSING_LIBRARY_MESSAGE = (
+    "pymultinest could not load the MultiNest library. In a conda "
+    "environment, install it with conda install -c conda-forge multinest. "
+    "Otherwise, build it from https://github.com/JohannesBuchner/MultiNest "
+    "and put its directory on LD_LIBRARY_PATH (Linux) or DYLD_LIBRARY_PATH "
+    "(macOS)."
+)
+
 try:
     import pymultinest
-except ImportError:
-    multinest_available = False
-    raise
-else:
-    multinest_available = True
+except ModuleNotFoundError as exc:
+    if exc.name != "pymultinest":
+        raise
+    raise ModuleNotFoundError(
+        "MultiNest fitting needs the pymultinest package and the MultiNest "
+        "library. To install both, create the conda environment in "
+        "environment.yml from the StarKit repository "
+        "(conda env create -f environment.yml). With pip, install pymultinest "
+        "with pip install 'starkit[multinest]' and build the library from "
+        "https://github.com/JohannesBuchner/MultiNest.",
+        name="pymultinest",
+    ) from exc
+except SystemExit as exc:
+    # On Linux, pymultinest prints the loading error and calls sys.exit(1)
+    # when it cannot load the library.
+    raise ImportError(_MISSING_LIBRARY_MESSAGE) from exc
+
+# On macOS, pymultinest passes find_library's None to cdll.LoadLibrary when it
+# cannot find the library. That opens the Python process instead, so the
+# import succeeds and a fit fails later with "symbol not found".
+_library = getattr(sys.modules.get("pymultinest.run"), "lib", None)
+if _library is not None and _library._name is None:
+    raise ImportError(_MISSING_LIBRARY_MESSAGE)
+multinest_available = True
 
 def multinest_evaluate(self, model_param, ndim, nparam):
     # returns the likelihood of observing the data given the model param_names
@@ -96,7 +124,7 @@ class MultiNestResult(object):
 
         posterior_data = pd.read_csv(
             '{0}_.txt'.format(basename),
-            delim_whitespace=True, names=['weights']+['loglikelihood']+parameter_names)
+            sep=r'\s+', names=['weights']+['loglikelihood']+parameter_names)
         posterior_data.index = np.arange(len(posterior_data))
         return posterior_data
 
@@ -109,7 +137,7 @@ class MultiNestResult(object):
 
         posterior_data = pd.read_csv(
             '{0}_post_equal_weights.dat'.format(basename),
-            delim_whitespace=True, names=parameter_names + ['x'])
+            sep=r'\s+', names=parameter_names + ['x'])
         posterior_data.index = np.arange(len(posterior_data))
 
         # since the chain is equally weighted, we should just put equal weights

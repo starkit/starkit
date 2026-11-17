@@ -10,6 +10,7 @@ techniques
 
     installation
     getting_started
+    fitting
 
 ------------
 Input/Output

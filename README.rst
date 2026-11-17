@@ -1,55 +1,47 @@
 StarKit
 =======
 
-.. image:: https://dev.azure.com/starkit/starkit/_apis/build/status/starkit-CI?branchName=master
-   :target: https://dev.azure.com/starkit/starkit/_build/latest?definitionId=2&branchName=master
-
-
 Installation
 ************
 
-We recommend you use `Anaconda <https://www.anaconda.com/distribution/>`_ to install
-the necessary requirements for Starkit to work.
+StarKit requires Python 3.10 or later. The simplest setup is the conda
+environment in ``environment.yml``. It uses Python 3.10 and contains StarKit
+(installed in editable mode), its optional features, the MultiNest library
+and pytest::
 
-Once you have anaconda installed please make a new environment with the prerequisites
-for starkit in the following way. This will create an environment called `starkit`::
-    # for Linux and Python 3
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix.yml
+   git clone https://github.com/starkit/starkit.git
+   cd starkit
+   conda env create -f environment.yml
+   conda activate starkit
+   pytest
 
-    # for MacOS and Python 3
-    curl -O https://raw.githubusercontent.com/starkit/starkit/master/starkit_gridfix_macos.yml
-    
-    # install using yml file into an environment called starkit. 
-    # If you want to call it something else, or already have a starkit enivornment, 
-    # you can change the -n argument
+To install with pip instead::
 
-    # for Linux
-    conda env create --file starkit_gridfix.yml -n starkit
+   python -m pip install -e '.[all,test]'
+   pytest
 
-    # for MacOS
-    conda env create --file starkit_gridfix_macos.yml -n starkit
-    
-    source activate starkit
+Optional extras currently available::
 
-For now until a new version of Astropy comes out that fixes some problems of memory leak, you need to install `specutils` from our fork::
-    
-    git clone https://github.com/followthesheep/specutils
-    cd specutils
-    python setup.py install
+   all         grid_io, multinest and parallel together
+   grid_io     Grid preparation helpers (progressbar2, sqlalchemy)
+   multinest   MultiNest fitting and corner plots (pymultinest, corner)
+   parallel    Distributed fitting helpers (ipyparallel, psutil)
+   photometry  Photometry support (wsynphot)
+   test        pytest
+   docs        Sphinx and its extensions, for building the documentation
 
-Then you can additionally install any other packages you like with::
-  
-    conda install <your package>
+``pymultinest`` is a Python interface to the native MultiNest library. The
+conda environment includes the library. With pip, the library must be built
+separately, and its directory must be on ``LD_LIBRARY_PATH`` (Linux) or
+``DYLD_LIBRARY_PATH`` (macOS).
 
-Once this is installed, there are two ways to install starkit. For simple use::
+If you plan to use OpenMPI, also install ``mpi4py``::
 
-    pip install git+https://github.com/starkit/starkit
+   python -m pip install mpi4py
 
-To download a full development version of starkit, please do::
+The photometry extra depends on ``wsynphot``, which is not on PyPI and may
+need to be installed separately.
 
-    git clone https://github.com/starkit/starkit
-    cd starkit
-    python setup.py develop
 
 Example publications that use StarKit
 **************************************
