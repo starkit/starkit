@@ -31,13 +31,27 @@ def _decode_meta_value(value):
 
 
 def _decode_meta(meta):
-    if isinstance(meta, pd.DataFrame):
-        if meta.shape[1] == 1:
-            decoded = meta.iloc[:, 0].map(_decode_meta_value)
-            return pd.Series(decoded.values, index=meta.index)
-        return meta.applymap(_decode_meta_value)
+    """Return grid metadata as a Series, decoding metadata stored as JSON text.
 
-    return meta.map(_decode_meta_value)
+    StarKit writes the metadata as a Series of Python objects (a list of
+    parameter names, numbers for R and R_sampling), which is returned
+    unchanged. Metadata stored entirely as text, one JSON value per entry, in
+    a Series or a one-column DataFrame, is decoded. Text values in the first
+    layout, such as "1.0", therefore stay text.
+    """
+    if isinstance(meta, pd.DataFrame):
+        if meta.shape[1] != 1:
+            raise ValueError('Grid metadata is a table with {0} columns; expected a '
+                             'Series or a one-column table'.format(meta.shape[1]))
+        meta = pd.Series(meta.iloc[:, 0].values, index=meta.index)
+    if all(isinstance(value, str) for value in meta.values):
+        return meta.map(_decode_meta_value)
+    return meta
+
+
+def _read_grid_meta(hdf_fname):
+    """Read and decode the metadata of a grid file."""
+    return _decode_meta(pd.read_hdf(hdf_fname, 'meta'))
 
 class BaseSpectralGrid(modeling.Model):
     inputs = tuple()
@@ -289,8 +303,7 @@ def read_grid(hdf_fname):
 
     logger.info('Reading index')
     index = pd.read_hdf(hdf_fname, 'index')
-    meta = pd.read_hdf(hdf_fname, 'meta')
-    meta = _decode_meta(meta)
+    meta = _read_grid_meta(hdf_fname)
     logger.info('Discovered columns {0}'.format(', '.join(meta['parameters'])))
 
     with h5py.File(hdf_fname) as fh:

@@ -1,6 +1,7 @@
 """Regression tests for reading grids written in the original HDF5 layout."""
 
 import itertools
+import json
 import warnings
 
 import h5py
@@ -21,9 +22,14 @@ def _linear_flux(teff, logg):
     return 1.0 + 1e-4 * (teff - 5000.0) + 0.1 * (logg - 4.0) + 0.01 * np.arange(WAVELENGTH.size)
 
 
-def _write_legacy_grid(path, parameters, points, fluxes):
-    """Write a grid whose metadata is a pickled object Series, as older grids were written."""
-    meta = pd.Series({
+def _write_legacy_grid(path, parameters, points, fluxes, extra_meta=None, json_meta=None):
+    """Write a grid in the StarKit HDF5 layout.
+
+    By default the metadata is a pickled object Series, as StarKit writes it.
+    With json_meta="series" or json_meta="frame", every metadata value is
+    stored as JSON text, in a Series or in a one-column DataFrame.
+    """
+    meta = {
         "parameters": list(parameters),
         "wavelength_unit": "Angstrom",
         "wavelength_type": "vacuum",
@@ -32,7 +38,14 @@ def _write_legacy_grid(path, parameters, points, fluxes):
         "R_sampling": 4.0,
         "grid_type": "log",
         "format_version": "v1.0",
-    })
+        **(extra_meta or {}),
+    }
+    if json_meta is None:
+        meta = pd.Series(meta)
+    else:
+        meta = pd.Series({key: json.dumps(value) for key, value in meta.items()})
+        if json_meta == "frame":
+            meta = meta.to_frame(name="value")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PerformanceWarning)
         meta.to_hdf(path, key="meta")
@@ -88,6 +101,34 @@ def test_grid_with_rising_minimum_logg_loads_and_interpolates(tmp_path):
 def test_grid_extent_is_in_parameter_units(legacy_grid):
     grid = load_grid(str(legacy_grid), wavelength_type="vacuum")
     np.testing.assert_allclose(grid.get_grid_extent(), [(5000.0, 6000.0), (4.0, 4.5)])
+
+
+def _six_point_grid(path, **kwargs):
+    points = [(teff, logg) for teff in (5000.0, 5500.0, 6000.0) for logg in (4.0, 4.5)]
+    _write_legacy_grid(path, ["teff", "logg"], points, [_linear_flux(*p) for p in points], **kwargs)
+
+
+@pytest.mark.parametrize("layout", ["series", "frame"])
+def test_grid_with_json_metadata(tmp_path, layout):
+    path = tmp_path / "json_meta_grid.h5"
+    _six_point_grid(path, json_meta=layout)
+    grid = load_grid(str(path), wavelength_type="vacuum")
+    assert list(grid.param_names) == ["teff", "logg"]
+    assert grid.R == 50000.0
+    assert grid.meta_grid["format_version"] == "v1.0"
+    grid.teff, grid.logg = 5250.0, 4.25
+    _, flux = grid()
+    np.testing.assert_allclose(flux, [1.05, 1.06, 1.07, 1.08, 1.09], rtol=1e-12)
+
+
+def test_text_metadata_that_parses_as_json_stays_text(tmp_path):
+    # Only metadata stored entirely as JSON text is decoded. In grids written
+    # by StarKit, a text value such as "1.0" or "null" stays text.
+    path = tmp_path / "legacy_grid.h5"
+    _six_point_grid(path, extra_meta={"grid_name": "1.0", "comment": "null"})
+    grid = load_grid(str(path), wavelength_type="vacuum")
+    assert grid.meta_grid["grid_name"] == "1.0"
+    assert grid.meta_grid["comment"] == "null"
 
 
 def _store_attributes_as_bytes(path):
