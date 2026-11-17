@@ -8,6 +8,10 @@ from scipy import interpolate
 # numpy 2.5 removed np.trapz, and numpy 1.x has no np.trapezoid.
 from scipy.integrate import trapezoid
 
+FLAM = u.erg / (u.s * u.cm ** 2 * u.angstrom)
+# wsynphot.io.cache_filters.DetectorType.PHOTON_COUNTER
+PHOTON_COUNTER = 1
+
 class ImagerInstrumentOperation(InstrumentOperationModel):
     pass
 
@@ -25,6 +29,10 @@ class Photometry(ImagerInstrumentOperation):
 
     def __init__(self, filter_set, mag_type='vega', grid_wavelength=None):
         super(Photometry, self).__init__()
+        if mag_type not in ('vega', 'ab'):
+            raise ValueError(
+                "mag_type must be 'vega' or 'ab', not {0!r}".format(mag_type))
+        self.mag_type = mag_type
         try:
             from wsynphot import FilterSet
         except ImportError:
@@ -37,42 +45,70 @@ class Photometry(ImagerInstrumentOperation):
 
 
         if grid_wavelength is not None:
-            self.grid_wavelength = grid_wavelength
-            self.zp_vega, self.filter_transmission, self.wavelength_delta = (
-                self.interpolate_filters_to_grid_wavelength(filter_set))
+            # Grids give their wavelengths as a Quantity. The filter
+            # integral needs plain values, in Angstrom like the zero points.
+            self.grid_wavelength = u.Quantity(grid_wavelength,
+                                              u.angstrom).value
+            (self.zero_point, self.filter_transmission,
+             self.wavelength_delta) = (
+                self.interpolate_filters_to_grid_wavelength(self.filter_set))
             self.method = 'grid'
 
         else:
             self.method = 'slow'
             self.calculate_magnitudes = getattr(
                 self.filter_set, 'calculate_{0}_magnitudes'.format(mag_type))
-            self.filter_set = filter_set
 
 
 
     def interpolate_filters_to_grid_wavelength(self, filter_set):
+        """
+        Interpolate the filter curves onto the grid wavelengths.
+
+        The magnitudes are computed as in wsynphot: the mean flux density in
+        a filter is the integral of the transmission times the flux, divided
+        by the integral of the transmission. For a photon-counting filter,
+        both integrands are also multiplied by the wavelength.
+
+        Returns
+        -------
+        zero_point : numpy.ndarray
+            Vega or AB zero point of each filter, in erg/(s cm2 Angstrom)
+        filter_transmission : numpy.ndarray
+            transmission of each filter on the grid wavelengths, times the
+            wavelength in Angstrom for a photon-counting filter
+        wavelength_delta : numpy.ndarray
+            integral of the transmission, in Angstrom, or of the transmission
+            times the wavelength, in Angstrom^2, for a photon-counting filter
+        """
         filter_transmission = np.empty((len(filter_set.filter_set),
                                         self.grid_wavelength.shape[0]))
-        zp_vega = np.empty(len(filter_set.filter_set))
+        zero_point = np.empty(len(filter_set.filter_set))
         wavelength_delta = np.empty(len(filter_set.filter_set))
         for i, item in enumerate(filter_set):
-            filter_transmission[i] = interpolate.interp1d(
-                item.wavelength.to('angstrom').value,
+            transmission = interpolate.interp1d(
+                item.wavelength.to_value(u.angstrom),
                 item.transmission_lambda, bounds_error=False,
                 fill_value=0.0)(self.grid_wavelength)
 
-            #TODO
-            ### be careful the units here are erg / (angstrom cm2 s) ##
-            zp_vega[i] = item.zp_vega_f_lambda.value
-            wavelength_delta[i] = item.calculate_wavelength_delta().to(
-                'angstrom').value
-        return zp_vega, filter_transmission, wavelength_delta
+            if getattr(item, 'detector_type', None) == PHOTON_COUNTER:
+                filter_transmission[i] = transmission * self.grid_wavelength
+                wavelength_delta[i] = item.calculate_wavelength_delta(
+                    ).to_value(u.angstrom ** 2)
+            else:
+                filter_transmission[i] = transmission
+                wavelength_delta[i] = item.calculate_wavelength_delta(
+                    ).to_value(u.angstrom)
+
+            zero_point[i] = getattr(
+                item, 'zp_{0}_f_lambda'.format(self.mag_type)).to_value(FLAM)
+        return zero_point, filter_transmission, wavelength_delta
 
 
     def evaluate_grid(self, wavelength, flux):
         return -2.5 * np.log10(trapezoid(self.filter_transmission * flux,
                                  x=self.grid_wavelength, axis=1)
-                        / self.wavelength_delta / self.zp_vega)
+                        / self.wavelength_delta / self.zero_point)
 
     def evaluate_slow(self, wavelength, flux):
 
