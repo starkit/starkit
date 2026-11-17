@@ -28,7 +28,7 @@ Optional extras currently available::
    parallel    Distributed fitting helpers (ipyparallel, psutil)
    photometry  Photometry support (wsynphot)
    test        pytest
-   docs        Sphinx and its extensions, for building the documentation
+   docs        Sphinx, its extensions and IPython, for building the documentation
 
 ``pymultinest`` is a Python interface to the native MultiNest library. The
 conda environment includes the library. With pip, the library must be built
@@ -41,6 +41,28 @@ If you plan to use OpenMPI, also install ``mpi4py``::
 
 The photometry extra depends on ``wsynphot``, which is not on PyPI and may
 need to be installed separately.
+
+
+Grid flux units
+***************
+
+Check the units of a grid before using it for absolute fluxes, such as with
+``Distance``, the magnitudes from ``Photometry`` or
+``RelativePhotometryLikelihood``. The ``flux_unit`` label of many grids is
+wrong: StarKit labeled every grid it wrote between December 2017 and January
+2025 ``erg/s/angstrom`` (luminosity density), although many of these grids
+hold surface flux, in erg/(s cm2 Angstrom). ``Distance`` is correct only for
+luminosity density; for surface flux, the flux at the observer is the surface
+flux times (R/d)^2, so absolute fluxes also need the radius R of the star.
+To check a grid::
+
+   from starkit.gridkit.flux_check import check_flux_scale, format_flux_scale_check
+
+   print(format_flux_scale_check(check_flux_scale('grid.h5')))
+
+Spectral fits that normalize the model to the observed spectrum, and fits to
+colors, do not depend on the flux scale. ``BUGS.md`` and the documentation
+page on grid flux units give the details and a workaround.
 
 
 Example publications that use StarKit

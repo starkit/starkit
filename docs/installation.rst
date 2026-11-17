@@ -57,7 +57,7 @@ Optional features are installed as extras, for example
 ``test``
     pytest, for running the test suite.
 ``docs``
-    Sphinx and its extensions, for building this documentation.
+    Sphinx, its extensions and IPython, for building this documentation.
 
 ``pymultinest`` is a Python interface to the MultiNest library. The conda
 environment above includes the library. With a pip installation the library
@@ -86,3 +86,16 @@ For an installed copy::
     pytest --pyargs starkit
 
 Tests that need an optional dependency are skipped when it is not installed.
+
+Building the documentation
+==========================
+
+Install the ``docs`` extra and `pandoc <https://pandoc.org/installing.html>`_,
+which nbsphinx needs to convert the notebooks, then build the HTML pages from
+the repository::
+
+    pip install -e '.[docs]'
+    make -C docs html
+
+The pages are written to ``docs/_build/html``. The notebooks are included
+with their saved output; they are not run during the build.
