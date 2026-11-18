@@ -200,8 +200,8 @@ uncertainties, in the order of the filters. The extinction ``a_v`` is applied
 to the magnitudes only. The example notebook
 :doc:`examples/photometry_spectroscopy_fit` fits a synthetic star with
 :math:`A_V` = 0.5 mag with its spectrum, its SDSS colors, and both: the
-colors alone give :math:`A_V` = 0.820 +0.319 -0.370 mag, and the spectrum and
-colors together give 0.478 +0.074 -0.078 mag.
+colors alone give :math:`A_V` = 0.81 +0.35 -0.36 mag, and the spectrum and
+colors together give 0.49 +0.06 -0.06 mag.
 
 MultiNest
 =========

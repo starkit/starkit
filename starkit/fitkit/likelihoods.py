@@ -126,6 +126,10 @@ class PhotometryColorLikelihood(StarKitModel):
     """
     Gaussian likelihood of the colors between consecutive filters.
 
+    The colors share magnitudes, so their covariance has off-diagonal terms;
+    ln L = -chi^2 / 2 with that covariance equals the magnitude chi^2
+    minimized over a common offset of the magnitudes.
+
     Parameters
     ----------
     magnitudes : array
@@ -141,15 +145,20 @@ class PhotometryColorLikelihood(StarKitModel):
         super(PhotometryColorLikelihood, self).__init__()
         magnitudes, magnitude_uncertainties = _observed_magnitudes(
             magnitudes, magnitude_uncertainties)
-        self.colors = magnitudes[:-1] - magnitudes[1:]
-        self.color_uncertainties = np.sqrt(
-            magnitude_uncertainties[:-1]**2 + magnitude_uncertainties[1:]**2)
+        # Colors m_i - m_(i+1) as a matrix product. Adjacent colors share a
+        # magnitude, so their covariance is D diag(sigma^2) D^T, not diagonal.
+        n_filters = magnitudes.size
+        self.color_matrix = (np.eye(n_filters - 1, n_filters)
+                             - np.eye(n_filters - 1, n_filters, k=1))
+        self.colors = self.color_matrix @ magnitudes
+        covariance = (self.color_matrix * magnitude_uncertainties**2
+                      @ self.color_matrix.T)
+        self.color_uncertainties = np.sqrt(np.diag(covariance))
+        self.inverse_covariance = np.linalg.inv(covariance)
 
     def evaluate(self, photometry):
-        synth_colors = photometry[:-1] - photometry[1:]
-        loglikelihood = -0.5 * np.sum(((self.colors - synth_colors)
-                                       / self.color_uncertainties)**2)
-        return loglikelihood
+        residual = self.colors - self.color_matrix @ np.ravel(photometry)
+        return -0.5 * residual @ self.inverse_covariance @ residual
 
 
 class RelativePhotometryLikelihood(StarKitModel):

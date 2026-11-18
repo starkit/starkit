@@ -169,7 +169,8 @@ Observed magnitudes in a fit
 ============================
 
 ``PhotometryColorLikelihood`` compares the colors between consecutive
-filters, which do not depend on the flux scale of the grid.
+filters, which do not depend on the flux scale of the grid, using the
+covariance of adjacent colors, which share a magnitude.
 ``RelativePhotometryLikelihood`` compares the magnitudes themselves. Both
 take the observed magnitudes and their uncertainties, in the order of the
 filters::
