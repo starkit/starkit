@@ -178,6 +178,31 @@ To save a result and read it back::
 the result from the files of a run kept in ``run_dir``, with ``basename`` the
 directory and prefix, such as ``'fit1/specgrid_multinest'``.
 
+Photometry and a spectrum together
+==================================
+
+``assemble_model`` with both ``spectrum`` and ``filter_set`` returns a model
+whose outputs are the wavelength and flux of the model spectrum and the
+magnitudes. A likelihood operation for each part is joined with ``&``, and
+``Addition`` adds the two logarithms of the likelihood::
+
+    from starkit.fitkit.likelihoods import Addition, PhotometryColorLikelihood
+
+    sdss = ['SLOAN/SDSS.u', 'SLOAN/SDSS.g', 'SLOAN/SDSS.r', 'SLOAN/SDSS.i']
+    model = assemble_model(grid, spectrum=spectrum, filter_set=sdss,
+                           mag_type='ab', vrad=0., a_v=0., normalize_npol=3)
+    likelihood = model | (SpectralChi2Likelihood(spectrum)
+                          & PhotometryColorLikelihood(magnitudes,
+                                                      uncertainties)) | Addition()
+
+``magnitudes`` and ``uncertainties`` are the observed magnitudes and their
+uncertainties, in the order of the filters. The extinction ``a_v`` is applied
+to the magnitudes only. The example notebook
+:doc:`examples/photometry_spectroscopy_fit` fits a synthetic star with
+:math:`A_V` = 0.5 mag with its spectrum, its SDSS colors, and both: the
+colors alone give :math:`A_V` = 0.820 +0.319 -0.370 mag, and the spectrum and
+colors together give 0.478 +0.074 -0.078 mag.
+
 MultiNest
 =========
 
