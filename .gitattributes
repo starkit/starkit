@@ -1,0 +1,3 @@
+# FITS files can start with 8000 bytes of text header, so git would take them
+# for text and could convert their line endings.
+*.fits binary
