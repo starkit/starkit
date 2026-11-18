@@ -5,6 +5,8 @@
 # pip install -e '.[docs]'.
 
 import datetime
+import sys
+from unittest import mock
 
 from sphinx_astropy.conf.v1 import *  # noqa: F401,F403
 
@@ -37,6 +39,16 @@ https://github.com/starkit/starkit/tree/master/docs/{{ env.doc2path(env.docname,
 """
 
 nbsphinx_execute = 'never'
+
+# The API reference is generated from the docstrings, and automodapi imports
+# the modules when the build starts. The documentation is built without the
+# MultiNest library, so pymultinest is then replaced by a stand-in.
+try:
+    import pymultinest  # noqa: F401
+except ImportError:
+    sys.modules['pymultinest'] = mock.MagicMock()
+# Inheritance diagrams need Graphviz, which the documentation build lacks.
+automodapi_inheritance_diagram = False
 
 # -- Options for HTML output --------------------------------------------------
 

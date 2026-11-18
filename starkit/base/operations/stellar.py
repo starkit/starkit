@@ -2,7 +2,8 @@ from astropy import constants as const, units as u
 from astropy import modeling
 import scipy.ndimage as nd
 
-__all__ = ['RotationalBroadening', 'CCM89Extinction', 'DopplerShift']
+__all__ = ['RotationalBroadening', 'DopplerShift', 'RadialVelocity',
+           'CCM89Extinction', 'Distance']
 
 import numpy as np
 

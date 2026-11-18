@@ -14,7 +14,8 @@ from starkit.utils.spectral import prepare_observed, fwhm2sigma, sigma2fwhm
 
 from starkit.gridkit.util import convolve_to_resolution
 
-__all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate', 'Normalize']
+__all__ = ['InstrumentRConstant', 'InstrumentDeltaLambdaConstant', 'Interpolate',
+           'Normalize', 'NormalizeParts']
 
 class SpectrographOperationModel(InstrumentOperationModel):
     pass
