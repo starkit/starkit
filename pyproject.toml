@@ -30,9 +30,9 @@ dependencies = [
 grid_io = ["progressbar2", "sqlalchemy"]
 multinest = ["corner", "pymultinest"]
 parallel = ["ipyparallel", "psutil"]
-# Photometry needs wsynphot, which is not on PyPI and so cannot be an extra
-# (see docs/installation.rst).
-all = ["starkit[grid_io,multinest,parallel]"]
+# synphot provides the Vega spectrum for Vega magnitudes.
+photometry = ["synphot"]
+all = ["starkit[grid_io,multinest,parallel,photometry]"]
 test = ["pytest"]
 # ipython provides the syntax highlighting of the notebook code cells.
 docs = ["sphinx-astropy[confv1]", "nbsphinx", "ipython"]
@@ -49,6 +49,8 @@ include = ["starkit*"]
 
 [tool.setuptools.package-data]
 "starkit.gridkit.io.gaia" = ["data/*.csv"]
+# SVO filter curves used by the tests in place of downloads.
+"starkit.tests" = ["data/*.xml"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
