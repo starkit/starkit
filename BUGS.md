@@ -9,8 +9,7 @@ All entries were found on 2026-11-17 in StarKit 0.7 and are open.
 5. [InstrumentDeltaLambdaConstant with numpy 2.5](#instrumentdeltalambdaconstant-with-numpy-25)
 6. [Normalize warns about well-conditioned fits](#normalize-warns-about-well-conditioned-fits)
 7. [Gaia and Munari grid builders](#gaia-and-munari-grid-builders)
-8. [Distance and RadialVelocity are missing from `__all__`](#distance-and-radialvelocity-are-missing-from-__all__)
-9. [Bell characters in the PHOENIX and BOSZ bibtex](#bell-characters-in-the-phoenix-and-bosz-bibtex)
+8. [Bell characters in the PHOENIX and BOSZ bibtex](#bell-characters-in-the-phoenix-and-bosz-bibtex)
 
 [Checked and correct](#checked-and-correct) and [Not yet checked](#not-yet-checked)
 list related findings that are not bugs.
@@ -206,13 +205,6 @@ fluxes and wavelengths in the older layout without a `meta` table;
 `default_values` argument that `BaseSpectralGridIO.to_hdf` does not accept.
 Importing `starkit.gridkit.io.base` requires sqlalchemy (the `grid_io`
 extra). Fix: move these builders to `BaseProcessGrid`, or remove them.
-
-## Distance and RadialVelocity are missing from `__all__`
-
-`__all__` in `starkit/base/operations/stellar.py` lists `RotationalBroadening`,
-`CCM89Extinction` and `DopplerShift`, so
-`from starkit.base.operations.stellar import *` does not import `Distance` or
-`RadialVelocity`. Importing them by name works.
 
 ## Bell characters in the PHOENIX and BOSZ bibtex
 
