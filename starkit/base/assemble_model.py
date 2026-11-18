@@ -8,6 +8,17 @@ from starkit.base.operations.stellar import CCM89Extinction
 from starkit.fitkit.likelihoods import SpectralChi2Likelihood
 
 
+def _chain(*models):
+    """Combine the given models with ``|``, skipping those that are None."""
+    models = [model for model in models if model is not None]
+    if not models:
+        return None
+    chained = models[0]
+    for model in models[1:]:
+        chained = chained | model
+    return chained
+
+
 def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
                    normalize_npol=None, filter_set=None, mag_type='vega',
                    **kwargs):
@@ -94,8 +105,9 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
 
     if filter_set is not None:
         if 'a_v' in kwargs:
-            imager_operations = (CCM89Extinction(a_v=parameters.pop('a_v'))
-                                 | Photometry.from_grid(
+            extinction = CCM89Extinction(a_v=parameters.pop('a_v'),
+                                         r_v=parameters.pop('r_v', 3.1))
+            imager_operations = (extinction | Photometry.from_grid(
                 spectral_grid, filter_set=filter_set, mag_type=mag_type))
         else:
             imager_operations = Photometry.from_grid(
@@ -111,34 +123,12 @@ def assemble_model(spectral_grid=None, spectrum=None, normalize_parts=None,
 
 
     if imager_operations is not None and spectrograph_operations is not None:
-        if spectral_grid is not None:
-            starkit_model = spectral_grid | stellar_operations
-        else:
-            starkit_model = stellar_operations
-        starkit_model = starkit_model | DoubleSpectrum()
-        starkit_model = starkit_model | (spectrograph_operations &
-                                         imager_operations)
-    elif imager_operations is not None:
-        if spectral_grid is not None:
-            starkit_model = (spectral_grid | stellar_operations |
-                             imager_operations)
-        else:
-            starkit_model = (stellar_operations | imager_operations)
+        return _chain(spectral_grid, stellar_operations, DoubleSpectrum(),
+                      spectrograph_operations & imager_operations)
+    # At most one of the two is given.
+    return _chain(spectral_grid, stellar_operations, spectrograph_operations,
+                  imager_operations)
 
-    elif spectrograph_operations is not None:
-        if spectral_grid is not None:
-            starkit_model = (spectral_grid | stellar_operations
-                             | spectrograph_operations)
-        else:
-            starkit_model = (stellar_operations | spectrograph_operations)
-
-    else:
-        if spectral_grid is not None:
-            starkit_model = spectral_grid | stellar_operations
-        else:
-            starkit_model = stellar_operations
-
-    return starkit_model
 
 
 

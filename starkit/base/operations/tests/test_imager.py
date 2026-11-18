@@ -3,9 +3,7 @@
 import sys
 from types import SimpleNamespace
 
-import h5py
 import numpy as np
-import pandas as pd
 import pytest
 from astropy import constants as const
 from astropy import units as u
@@ -13,7 +11,6 @@ from astropy import units as u
 from starkit import filters
 from starkit.base.operations.imager import Photometry
 from starkit.filters import Filter
-from starkit.gridkit import load_grid
 
 FLAM = u.erg / (u.s * u.cm ** 2 * u.angstrom)
 WAVELENGTH = np.linspace(3500.0, 5500.0, 2001)
@@ -29,26 +26,10 @@ PHOTON_MEAN = ((5000.0 ** 3 - 4000.0 ** 3) / 3000.0
                / ((5000.0 ** 2 - 4000.0 ** 2) / 2.0))
 
 
-def _load_grid(path, flux, wavelength=WAVELENGTH):
-    """Write and load a grid whose four spectra are all ``flux``."""
-    meta = pd.Series({'parameters': ['teff', 'logg'], 'grid_type': 'log',
-                      'wavelength_unit': 'Angstrom',
-                      'wavelength_type': 'vacuum',
-                      'flux_unit': 'erg/s/cm^2/angstrom',
-                      'R': 3000.0, 'R_sampling': 4, 'format_version': 'v1.0'})
-    meta.to_hdf(path, key='meta')
-    pd.DataFrame({'teff': [5000.0, 5000.0, 6000.0, 6000.0],
-                  'logg': [4.0, 4.5, 4.0, 4.5]}).to_hdf(path, key='index')
-    pd.DataFrame({0: wavelength}).to_hdf(path, key='wavelength')
-    with h5py.File(path, 'a') as handle:
-        handle['fluxes'] = np.tile(flux, (4, 1))
-    return load_grid(path)
-
-
 @pytest.fixture
-def linear_grid(tmp_path):
+def linear_grid(make_grid):
     # f_lambda = lambda / 1000 Angstrom.
-    return _load_grid(tmp_path / 'grid.h5', WAVELENGTH / 1000.0)
+    return make_grid(WAVELENGTH / 1000.0, WAVELENGTH)
 
 
 def test_photometry_from_grid_gives_vega_magnitudes(flat_vega, linear_grid):
@@ -68,7 +49,7 @@ def test_photometry_without_grid_wavelengths_uses_the_spectrum(flat_vega):
         atol=1e-5)
 
 
-def test_photometry_needs_no_synphot(monkeypatch, tmp_path):
+def test_photometry_needs_no_synphot(monkeypatch, make_grid):
     # A None entry in sys.modules makes "import synphot" fail as if the
     # package were not installed.
     monkeypatch.setitem(sys.modules, 'synphot', None)
@@ -76,13 +57,13 @@ def test_photometry_needs_no_synphot(monkeypatch, tmp_path):
     try:
         f_nu_3631 = (3631 * u.Jy * const.c
                      / (WAVELENGTH * u.angstrom) ** 2).to_value(FLAM)
-        ab_grid = _load_grid(tmp_path / 'ab.h5', f_nu_3631)
+        ab_grid = make_grid(f_nu_3631, WAVELENGTH, name='ab.h5')
         ab = ab_grid | Photometry.from_grid(
             ab_grid, filter_set=[PHOTON_BOX, ENERGY_BOX], mag_type='ab')
         vega_wavelength, vega_flux = filters.vega_spectrum()
-        vega_grid = _load_grid(
-            tmp_path / 'vega.h5',
-            np.interp(WAVELENGTH, vega_wavelength, vega_flux))
+        vega_grid = make_grid(
+            np.interp(WAVELENGTH, vega_wavelength, vega_flux), WAVELENGTH,
+            name='vega.h5')
         vega = vega_grid | Photometry.from_grid(
             vega_grid, filter_set=[PHOTON_BOX, ENERGY_BOX], mag_type='vega')
         # On the 1 Angstrom grid the vertical edges of the box become
@@ -111,9 +92,8 @@ def test_photometry_rejects_unknown_magnitude_types():
         Photometry(filter_set=[PHOTON_BOX], mag_type='st')
 
 
-def test_filters_must_lie_within_the_grid(flat_vega, tmp_path):
+def test_filters_must_lie_within_the_grid(flat_vega, make_grid):
     wavelength = np.linspace(4500.0, 5500.0, 1001)
-    grid = _load_grid(tmp_path / 'grid.h5', np.ones(wavelength.size),
-                      wavelength=wavelength)
+    grid = make_grid(np.ones(wavelength.size), wavelength)
     with pytest.raises(ValueError, match='photon box'):
         Photometry.from_grid(grid, filter_set=[PHOTON_BOX])

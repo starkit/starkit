@@ -35,6 +35,36 @@ def svo(monkeypatch):
 
 
 @pytest.fixture
+def make_grid(tmp_path):
+    """
+    Return a function that writes and loads a grid of four models (teff 5000
+    and 6000 K, logg 4.0 and 4.5) whose spectra are all ``flux`` on
+    ``wavelength`` (Angstrom).
+    """
+    import h5py
+    import pandas as pd
+    from starkit.gridkit import load_grid
+
+    def make(flux, wavelength, name='grid.h5'):
+        path = tmp_path / name
+        meta = pd.Series({'parameters': ['teff', 'logg'], 'grid_type': 'log',
+                          'wavelength_unit': 'Angstrom',
+                          'wavelength_type': 'vacuum',
+                          'flux_unit': 'erg/s/cm^2/angstrom',
+                          'R': 3000.0, 'R_sampling': 4,
+                          'format_version': 'v1.0'})
+        meta.to_hdf(path, key='meta')
+        pd.DataFrame({'teff': [5000.0, 5000.0, 6000.0, 6000.0],
+                      'logg': [4.0, 4.5, 4.0, 4.5]}).to_hdf(path, key='index')
+        pd.DataFrame({0: wavelength}).to_hdf(path, key='wavelength')
+        with h5py.File(path, 'a') as handle:
+            handle['fluxes'] = np.tile(flux, (4, 1))
+        return load_grid(path)
+
+    return make
+
+
+@pytest.fixture
 def flat_vega(monkeypatch):
     """Replace the Vega spectrum by f_lambda = 1 from 1000 to 30000 Angstrom."""
     from starkit import filters
