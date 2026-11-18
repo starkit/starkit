@@ -102,17 +102,48 @@ class SpectralScaledChi2Likelihood(SpectralChi2Likelihood):
         else:
             return loglikelihood
 
+def _observed_magnitudes(magnitudes, magnitude_uncertainties):
+    """
+    Observed magnitudes and their uncertainties as arrays, from two arrays or
+    from an object with the attributes ``magnitudes`` and
+    ``magnitude_uncertainties``, such as a wsynphot ``MagnitudeSet``.
+    """
+    if magnitude_uncertainties is None:
+        if not hasattr(magnitudes, 'magnitude_uncertainties'):
+            raise TypeError('Give the magnitude_uncertainties of the '
+                            'observed magnitudes.')
+        magnitude_uncertainties = magnitudes.magnitude_uncertainties
+        magnitudes = magnitudes.magnitudes
+    magnitudes = np.asarray(magnitudes, float)
+    magnitude_uncertainties = np.asarray(magnitude_uncertainties, float)
+    if magnitudes.shape != magnitude_uncertainties.shape:
+        raise ValueError('magnitudes and magnitude_uncertainties must have '
+                         'the same shape')
+    return magnitudes, magnitude_uncertainties
+
+
 class PhotometryColorLikelihood(StarKitModel):
+    """
+    Gaussian likelihood of the colors between consecutive filters.
+
+    Parameters
+    ----------
+    magnitudes : array
+        observed magnitudes, in the order of the filters of the Photometry
+        operation; an object with the attributes ``magnitudes`` and
+        ``magnitude_uncertainties`` is also accepted
+    magnitude_uncertainties : array
+    """
     inputs = ('photometry',)
     outputs = ('loglikelihood',)
 
-    def __init__(self, magnitude_set):
+    def __init__(self, magnitudes, magnitude_uncertainties=None):
         super(PhotometryColorLikelihood, self).__init__()
-        self.colors = (magnitude_set.magnitudes[:-1] -
-                       magnitude_set.magnitudes[1:])
+        magnitudes, magnitude_uncertainties = _observed_magnitudes(
+            magnitudes, magnitude_uncertainties)
+        self.colors = magnitudes[:-1] - magnitudes[1:]
         self.color_uncertainties = np.sqrt(
-            magnitude_set.magnitude_uncertainties[:-1]**2
-            + magnitude_set.magnitude_uncertainties[1:]**2)
+            magnitude_uncertainties[:-1]**2 + magnitude_uncertainties[1:]**2)
 
     def evaluate(self, photometry):
         synth_colors = photometry[:-1] - photometry[1:]
@@ -122,14 +153,25 @@ class PhotometryColorLikelihood(StarKitModel):
 
 
 class RelativePhotometryLikelihood(StarKitModel):
+    """
+    Gaussian likelihood of the magnitudes.
+
+    Parameters
+    ----------
+    magnitudes : array
+        observed magnitudes, in the order of the filters of the Photometry
+        operation; an object with the attributes ``magnitudes`` and
+        ``magnitude_uncertainties`` is also accepted
+    magnitude_uncertainties : array
+    """
 
     inputs = ('photometry', )
     outputs = ('loglikelihood', )
 
-    def __init__(self, magnitude_set):
+    def __init__(self, magnitudes, magnitude_uncertainties=None):
         super(RelativePhotometryLikelihood, self).__init__()
-        self.magnitudes = magnitude_set.magnitudes
-        self.magnitude_uncertainties = magnitude_set.magnitude_uncertainties
+        self.magnitudes, self.magnitude_uncertainties = _observed_magnitudes(
+            magnitudes, magnitude_uncertainties)
 
     def evaluate(self, photometry):
         loglikelihood = -0.5 * np.sum(
