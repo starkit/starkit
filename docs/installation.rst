@@ -22,8 +22,9 @@ repository root::
     conda activate starkit
 
 This environment uses Python 3.10 and conda-forge packages. It includes the
-``grid_io``, ``multinest`` and ``parallel`` extras, the MultiNest library and
-pytest, and installs StarKit from the checkout in editable mode. conda-forge
+``grid_io``, ``multinest``, ``parallel`` and ``photometry`` extras, the
+MultiNest library and pytest, and installs StarKit from the checkout in
+editable mode. conda-forge
 has the MultiNest library for Linux on x86-64 and for macOS, but not for Linux
 on ARM or for Windows. On those platforms, remove ``multinest`` and
 ``pymultinest`` from ``environment.yml``, install pymultinest with pip, and
@@ -49,8 +50,11 @@ Optional features are installed as extras, for example
     MultiNest fitting and corner plots (pymultinest, corner).
 ``parallel``
     Distributed fitting with ipyparallel (ipyparallel, psutil).
+``photometry``
+    Vega magnitudes in synthetic photometry (synphot). synphot 1.8 and later
+    need Python 3.11 or later; with Python 3.10, pip installs synphot 1.7.0.
 ``all``
-    ``grid_io``, ``multinest`` and ``parallel``.
+    ``grid_io``, ``multinest``, ``parallel`` and ``photometry``.
 ``test``
     pytest, for running the test suite.
 ``docs``
@@ -74,17 +78,10 @@ library.
 Synthetic photometry
 ====================
 
-``Photometry`` needs wsynphot (https://github.com/starkit/wsynphot), which is
-not on PyPI and therefore cannot be a StarKit extra. As of November 2026 it
-does not install in a current environment:
-
-- its setup script imports ``imp``, which Python 3.12 removed;
-- with Python 3.11, the setup script fails because current setuptools no
-  longer provides ``pkg_resources``;
-- its code calls ``np.trapz``, which numpy 2.5 removed.
-
-Photometry can therefore be used only where wsynphot is already installed
-with numpy earlier than 2.5, until wsynphot is updated.
+``Photometry`` downloads filter curves from the SVO Filter Profile Service,
+and synphot downloads the spectrum of Vega from STScI, on first use. Both are
+kept in the astropy download cache, so later uses need no network
+connection. wsynphot is no longer used. See :doc:`photometry`.
 
 Running the tests
 =================
