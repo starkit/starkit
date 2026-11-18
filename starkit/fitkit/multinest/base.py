@@ -76,16 +76,16 @@ class MultiNestResult(object):
 
         Parameters
         ----------
-
-        basename: str
+        basename : str
             basename (path + prefix) for a multinest run
-
-        Keywords
-        --------
-        equal_weights - load the equally weighted chains instead
+        parameter_names : list of str
+            names of the fitted parameters, in the order of the columns
+        equal_weights : bool, optional
+            load the equally weighted chains instead [default False]
 
         Returns
-            : ~MultinestResult
+        -------
+        MultiNestResult
         """
         if equal_weights:
             posterior_data = cls.read_equal_posterior_data(basename, parameter_names)
@@ -118,8 +118,9 @@ class MultiNestResult(object):
         """
         Reading the posterior data into a pandas dataframe
 
-        Multinest weighted posterior file blah_.txt has the following format
-        weights, log likelihood, parameters
+        The weighted posterior file ``<basename>_.txt`` written by MultiNest
+        has the columns weight, -2 ln L (read into the column
+        ``loglikelihood``) and the parameters.
         """
 
         posterior_data = pd.read_csv(
@@ -219,12 +220,14 @@ class MultiNestResult(object):
         '''
         Produce a corner plot of the chains posterior.
 
-        Keywords
-        --------
-        parameters - a list of paramters to plot. By default, it will plot
-                     all fit parameters. This is useful if you run into problems
-                     where one of the fit paramters is fixed and corner.py does
-                     not work on it
+        Parameters
+        ----------
+        parameters : list of str, optional
+            parameters to plot; by default all fitted parameters. Giving a
+            list avoids problems with corner.py when one of the parameters
+            has a constant value.
+        **kwargs
+            passed to ``corner.corner``
         '''
         try:
             from corner import corner

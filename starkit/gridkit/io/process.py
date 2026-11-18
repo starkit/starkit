@@ -57,10 +57,11 @@ class BaseProcessGrid(object):
     def get_fluxes(self):
         """
         Load the fluxes from the files given in the raw index, process them, interpolate them and return them.
-        This return float64 arrays
+
         Returns
         -------
-            fluxes : numpy.ndarray
+        fluxes : numpy.ndarray
+            float64 array with one row per model
         """
         fluxes = np.empty((len(self.index), len(self.output_wavelength)), dtype=np.float64)
 
@@ -108,9 +109,10 @@ class BaseProcessGrid(object):
     def get_index(self):
         """
         Remove the filenames from the index
+
         Returns
         -------
-            : pandas DataFrame
+        pandas.DataFrame
         """
 
         index = self.index.copy()

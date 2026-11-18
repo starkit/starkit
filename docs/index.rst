@@ -12,6 +12,7 @@ techniques
     getting_started
     fitting
     photometry
+    api
 
 ------------
 Input/Output
