@@ -10,8 +10,8 @@ magnitudes are in the Vega or the AB system. The flux is taken to be
 observer; read :doc:`io/flux_units` before comparing the magnitudes of a grid
 with observed ones.
 
-Vega magnitudes need the ``photometry`` extra, which installs synphot (see
-:doc:`installation`). AB magnitudes need no extra package.
+No package beyond the StarKit requirements is needed; the Vega spectrum for
+Vega magnitudes is included with StarKit.
 
 Quick start
 ===========
@@ -128,12 +128,13 @@ Zero points
 ===========
 
 ``mag_type='vega'`` gives magnitudes relative to the spectrum of Vega, with
-Vega at 0 mag in every filter. The spectrum is the CALSPEC spectrum that
-synphot reads from ``synphot.conf.vega_file`` (``alpha_lyr_stis_011.fits``
-in synphot 1.9.0), downloaded on first use and kept in the astropy download
-cache. Its mean flux density is computed with the same integral as for the
-model spectrum. StarKit keeps the spectrum for the rest of the Python
-session; to use another one, set ``synphot.conf.vega_file`` and call
+Vega at 0 mag in every filter. The spectrum is the CALSPEC spectrum
+``alpha_lyr_stis_011.fits`` (Bohlin, Gordon & Tremblay 2014, PASP 126, 711),
+from 900 Å to 300 µm, which is included with StarKit; it is the default Vega
+spectrum of synphot 1.9.0. Its mean flux density is computed with the same
+integral as for the model spectrum. StarKit keeps the spectrum for the rest
+of the Python session; to use another CALSPEC spectrum, set
+``starkit.filters.VEGA_FILE`` to its path or URL and call
 ``starkit.filters.vega_spectrum.cache_clear()``.
 
 ``mag_type='ab'`` gives :math:`m = -2.5 \log_{10} (\langle f_\nu \rangle /
@@ -184,8 +185,9 @@ such as a wsynphot ``MagnitudeSet``, is also accepted.
 Accuracy
 ========
 
-The magnitudes from ``Photometry`` were compared with those of synphot's
-``Observation.effstim``, using the same SVO curves and Vega spectrum, for two
+The magnitudes from ``Photometry`` were compared with those of
+``Observation.effstim`` in synphot 1.9.0, using the same SVO curves and Vega
+spectrum, for two
 spectra: the spectrum of the example grid
 ``phoenix_t4000_10000_w3000_9000_r3000.h5`` at 6000 K, log g = 4.5 and
 [M/H] = 0, and a 3000 K blackbody tabulated from 0.9 to 6 µm.
@@ -226,9 +228,10 @@ that affect results are:
   Vega magnitudes computed with it differ from the present ones by
   -0.010 mag in ``Generic/Johnson.V``, -0.004 mag in ``SLOAN/SDSS.r`` and
   +0.020 mag in ``2MASS/2MASS.Ks`` (wsynphot minus present). Setting
-  ``synphot.conf.vega_file`` to
+  ``starkit.filters.VEGA_FILE`` to
   https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_mod_002.fits
-  reproduces the wsynphot zero points.
+  and calling ``starkit.filters.vega_spectrum.cache_clear()`` reproduces the
+  wsynphot zero points.
 - The detector type. wsynphot from October 2017 to January 2022 used the
   photon-counting integral for every curve, including the curves SVO lists
   as energy responses, such as the generic Johnson filters; earlier versions

@@ -32,8 +32,6 @@ dependencies:
   # parallel extra
   - ipyparallel
   - psutil
-  # photometry extra
-  - synphot
   # Tests
   - pytest
   - pip:

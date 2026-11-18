@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from astropy import constants as const
 from astropy import units as u
+from astropy.io import fits
 
 from starkit import filters
 from starkit.filters import Filter
@@ -114,14 +115,37 @@ def test_vega_zero_point_is_the_mean_flux_density_of_vega(monkeypatch):
     assert box.zero_point('vega') == pytest.approx(expected, rel=1e-6)
 
 
-def test_vega_zero_points_report_how_to_install_synphot(monkeypatch):
+def test_vega_spectrum_is_read_from_the_shipped_file(monkeypatch):
     # A None entry in sys.modules makes "import synphot" fail as if the
     # package were not installed.
     monkeypatch.setitem(sys.modules, 'synphot', None)
     filters.vega_spectrum.cache_clear()
-    with pytest.raises(ModuleNotFoundError, match=r"starkit\[photometry\]"):
-        Filter(BOX_WAVELENGTH, BOX).zero_point('vega')
+    try:
+        wavelength, flux = filters.vega_spectrum()
+    finally:
+        filters.vega_spectrum.cache_clear()
+    # CALSPEC alpha_lyr_stis_011.fits
+    assert wavelength.size == 9192
+    assert wavelength[0] == pytest.approx(900.452, rel=1e-6)
+    assert wavelength[-1] == pytest.approx(2993651.7, rel=1e-6)
+    assert np.interp(5556.0, wavelength, flux) == pytest.approx(3.4666e-9,
+                                                                rel=0.01)
+
+
+def test_vega_file_can_be_replaced(monkeypatch, tmp_path):
+    wavelength = np.linspace(1000.0, 30000.0, 2901)
+    path = tmp_path / 'flat_vega.fits'
+    fits.HDUList([fits.PrimaryHDU(), fits.BinTableHDU.from_columns([
+        fits.Column(name='WAVELENGTH', format='D', array=wavelength),
+        fits.Column(name='FLUX', format='E',
+                    array=np.full(wavelength.size, 2.0))])]).writeto(path)
+    monkeypatch.setattr(filters, 'VEGA_FILE', str(path))
     filters.vega_spectrum.cache_clear()
+    try:
+        assert Filter(BOX_WAVELENGTH, BOX).zero_point('vega') == (
+            pytest.approx(2.0))
+    finally:
+        filters.vega_spectrum.cache_clear()
 
 
 def test_filter_must_lie_within_the_spectrum():

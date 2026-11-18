@@ -30,9 +30,7 @@ dependencies = [
 grid_io = ["progressbar2", "sqlalchemy"]
 multinest = ["corner", "pymultinest"]
 parallel = ["ipyparallel", "psutil"]
-# synphot provides the Vega spectrum for Vega magnitudes.
-photometry = ["synphot"]
-all = ["starkit[grid_io,multinest,parallel,photometry]"]
+all = ["starkit[grid_io,multinest,parallel]"]
 test = ["pytest"]
 # ipython provides the syntax highlighting of the notebook code cells.
 docs = ["sphinx-astropy[confv1]", "nbsphinx", "ipython"]
@@ -48,6 +46,7 @@ version = { attr = "starkit.version.version" }
 include = ["starkit*"]
 
 [tool.setuptools.package-data]
+"starkit" = ["data/*.fits"]
 "starkit.gridkit.io.gaia" = ["data/*.csv"]
 # SVO filter curves used by the tests in place of downloads.
 "starkit.tests" = ["data/*.xml"]

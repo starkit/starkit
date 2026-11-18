@@ -22,11 +22,10 @@ To install with pip instead::
 
 Optional extras currently available::
 
-   all         grid_io, multinest, parallel and photometry together
+   all         grid_io, multinest and parallel together
    grid_io     Grid preparation helpers (progressbar2, sqlalchemy)
    multinest   MultiNest fitting and corner plots (pymultinest, corner)
    parallel    Distributed fitting helpers (ipyparallel, psutil)
-   photometry  Vega magnitudes in synthetic photometry (synphot)
    test        pytest
    docs        Sphinx, its extensions and IPython, for building the documentation
 
@@ -40,8 +39,8 @@ If you plan to use OpenMPI, also install ``mpi4py``::
    python -m pip install mpi4py
 
 Synthetic photometry (``Photometry``) downloads filter curves from the SVO
-Filter Profile Service. Vega magnitudes need the ``photometry`` extra
-(synphot); AB magnitudes need no extra package.
+Filter Profile Service. The Vega spectrum for Vega magnitudes is included
+with StarKit.
 
 
 Grid flux units

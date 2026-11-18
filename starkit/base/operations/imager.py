@@ -23,7 +23,7 @@ class Photometry(ImagerInstrumentOperation):
     filter_set : str, starkit.filters.Filter, or a list of them
         filters; strings are SVO filter IDs (see `starkit.filters.as_filters`)
     mag_type : str
-        'vega' (the default), which needs synphot, or 'ab'
+        'vega' (the default) or 'ab'
     grid_wavelength : astropy.units.Quantity or array, optional
         wavelengths of every spectrum the operation will receive, such as
         those of a grid; the filter curves are then interpolated onto them

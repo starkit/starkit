@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 from astropy import constants as const
 from astropy import units as u
-from astropy.io import votable
+from astropy.io import fits, votable
 from astropy.utils.data import clear_download_cache, download_file
 from scipy.integrate import trapezoid
 
@@ -37,13 +37,17 @@ DETECTOR_TYPES = {0: 'energy', 1: 'photon'}
 COVERAGE_LIMIT = 0.01
 
 
+# CALSPEC spectrum of Vega (Bohlin, Gordon & Tremblay 2014, PASP 126, 711),
+# from https://ssb.stsci.edu/trds/calspec/alpha_lyr_stis_011.fits. Another
+# CALSPEC FITS table, as a path or a URL, can be set here; call
+# vega_spectrum.cache_clear() after changing it.
+VEGA_FILE = str(Path(__file__).parent / 'data' / 'alpha_lyr_stis_011.fits')
+
+
 @lru_cache(maxsize=None)
 def vega_spectrum():
     """
-    Spectrum of Vega used for the Vega zero points, from synphot.
-
-    synphot downloads the CALSPEC spectrum named by ``synphot.conf.vega_file``
-    on first use and keeps it in the astropy download cache.
+    Spectrum of Vega used for the Vega zero points, read from `VEGA_FILE`.
 
     Returns
     -------
@@ -52,17 +56,10 @@ def vega_spectrum():
     flux : numpy.ndarray
         f_lambda in erg/(s cm2 Angstrom)
     """
-    try:
-        from synphot import SourceSpectrum, units as synphot_units
-    except ModuleNotFoundError as exc:
-        if exc.name != 'synphot':
-            raise
-        raise ModuleNotFoundError(
-            "Vega magnitudes need synphot. Install it with "
-            "pip install 'starkit[photometry]'.", name='synphot') from exc
-    vega = SourceSpectrum.from_vega()
-    wavelength = vega.waveset.to_value(u.angstrom)
-    return wavelength, vega(wavelength, flux_unit=synphot_units.FLAM).value
+    with fits.open(VEGA_FILE, cache=True) as hdus:
+        table = hdus[1].data
+        return (np.array(table['WAVELENGTH'], float),
+                np.array(table['FLUX'], float))
 
 
 class Filter(object):

@@ -68,18 +68,30 @@ def test_photometry_without_grid_wavelengths_uses_the_spectrum(flat_vega):
         atol=1e-5)
 
 
-def test_ab_magnitudes_do_not_need_synphot(monkeypatch, tmp_path):
+def test_photometry_needs_no_synphot(monkeypatch, tmp_path):
+    # A None entry in sys.modules makes "import synphot" fail as if the
+    # package were not installed.
     monkeypatch.setitem(sys.modules, 'synphot', None)
     filters.vega_spectrum.cache_clear()
-    f_nu_3631 = (3631 * u.Jy * const.c
-                 / (WAVELENGTH * u.angstrom) ** 2).to_value(FLAM)
-    grid = _load_grid(tmp_path / 'grid.h5', f_nu_3631)
-    model = grid | Photometry.from_grid(
-        grid, filter_set=[PHOTON_BOX, ENERGY_BOX], mag_type='ab')
-    # On the 1 Angstrom grid the vertical edges of the box become 1 Angstrom
-    # ramps, which changes the magnitudes by 3e-5.
-    np.testing.assert_allclose(model(), [0.0, 0.0], atol=1e-4)
-    filters.vega_spectrum.cache_clear()
+    try:
+        f_nu_3631 = (3631 * u.Jy * const.c
+                     / (WAVELENGTH * u.angstrom) ** 2).to_value(FLAM)
+        ab_grid = _load_grid(tmp_path / 'ab.h5', f_nu_3631)
+        ab = ab_grid | Photometry.from_grid(
+            ab_grid, filter_set=[PHOTON_BOX, ENERGY_BOX], mag_type='ab')
+        vega_wavelength, vega_flux = filters.vega_spectrum()
+        vega_grid = _load_grid(
+            tmp_path / 'vega.h5',
+            np.interp(WAVELENGTH, vega_wavelength, vega_flux))
+        vega = vega_grid | Photometry.from_grid(
+            vega_grid, filter_set=[PHOTON_BOX, ENERGY_BOX], mag_type='vega')
+        # On the 1 Angstrom grid the vertical edges of the box become
+        # 1 Angstrom ramps, which changes the magnitudes by 3e-5.
+        np.testing.assert_allclose(ab(), [0.0, 0.0], atol=1e-4)
+        # Vega has magnitude 0 in the Vega system.
+        np.testing.assert_allclose(vega(), [0.0, 0.0], atol=1e-4)
+    finally:
+        filters.vega_spectrum.cache_clear()
 
 
 def test_photometry_accepts_svo_ids_and_wsynphot_filters(svo, flat_vega):
