@@ -113,9 +113,9 @@ below; import each one from its module by name, for example
      - none
      - Converts the spectrum to magnitudes in a set of filters, assuming the
        flux is in erg s\ :sup:`-1` cm\ :sup:`-2` Å\ :sup:`-1` at the observer
-       (see :doc:`io/flux_units`). ``mag_type`` is ``'vega'`` or ``'ab'``.
-       It requires wsynphot (see :doc:`installation`); see
-       :doc:`/examples/starkit_photometry`.
+       (see :doc:`io/flux_units`). The filters are SVO filter IDs or
+       ``starkit.filters.Filter`` objects, and ``mag_type`` is ``'vega'`` or
+       ``'ab'``; see :doc:`photometry`.
 
 For example, a Doppler shift of 20 km/s::
 
@@ -187,10 +187,11 @@ distance, instrumental resolution, whatever the order of the keywords.
 operations with ``|``. Grid parameters are not accepted as keywords and stop
 ``assemble_model`` with a ``ValueError``; set them on the returned model.
 
-``assemble_model`` requires at least one stellar operation (``vrot``,
-``vrad``, ``a_v``, ``r_v`` or ``distance``). Without one it stops with
-``TypeError: object of type 'NoneType' has no len()``, also when ``R`` or
-``spectrum`` is given. Passing ``vrad=0.`` avoids this.
+Without the stellar keywords (``vrot``, ``vrad``, ``a_v``, ``r_v``,
+``distance``), ``assemble_model`` returns the grid itself, or the grid
+followed by the instrumental operations or ``Photometry``. When
+``filter_set`` is given, the extinction (``a_v`` and ``r_v``) is applied to
+the magnitudes only, not to a spectrum.
 
 Comparing a model with an observed spectrum
 ===========================================

@@ -5,13 +5,12 @@ All entries were found on 2026-11-17 in StarKit 0.7 and are open.
 1. [Grid flux units and operations that need absolute fluxes](#grid-flux-units-and-operations-that-need-absolute-fluxes)
 2. [PHOENIX grids have half the resolving power in their metadata](#phoenix-grids-have-half-the-resolving-power-in-their-metadata)
 3. [Pollux grid builder](#pollux-grid-builder)
-4. [assemble_model without a stellar operation](#assemble_model-without-a-stellar-operation)
-5. [The loglikelihood column of MultiNest results holds -2 ln L](#the-loglikelihood-column-of-multinest-results-holds--2-ln-l)
-6. [InstrumentDeltaLambdaConstant with numpy 2.5](#instrumentdeltalambdaconstant-with-numpy-25)
-7. [Normalize warns about well-conditioned fits](#normalize-warns-about-well-conditioned-fits)
-8. [Gaia and Munari grid builders](#gaia-and-munari-grid-builders)
-9. [Distance and RadialVelocity are missing from `__all__`](#distance-and-radialvelocity-are-missing-from-__all__)
-10. [Bell characters in the PHOENIX and BOSZ bibtex](#bell-characters-in-the-phoenix-and-bosz-bibtex)
+4. [The loglikelihood column of MultiNest results holds -2 ln L](#the-loglikelihood-column-of-multinest-results-holds--2-ln-l)
+5. [InstrumentDeltaLambdaConstant with numpy 2.5](#instrumentdeltalambdaconstant-with-numpy-25)
+6. [Normalize warns about well-conditioned fits](#normalize-warns-about-well-conditioned-fits)
+7. [Gaia and Munari grid builders](#gaia-and-munari-grid-builders)
+8. [Distance and RadialVelocity are missing from `__all__`](#distance-and-radialvelocity-are-missing-from-__all__)
+9. [Bell characters in the PHOENIX and BOSZ bibtex](#bell-characters-in-the-phoenix-and-bosz-bibtex)
 
 [Checked and correct](#checked-and-correct) and [Not yet checked](#not-yet-checked)
 list related findings that are not bugs.
@@ -172,15 +171,6 @@ problems.
   Nothing checks that a flux array and the wavelength array have the same
   length. Fix: check the lengths in `BaseProcessGrid.get_fluxes`, and rename
   the caches (`.v2.npy`) so that caches from older code are not reused.
-
-## assemble_model without a stellar operation
-
-`assemble_model` combines the grid with the stellar operations before the
-instrumental ones, without checking that there is a stellar operation. Without
-`vrot`, `vrad`, `a_v`, `r_v` or `distance` it stops with
-`TypeError: object of type 'NoneType' has no len()`, also when `R` or
-`spectrum` is given, for example `assemble_model(grid, spectrum=s,
-normalize_npol=3)`. Workaround: pass `vrad=0.`.
 
 ## The loglikelihood column of MultiNest results holds -2 ln L
 

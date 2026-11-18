@@ -74,17 +74,10 @@ library.
 Synthetic photometry
 ====================
 
-``Photometry`` needs wsynphot (https://github.com/starkit/wsynphot), which is
-not on PyPI and therefore cannot be a StarKit extra. As of November 2026 it
-does not install in a current environment:
-
-- its setup script imports ``imp``, which Python 3.12 removed;
-- with Python 3.11, the setup script fails because current setuptools no
-  longer provides ``pkg_resources``;
-- its code calls ``np.trapz``, which numpy 2.5 removed.
-
-Photometry can therefore be used only where wsynphot is already installed
-with numpy earlier than 2.5, until wsynphot is updated.
+``Photometry`` downloads filter curves from the SVO Filter Profile Service on
+first use and keeps them in the astropy download cache, so later uses need no
+network connection. The Vega spectrum used for Vega magnitudes is included
+with StarKit. wsynphot is no longer used. See :doc:`photometry`.
 
 Running the tests
 =================

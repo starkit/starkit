@@ -11,6 +11,7 @@ techniques
     installation
     getting_started
     fitting
+    photometry
 
 ------------
 Input/Output

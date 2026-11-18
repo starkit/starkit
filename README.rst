@@ -38,9 +38,9 @@ If you plan to use OpenMPI, also install ``mpi4py``::
 
    python -m pip install mpi4py
 
-Synthetic photometry (``Photometry``) needs ``wsynphot``, which is not on PyPI
-and does not currently install with recent Python, setuptools and numpy
-versions; see the installation instructions in the documentation.
+Synthetic photometry (``Photometry``) downloads filter curves from the SVO
+Filter Profile Service. The Vega spectrum for Vega magnitudes is included
+with StarKit.
 
 
 Grid flux units
