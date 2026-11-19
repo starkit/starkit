@@ -68,22 +68,22 @@ page on grid flux units give the details and a workaround.
 Citing StarKit
 **************
 
-If you use StarKit in published work, please cite the StarKit release on
-Zenodo:
+If you use StarKit in published work, please cite it with its Zenodo DOI.
+The DOI covers all versions of StarKit and resolves to the newest version
+archived on Zenodo:
 
-   Kerzendorf, W., & Do, T. 2015, Starkit: second release (version 0.3),
-   Zenodo, https://doi.org/10.5281/zenodo.1117920
+   Kerzendorf, W., & Do, T. 2015, Starkit: second release, Zenodo,
+   https://doi.org/10.5281/zenodo.592485
 
 In BibTeX::
 
    @misc{starkit,
      author    = {Kerzendorf, Wolfgang and Do, Tuan},
      title     = {Starkit: second release},
-     version   = {0.3},
      publisher = {Zenodo},
      year      = {2015},
-     doi       = {10.5281/zenodo.1117920},
-     url       = {https://doi.org/10.5281/zenodo.1117920}
+     doi       = {10.5281/zenodo.592485},
+     url       = {https://doi.org/10.5281/zenodo.592485}
    }
 
 If you use one of the test grids at
