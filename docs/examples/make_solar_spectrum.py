@@ -75,7 +75,7 @@ def smooth_to_resolution(wavelength, flux, output_wavelength, resolution,
     At each output wavelength, the result is the mean of the input points
     within five standard deviations, weighted with a Gaussian of FWHM
     sqrt((lambda / resolution)**2 - input_fwhm**2), so that a line of FWHM
-    input_fwhm has FWHM lambda / resolution afterwards.
+    input_fwhm has FWHM lambda / resolution afterward.
 
     Parameters
     ----------
