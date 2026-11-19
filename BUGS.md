@@ -134,6 +134,16 @@ gives a FWHM of 1.000 Angstrom (R = 5000) with `pre_sampling=2` and
 2017-12-19 (f9a8ea8), so PHOENIX grids built with the defaults since then are
 probably affected; their metadata does not record `pre_sampling`.
 
+The test grid `docs/examples/phoenix_t4000_10000_w3000_9000_r3000.h5`,
+labeled R = 3000, has R = 1500 (measured 2026-11-18). Its spectrum at 5600 K,
+log g = 4.0 and [M/H] = 0.0 differs from the PHOENIX HiRes spectrum of the
+same model in `starkit/gridkit/io/tests/data`, smoothed with a Gaussian to
+constant R, by 0.29 % rms at R = 1400, 0.07 % at R = 1500, 0.29 % at R = 1600
+and 3.4 % at R = 3000 (4000 to 8000 Angstrom, after division by a polynomial
+of degree 5). An observed spectrum fitted with this grid should therefore
+have R = 1500 or less; the solar spectrum `starkit/data/sun_kurucz2005_r1500.fits`
+is smoothed to R = 1500 for this reason.
+
 Fitted parameters that set the line widths (`vrot`, an instrumental `R`)
 absorb the extra width, so they are biased; `InstrumentRConstant` computes its
 kernel from the `R` in the metadata and leaves the model broader than
