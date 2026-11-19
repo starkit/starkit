@@ -12,7 +12,6 @@ techniques
     getting_started
     fitting
     photometry
-    api
 
 ------------
 Input/Output
@@ -31,3 +30,12 @@ Examples
     :maxdepth: 2
 
     examples/index.rst
+
+-------------
+API Reference
+-------------
+
+.. toctree::
+    :maxdepth: 2
+
+    api

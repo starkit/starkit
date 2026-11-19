@@ -65,10 +65,34 @@ colors, do not depend on the flux scale. ``BUGS.md`` and the documentation
 page on grid flux units give the details and a workaround.
 
 
+Citing StarKit
+**************
+
+If you use StarKit in published work, please cite the StarKit release on
+Zenodo:
+
+   Kerzendorf, W., & Do, T. 2015, Starkit: second release (version 0.3),
+   Zenodo, https://doi.org/10.5281/zenodo.1117920
+
+In BibTeX::
+
+   @misc{starkit,
+     author    = {Kerzendorf, Wolfgang and Do, Tuan},
+     title     = {Starkit: second release},
+     version   = {0.3},
+     publisher = {Zenodo},
+     year      = {2015},
+     doi       = {10.5281/zenodo.1117920},
+     url       = {https://doi.org/10.5281/zenodo.1117920}
+   }
+
+If you use one of the test grids at
+https://starkit.github.io/starkit/io/available_grids.html, please also cite
+the model grid it was made from (such as PHOENIX).
+
+
 Example publications that use StarKit
 **************************************
 
 - Do, Tuan; Kerzendorf, Wolfgang; Konopacky, Quinn; Marcinik, Joseph M.; Ghez, Andrea; Lu, Jessica R.; Morris, Mark R., `Super-solar Metallicity Stars in the Galactic Center Nuclear Star Cluster: Unusual Sc, V, and Y Abundances <https://ui.adsabs.harvard.edu/#abs/2018ApJ...855L...5D/abstract>`_
 - Feldmeier-Krause, A.; Kerzendorf, W.; Neumayer, N.; Schödel, R.; Nogueras-Lara, F.; Do, T.; de Zeeuw, P. T.; Kuntschner, H., `KMOS view of the Galactic Centre - II. Metallicity distribution of late-type stars <https://ui.adsabs.harvard.edu/#abs/2017MNRAS.464..194F/abstract>`_
-
-A few test grids can be found at https://starkit.github.io/starkit/io/available_grids.html. If you use any of these grids, please make sure that the grid from which it is created (like Phoenix grid) is also cited.
