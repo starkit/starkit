@@ -4,13 +4,16 @@ the example solar_spectrum_fit.ipynb.
 The source is the solar irradiance atlas of Kurucz (2005), described in
 Kurucz, R. L. 2006, arXiv:astro-ph/0605029: 300 to 1000 nm sampled every
 0.025 nm, broadened with a Gaussian of 0.05 nm FWHM, in W m-2 nm-1, calibrated
-to Thuillier et al. (2004), with the telluric lines divided out and the
-gravitational redshift removed.
+to Thuillier et al. (2004), with the telluric lines divided out.
 
-The wavelengths of the atlas file are vacuum wavelengths. The atlas poster
-says the scans were joined in air, but the file was made from the wavenumber
-file, and the cores of Na D1, Na D2, H alpha, H beta and Mg b 5183 lie within
-1.6 km/s of their vacuum wavelengths and 84 km/s from their air wavelengths.
+The atlas poster (irrad.ps in the same directory as the atlas) describes the
+irradiance spectrum, its Figures 8 and 10, as being in the solar laboratory
+frame, in vacuum, with the gravitational redshift (0.64 km/s) included. The
+vacuum wavelengths are confirmed by the line positions: the cores of Na D1,
+Na D2, H alpha, H beta and Mg b 5183 lie within 3 km/s of their vacuum
+wavelengths and 82 to 85 km/s from their air wavelengths. (The poster's
+"in air, gravitational redshift removed" refers to the flux atlas, its
+Figure 4.)
 
 The atlas is smoothed to R = 1500, the resolving power of the test grid
 phoenix_t4000_10000_w3000_9000_r3000.h5 (labeled R = 3000; see BUGS.md), and
@@ -163,11 +166,13 @@ def main():
     table.meta['RESOLUTN'] = RESOLUTION
     table.meta['HISTORY'] = [
         'Solar irradiance atlas of Kurucz (2005), 300-1000 nm, calibrated to',
-        'Thuillier et al. (2004), telluric lines divided out, gravitational',
-        'redshift removed. Vacuum wavelengths (line cores within 1.6 km/s of',
-        'their vacuum wavelengths). Smoothed with a Gaussian to R = 1500',
-        '(R = lambda / FWHM), taking the 0.05 nm FWHM broadening of the atlas',
-        'file into account, and sampled on the wavelengths of the test grid',
+        'Thuillier et al. (2004), telluric lines divided out. Vacuum',
+        'wavelengths in the solar laboratory frame with the gravitational',
+        'redshift included (atlas poster, Figures 8 and 10); line cores lie',
+        'within 3 km/s of their vacuum wavelengths. Smoothed with a Gaussian',
+        'to R = 1500 (R = lambda / FWHM), taking the 0.05 nm FWHM broadening',
+        'of the atlas file into account, and sampled on the wavelengths of the',
+        'test grid',
         'phoenix_t4000_10000_w3000_9000_r3000.h5 (labeled R = 3000, effective',
         'R = 1500). Made with docs/examples/make_solar_spectrum.py.',
     ]

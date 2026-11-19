@@ -38,3 +38,6 @@ def test_solar_spectrum_header():
     assert header['WAVETYPE'] == 'vacuum'
     assert header['RESOLUTN'] == 1500
     assert 'Kurucz' in header['REFERENC']
+    # The irradiance atlas keeps the gravitational redshift of the Sun.
+    history = ' '.join(header['HISTORY'])
+    assert 'gravitational redshift included' in history.replace('  ', ' ')

@@ -37,7 +37,7 @@ If you don't prefer to create a grid on your own, you can use any of the followi
 
    * - `phoenix_t4000_10000_w3000_9000_r3000 <https://zenodo.org/record/2557923>`_
      - Phoenix
-     - 3000
+     - 1500 (labeled 3000)
      - 3000
      - 9000
      - 4000
@@ -62,3 +62,9 @@ If you don't prefer to create a grid on your own, you can use any of the followi
      - 1.0
      - -0.4
      - 1.0
+
+The resolution of ``phoenix_t4000_10000_w3000_9000_r3000`` is the measured
+resolving power, half of the value in its name and metadata, because of a bug
+in the PHOENIX grid builder described in ``BUGS.md``. The resolutions of the
+other two PHOENIX grids are the values in their metadata and have not been
+measured; grids built with the same builder may also have half that value.
