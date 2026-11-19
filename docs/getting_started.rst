@@ -11,8 +11,10 @@ StarKit computes a model spectrum by interpolating linearly between the
 spectra of a model grid stored in an HDF5 file. :doc:`io/available_grids`
 lists grids that can be downloaded, and :ref:`io` describes how to build one.
 The examples on this page use ``phoenix_t4000_10000_w3000_9000_r3000.h5``, a
-PHOENIX grid with resolving power :math:`R = 3000` from 3000 to 9000 Å, which
-is also in the ``docs/examples`` directory of the repository::
+PHOENIX grid from 3000 to 9000 Å, which is also in the ``docs/examples``
+directory of the repository. Its metadata gives a resolving power
+:math:`R = 3000`, but its spectra have :math:`R = 1500`, the result of a bug
+in the PHOENIX grid builder described in ``BUGS.md``::
 
     >>> from starkit.gridkit import load_grid
     >>> grid = load_grid('phoenix_t4000_10000_w3000_9000_r3000.h5',
